@@ -1,4 +1,5 @@
 export interface AcademicStatus {
+  id?: string;
   name: string;
   shortName: string;
 }
