@@ -4,9 +4,8 @@ import {
   readEntities,
   updateEntityApi,
 } from '../api/apiCalls';
-import { AcademicStatus, AcademicStatusId } from '../interfaces/AcademicStatus';
 import CommonForm from './CommonForm';
-import { Teacher } from '../interfaces/Teacher';
+import { AcademicStatus, Teacher } from '../types/types';
 
 const academicStatusFormFields = {
   name: { label: 'Name', type: 'text' },
@@ -80,7 +79,7 @@ export const CreateTeacherForm = () =>
         firstName: obj.firstName || '',
         surname: obj.surname || '',
         patronymic: obj.patronymic || '',
-        academicStatus: obj.academicStatus || ({} as AcademicStatusId),
+        academicStatus: obj.academicStatus || ({} as AcademicStatus),
       };
       return await createEntityApi(newTeacher, ENDPOINTS.teacher);
     },
@@ -97,7 +96,7 @@ export const UpdateTeacherForm = () =>
         firstName: obj.firstName || '',
         surname: obj.surname || '',
         patronymic: obj.patronymic || '',
-        academicStatus: obj.academicStatus || ({} as AcademicStatusId),
+        academicStatus: obj.academicStatus || ({} as AcademicStatus),
       };
       return await createEntityApi(newTeacher, ENDPOINTS.teacher);
     },
