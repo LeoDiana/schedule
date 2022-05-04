@@ -26,6 +26,31 @@ export const createAcademicStatus = async (
   }
 };
 
+export const updateAcademicStatus = async (
+  academicStatus: AcademicStatus
+): Promise<string> => {
+  try {
+    const response = await axios.put(
+      `academic-status/${academicStatus.id}`,
+      academicStatus
+    );
+    return SUCCESS_MESSAGE;
+  } catch (error) {
+    console.log(error);
+    return ERROR_MESSAGE;
+  }
+};
+
+export const deleteAcademicStatus = async (id: string): Promise<string> => {
+  try {
+    const response = await axios.delete(`academic-status/${id}`);
+    return SUCCESS_MESSAGE;
+  } catch (error) {
+    console.log(error);
+    return ERROR_MESSAGE;
+  }
+};
+
 export const createTeacher = async (teacher: Teacher): Promise<string> => {
   try {
     const response = await axios.post("teachers", teacher);
