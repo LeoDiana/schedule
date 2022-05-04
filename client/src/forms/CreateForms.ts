@@ -1,8 +1,8 @@
-import CreateOnlyTextEntityForm from "./CreateOnlyTextEntityForm";
 import {
   createAcademicStatus,
   createTeacher,
   readAllAcademicStatuses,
+  updateAcademicStatus,
 } from "../api/apiCalls";
 import { AcademicStatus, AcademicStatusId } from "../interfaces/AcademicStatus";
 import CommonForm from "./CommonForm";
@@ -24,6 +24,27 @@ export const CreateAcademicStatusForm = () =>
       return await createAcademicStatus(newAcademicStatus);
     },
   });
+
+export const UpdateAcademicStatusForm = (obj: AcademicStatus) =>
+  CommonForm(
+    {
+      title: "Update academic status",
+      type: "update",
+      fields: {
+        name: { label: "Name", type: "text" },
+        shortName: { label: "Short name", type: "text" },
+      },
+      apiCall: async (obj: AcademicStatus) => {
+        const newAcademicStatus = {
+          id: obj.id || "",
+          name: obj.name || "",
+          shortName: obj.shortName || "",
+        };
+        return await updateAcademicStatus(newAcademicStatus);
+      },
+    },
+    obj
+  );
 
 export const CreateTeacherForm = () =>
   CommonForm({
