@@ -36,7 +36,7 @@ const createFormValidationSchema = (fields) => {
 };
 
 // this is common form for creating and updating entities
-const CommonForm = (formScheme) => {
+const CommonForm = (formScheme, obj) => {
   const [entityFieldsData, setEntityFieldsData] = useState({});
 
   useEffect(() => {
@@ -61,11 +61,12 @@ const CommonForm = (formScheme) => {
     type: "",
   });
 
-  let initialValues = createFormInitialValues(formScheme.fields);
-  let validationSchema = createFormValidationSchema(formScheme.fields);
+  const initialValues = obj || createFormInitialValues(formScheme.fields) || {};
+  const validationSchema = createFormValidationSchema(formScheme.fields);
 
   const apiCall = async (data, resetForm) => {
-    const response = await formScheme.apiCall(data);
+    const newEntity = obj ? { id: obj.id, ...data } : data;
+    const response = await formScheme.apiCall(newEntity);
     if (response === ERROR_MESSAGE) {
       setFormStatus(formStatusProps.error);
     } else if (response === SUCCESS_MESSAGE) {
@@ -78,6 +79,8 @@ const CommonForm = (formScheme) => {
   return (
     <div>
       <Formik
+        enableReinitialize
+        key={initialValues}
         initialValues={initialValues}
         onSubmit={(values, actions) => {
           apiCall(values, actions.resetForm);
