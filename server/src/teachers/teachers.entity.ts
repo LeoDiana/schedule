@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { AcademicStatus } from '../academic-status/academic-status.entity';
+import { AcademicStatus } from '../academic-statuses/academic-statuses.entity';
 
 @Entity()
 export class Teacher {

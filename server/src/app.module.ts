@@ -4,13 +4,13 @@ import { AppService } from './app.service';
 import { LessonsModule } from './lessons/lessons.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AcademicStatusModule } from './academic-status/academic-status.module';
+import { AcademicStatusesModule } from './academic-statuses/academic-statuses.module';
 
 @Module({
   imports: [
     LessonsModule,
     TeachersModule,
-    AcademicStatusModule,
+    AcademicStatusesModule,
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'db',

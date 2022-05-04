@@ -7,12 +7,12 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { AcademicStatusService } from './academic-status.service';
-import { AcademicStatus } from '../academic-status.entity';
+import { AcademicStatusesService } from './academic-statuses.service';
+import { AcademicStatus } from '../academic-statuses.entity';
 
-@Controller('academic-status')
-export class AcademicStatusController {
-  constructor(private academicStatusService: AcademicStatusService) {}
+@Controller('academic-statuses')
+export class AcademicStatusesController {
+  constructor(private academicStatusService: AcademicStatusesService) {}
 
   @Get()
   async findAll(): Promise<AcademicStatus[]> {

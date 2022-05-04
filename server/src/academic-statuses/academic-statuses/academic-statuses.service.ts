@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AcademicStatus } from '../academic-status.entity';
+import { AcademicStatus } from '../academic-statuses.entity';
 
 @Injectable()
-export class AcademicStatusService {
+export class AcademicStatusesService {
   constructor(
     @InjectRepository(AcademicStatus)
     private academicStatusRepository: Repository<AcademicStatus>,
