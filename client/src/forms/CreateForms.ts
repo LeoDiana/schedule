@@ -3,14 +3,14 @@ import {
   ENDPOINTS,
   readEntities,
   updateEntityApi,
-} from "../api/apiCalls";
-import { AcademicStatus, AcademicStatusId } from "../interfaces/AcademicStatus";
-import CommonForm from "./CommonForm";
-import { Teacher } from "../interfaces/Teacher";
+} from '../api/apiCalls';
+import { AcademicStatus, AcademicStatusId } from '../interfaces/AcademicStatus';
+import CommonForm from './CommonForm';
+import { Teacher } from '../interfaces/Teacher';
 
 const academicStatusFormFields = {
-  name: { label: "Name", type: "text" },
-  shortName: { label: "Short name", type: "text" },
+  name: { label: 'Name', type: 'text' },
+  shortName: { label: 'Short name', type: 'text' },
 };
 
 const academicStatusShortShownName = (obj: AcademicStatus) => {
@@ -19,13 +19,13 @@ const academicStatusShortShownName = (obj: AcademicStatus) => {
 
 export const CreateAcademicStatusForm = () =>
   CommonForm({
-    title: "Create academic status",
-    type: "create",
+    title: 'Create academic status',
+    type: 'create',
     fields: academicStatusFormFields,
     apiCall: async (obj: AcademicStatus) => {
       const newAcademicStatus = {
-        name: obj.name || "",
-        shortName: obj.shortName || "",
+        name: obj.name || '',
+        shortName: obj.shortName || '',
       };
       return await createEntityApi(newAcademicStatus, ENDPOINTS.academicStatus);
     },
@@ -34,31 +34,31 @@ export const CreateAcademicStatusForm = () =>
 export const UpdateAcademicStatusForm = (obj: AcademicStatus) =>
   CommonForm(
     {
-      title: "Update academic status",
-      type: "update",
+      title: 'Update academic status',
+      type: 'update',
       fields: academicStatusFormFields,
       apiCall: async (obj: AcademicStatus) => {
         const newAcademicStatus = {
-          id: obj.id || "",
-          name: obj.name || "",
-          shortName: obj.shortName || "",
+          id: obj.id || '',
+          name: obj.name || '',
+          shortName: obj.shortName || '',
         };
         return await updateEntityApi(
           newAcademicStatus,
-          ENDPOINTS.academicStatus
+          ENDPOINTS.academicStatus,
         );
       },
     },
-    obj
+    obj,
   );
 
 const teacherFormFields = {
-  firstName: { label: "First name", type: "text" },
-  surname: { label: "Surname", type: "text" },
-  patronymic: { label: "Patronymic", type: "text" },
+  firstName: { label: 'First name', type: 'text' },
+  surname: { label: 'Surname', type: 'text' },
+  patronymic: { label: 'Patronymic', type: 'text' },
   academicStatus: {
-    label: "Academic status",
-    type: "entity",
+    label: 'Academic status',
+    type: 'entity',
     getEntitiesForList: async () => {
       return await readEntities(ENDPOINTS.academicStatus);
     },
@@ -72,14 +72,14 @@ const teacherShortShownName = (obj: Teacher) => {
 
 export const CreateTeacherForm = () =>
   CommonForm({
-    title: "Create teacher",
-    type: "create",
+    title: 'Create teacher',
+    type: 'create',
     fields: teacherFormFields,
     apiCall: async (obj: Teacher) => {
       const newTeacher = {
-        firstName: obj.firstName || "",
-        surname: obj.surname || "",
-        patronymic: obj.patronymic || "",
+        firstName: obj.firstName || '',
+        surname: obj.surname || '',
+        patronymic: obj.patronymic || '',
         academicStatus: obj.academicStatus || ({} as AcademicStatusId),
       };
       return await createEntityApi(newTeacher, ENDPOINTS.teacher);
@@ -88,15 +88,15 @@ export const CreateTeacherForm = () =>
 
 export const UpdateTeacherForm = () =>
   CommonForm({
-    title: "Update teacher",
-    type: "update",
+    title: 'Update teacher',
+    type: 'update',
     fields: teacherFormFields,
     apiCall: async (obj: Teacher) => {
       const newTeacher = {
-        id: obj.id || "",
-        firstName: obj.firstName || "",
-        surname: obj.surname || "",
-        patronymic: obj.patronymic || "",
+        id: obj.id || '',
+        firstName: obj.firstName || '',
+        surname: obj.surname || '',
+        patronymic: obj.patronymic || '',
         academicStatus: obj.academicStatus || ({} as AcademicStatusId),
       };
       return await createEntityApi(newTeacher, ENDPOINTS.teacher);

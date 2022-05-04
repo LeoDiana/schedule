@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Button, Grid, MenuItem, Select, TextField } from "@mui/material";
-import { Form, Formik } from "formik";
-import * as Yup from "yup";
+import React, { useEffect, useState } from 'react';
+import { Button, Grid, MenuItem, Select, TextField } from '@mui/material';
+import { Form, Formik } from 'formik';
+import * as Yup from 'yup';
 
-import { ERROR_MESSAGE, SUCCESS_MESSAGE } from "../api/apiCalls";
-import { formStatusProps } from "./common";
+import { ERROR_MESSAGE, SUCCESS_MESSAGE } from '../api/apiCalls';
+import { formStatusProps } from './common';
 
 /*
 TODO config form status
@@ -13,7 +13,7 @@ TODO add error message in validation form
 
 const createFormInitialValues = (fields) => {
   const initialValues = {};
-  Object.keys(fields).forEach((fieldName) => (initialValues[fieldName] = ""));
+  Object.keys(fields).forEach((fieldName) => (initialValues[fieldName] = ''));
   return initialValues;
 };
 
@@ -21,13 +21,13 @@ const createFormValidationSchema = (fields) => {
   let validationSchema = {};
   Object.keys(fields).forEach((fieldName) => {
     switch (fields[fieldName].type) {
-      case "text":
+      case 'text':
         validationSchema[fieldName] = Yup.string().required();
         break;
-      case "number":
+      case 'number':
         validationSchema[fieldName] = Yup.number().required();
         break;
-      case "entity":
+      case 'entity':
         validationSchema[fieldName] = Yup.object().required();
         break;
     }
@@ -43,7 +43,7 @@ const CommonForm = (formScheme, obj) => {
     const fetchedEntities = {};
     const fetchData = async () => {
       Object.keys(formScheme.fields)
-        .filter((fieldName) => formScheme.fields[fieldName].type === "entity")
+        .filter((fieldName) => formScheme.fields[fieldName].type === 'entity')
         .map(async (fieldName) => {
           fetchedEntities[fieldName] = await formScheme.fields[
             fieldName
@@ -57,8 +57,8 @@ const CommonForm = (formScheme, obj) => {
 
   const [displayFormStatus, setDisplayFormStatus] = useState(false);
   const [formStatus, setFormStatus] = useState({
-    message: "",
-    type: "",
+    message: '',
+    type: '',
   });
 
   const initialValues = obj || createFormInitialValues(formScheme.fields) || {};
@@ -107,8 +107,8 @@ const CommonForm = (formScheme, obj) => {
                   <Grid key={fieldName} item lg={10} md={10} sm={10} xs={10}>
                     {(() => {
                       if (
-                        formScheme.fields[fieldName].type === "text" ||
-                        formScheme.fields[fieldName].type === "number"
+                        formScheme.fields[fieldName].type === 'text' ||
+                        formScheme.fields[fieldName].type === 'number'
                       ) {
                         return (
                           <TextField
@@ -128,7 +128,7 @@ const CommonForm = (formScheme, obj) => {
                           />
                         );
                       }
-                      if (formScheme.fields[fieldName].type === "entity") {
+                      if (formScheme.fields[fieldName].type === 'entity') {
                         return (
                           <Select
                             name={fieldName}
@@ -170,9 +170,9 @@ const CommonForm = (formScheme, obj) => {
                   </Button>
                   {displayFormStatus && (
                     <div className="formStatus">
-                      {formStatus.type === "error" ? (
+                      {formStatus.type === 'error' ? (
                         <p>{formStatus.message}</p>
-                      ) : formStatus.type === "success" ? (
+                      ) : formStatus.type === 'success' ? (
                         <p>{formStatus.message}</p>
                       ) : null}
                     </div>

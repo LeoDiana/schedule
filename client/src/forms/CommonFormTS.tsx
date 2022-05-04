@@ -1,9 +1,9 @@
 // @ts-nocheck
 
-import React, { useEffect, useState } from "react";
-import { Button, Grid, MenuItem, Select, TextField } from "@mui/material";
-import { Form, Formik, FormikProps } from "formik";
-import * as Yup from "yup";
+import React, { useEffect, useState } from 'react';
+import { Button, Grid, MenuItem, Select, TextField } from '@mui/material';
+import { Form, Formik, FormikProps } from 'formik';
+import * as Yup from 'yup';
 
 import {
   FieldScheme,
@@ -11,14 +11,14 @@ import {
   FormScheme,
   FormStatus,
   formStatusProps,
-} from "./common";
-import { ERROR_MESSAGE, SUCCESS_MESSAGE } from "../api/apiCalls";
+} from './common';
+import { ERROR_MESSAGE, SUCCESS_MESSAGE } from '../api/apiCalls';
 
 const createFormInitialValues = <T,>(fields: FieldsScheme<T>) => {
   const initialValues = {} as Record<keyof T, string>;
   fields
     .keys()
-    .forEach((fieldName: keyof T) => (initialValues[fieldName] = ""));
+    .forEach((fieldName: keyof T) => (initialValues[fieldName] = ''));
   return initialValues;
 };
 
@@ -27,13 +27,13 @@ const createFormValidationSchema = <T,>(fields: FieldsScheme<T>) => {
   let validationSchema = {} as Record<keyof T, any>;
   fields.keys().forEach((fieldName: keyof T) => {
     switch (fields[fieldName].type) {
-      case "text":
+      case 'text':
         validationSchema[fieldName] = Yup.string().required();
         break;
-      case "number":
+      case 'number':
         validationSchema[fieldName] = Yup.number().required();
         break;
-      case "entity":
+      case 'entity':
         validationSchema[fieldName] = Yup.array().required();
         break;
     }
@@ -51,7 +51,8 @@ const CommonForm = <T extends object>(formScheme: FormScheme<T>) => {
       formScheme.fields
         .keys()
         .filter(
-          (fieldName: keyof T) => formScheme.fields[fieldName].type === "entity"
+          (fieldName: keyof T) =>
+            formScheme.fields[fieldName].type === 'entity',
         )
         .map((fieldName: keyof T) => {
           fetchedEntities[fieldName] = await formScheme.fields[
@@ -67,8 +68,8 @@ const CommonForm = <T extends object>(formScheme: FormScheme<T>) => {
   const [displayFormStatus, setDisplayFormStatus] = useState(false); // TODO think how can I use it
   const [formStatus, setFormStatus] = useState<FormStatus>({
     //TODO this too
-    message: "",
-    type: "",
+    message: '',
+    type: '',
   });
 
   let initialValues = createFormInitialValues(formScheme.fields);
@@ -116,7 +117,7 @@ const CommonForm = <T extends object>(formScheme: FormScheme<T>) => {
                 {formScheme.fields.keys().map((fieldName: FieldScheme) => (
                   <Grid key={fieldName} item lg={10} md={10} sm={10} xs={10}>
                     {(() => {
-                      if (field.type === "text" || field.type === "number") {
+                      if (field.type === 'text' || field.type === 'number') {
                         return (
                           <TextField
                             name={fieldName}
@@ -135,7 +136,7 @@ const CommonForm = <T extends object>(formScheme: FormScheme<T>) => {
                           />
                         );
                       }
-                      if (field.type === "entity") {
+                      if (field.type === 'entity') {
                         return (
                           <Select
                             name={fieldName}
@@ -175,9 +176,9 @@ const CommonForm = <T extends object>(formScheme: FormScheme<T>) => {
                   {displayFormStatus && (
                     <div className="formStatus">
                       // TODO
-                      {formStatus.type === "error" ? (
+                      {formStatus.type === 'error' ? (
                         <p>{formStatus.message}</p>
-                      ) : formStatus.type === "success" ? (
+                      ) : formStatus.type === 'success' ? (
                         <p>{formStatus.message}</p>
                       ) : null}
                     </div>

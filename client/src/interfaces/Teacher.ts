@@ -1,4 +1,4 @@
-import { AcademicStatusId } from "./AcademicStatus";
+import { AcademicStatusId } from './AcademicStatus';
 
 export interface Teacher {
   id?: string;

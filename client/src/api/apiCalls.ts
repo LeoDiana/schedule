@@ -1,19 +1,17 @@
-import { instance as axios } from "./axiosConfig";
-import { AcademicStatus, AcademicStatusId } from "../interfaces/AcademicStatus";
-import { Teacher } from "../interfaces/Teacher";
+import { instance as axios } from './axiosConfig';
 
-export const ERROR_MESSAGE = "Error occurred";
-export const SUCCESS_MESSAGE = "Success";
+export const ERROR_MESSAGE = 'Error occurred';
+export const SUCCESS_MESSAGE = 'Success';
 
 export const ENDPOINTS = {
-  academicStatus: "academic-statuses",
-  teacher: "teachers",
+  academicStatus: 'academic-statuses',
+  teacher: 'teachers',
 };
 
 export const readEntities = async (endpoint: string): Promise<any[]> => {
   try {
     const response = await axios.get(endpoint);
-    return response.data as AcademicStatusId[];
+    return response.data;
   } catch (error) {
     return [];
   }
@@ -21,7 +19,7 @@ export const readEntities = async (endpoint: string): Promise<any[]> => {
 
 export const createEntityApi = async (
   entity: any,
-  endpoint: string
+  endpoint: string,
 ): Promise<string> => {
   try {
     const response = await axios.post(endpoint, entity);
@@ -34,7 +32,7 @@ export const createEntityApi = async (
 
 export const updateEntityApi = async (
   entity: any,
-  endpoint: string
+  endpoint: string,
 ): Promise<string> => {
   try {
     const response = await axios.put(`${endpoint}/${entity.id}`, entity);
@@ -47,7 +45,7 @@ export const updateEntityApi = async (
 
 export const deleteEntityApi = async (
   id: string,
-  endpoint: string
+  endpoint: string,
 ): Promise<string> => {
   try {
     const response = await axios.delete(`${endpoint}/${id}`);

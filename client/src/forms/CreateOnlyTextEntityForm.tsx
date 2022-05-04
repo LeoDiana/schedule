@@ -1,32 +1,32 @@
-import React, { useState } from "react";
-import { Grid, TextField, Button } from "@mui/material";
-import { Formik, Form, FormikProps } from "formik";
-import * as Yup from "yup";
+import React, { useState } from 'react';
+import { Grid, TextField, Button } from '@mui/material';
+import { Formik, Form, FormikProps } from 'formik';
+import * as Yup from 'yup';
 
 import {
   CreateFormWithTextFieldsOnly,
   FormStatus,
   formStatusProps,
   TextOnlyEntity,
-} from "./common";
-import { ERROR_MESSAGE, SUCCESS_MESSAGE } from "../api/apiCalls";
+} from './common';
+import { ERROR_MESSAGE, SUCCESS_MESSAGE } from '../api/apiCalls';
 
 const CreateOnlyTextEntityForm = (formData: CreateFormWithTextFieldsOnly) => {
   const [displayFormStatus, setDisplayFormStatus] = useState(false);
   const [formStatus, setFormStatus] = useState<FormStatus>({
-    message: "",
-    type: "",
+    message: '',
+    type: '',
   });
 
   let initialValues = {} as TextOnlyEntity;
-  formData.fields.forEach((field) => (initialValues[field.name] = ""));
+  formData.fields.forEach((field) => (initialValues[field.name] = ''));
 
   let validationSchema = {} as any;
   formData.fields.forEach(
     (field) =>
       (validationSchema[field.name] = Yup.string().required(
-        `Please enter ${field.label}`
-      ))
+        `Please enter ${field.label}`,
+      )),
   );
 
   const create = async (data: TextOnlyEntity, resetForm: Function) => {
@@ -95,9 +95,9 @@ const CreateOnlyTextEntityForm = (formData: CreateFormWithTextFieldsOnly) => {
                   </Button>
                   {displayFormStatus && (
                     <div className="formStatus">
-                      {formStatus.type === "error" ? (
+                      {formStatus.type === 'error' ? (
                         <p>{formStatus.message}</p>
-                      ) : formStatus.type === "success" ? (
+                      ) : formStatus.type === 'success' ? (
                         <p>{formStatus.message}</p>
                       ) : null}
                     </div>
