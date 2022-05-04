@@ -8,14 +8,20 @@ import { AcademicStatus, AcademicStatusId } from "../interfaces/AcademicStatus";
 import CommonForm from "./CommonForm";
 import { Teacher } from "../interfaces/Teacher";
 
+const academicStatusFormFields = {
+  name: { label: "Name", type: "text" },
+  shortName: { label: "Short name", type: "text" },
+};
+
+const academicStatusShortShownName = (obj: AcademicStatus) => {
+  return `${obj.shortName}.`;
+};
+
 export const CreateAcademicStatusForm = () =>
   CommonForm({
     title: "Create academic status",
     type: "create",
-    fields: {
-      name: { label: "Name", type: "text" },
-      shortName: { label: "Short name", type: "text" },
-    },
+    fields: academicStatusFormFields,
     apiCall: async (obj: AcademicStatus) => {
       const newAcademicStatus = {
         name: obj.name || "",
@@ -30,10 +36,7 @@ export const UpdateAcademicStatusForm = (obj: AcademicStatus) =>
     {
       title: "Update academic status",
       type: "update",
-      fields: {
-        name: { label: "Name", type: "text" },
-        shortName: { label: "Short name", type: "text" },
-      },
+      fields: academicStatusFormFields,
       apiCall: async (obj: AcademicStatus) => {
         const newAcademicStatus = {
           id: obj.id || "",
@@ -49,26 +52,29 @@ export const UpdateAcademicStatusForm = (obj: AcademicStatus) =>
     obj
   );
 
+const teacherFormFields = {
+  firstName: { label: "First name", type: "text" },
+  surname: { label: "Surname", type: "text" },
+  patronymic: { label: "Patronymic", type: "text" },
+  academicStatus: {
+    label: "Academic status",
+    type: "entity",
+    getEntitiesForList: async () => {
+      return await readEntities(ENDPOINTS.academicStatus);
+    },
+    makeShortShownName: academicStatusShortShownName,
+  },
+};
+
+const teacherShortShownName = (obj: Teacher) => {
+  return `${obj.surname} ${obj.firstName[0]}.${obj.patronymic[0]}.`;
+};
+
 export const CreateTeacherForm = () =>
   CommonForm({
     title: "Create teacher",
     type: "create",
-    fields: {
-      firstName: { label: "First name", type: "text" },
-      surname: { label: "Surname", type: "text" },
-      patronymic: { label: "Patronymic", type: "text" },
-      academicStatus: {
-        label: "Academic status",
-        type: "entity",
-        getEntitiesForList: async () => {
-          return await readEntities(ENDPOINTS.academicStatus);
-        },
-        makeShortShownName: (obj: AcademicStatus) => {
-          // @ts-ignore
-          return `${obj.shortName}.`;
-        },
-      },
-    },
+    fields: teacherFormFields,
     apiCall: async (obj: Teacher) => {
       const newTeacher = {
         firstName: obj.firstName || "",
@@ -80,10 +86,19 @@ export const CreateTeacherForm = () =>
     },
   });
 
-/*
-makeShortShownName: (obj: Teacher) => {
-          console.log(obj);
-          // @ts-ignore
-          return `${obj.surname} ${obj.firstName[0]}.${obj.patronymic[0]}.`;
-        },
-* */
+export const UpdateTeacherForm = () =>
+  CommonForm({
+    title: "Update teacher",
+    type: "update",
+    fields: teacherFormFields,
+    apiCall: async (obj: Teacher) => {
+      const newTeacher = {
+        id: obj.id || "",
+        firstName: obj.firstName || "",
+        surname: obj.surname || "",
+        patronymic: obj.patronymic || "",
+        academicStatus: obj.academicStatus || ({} as AcademicStatusId),
+      };
+      return await createEntityApi(newTeacher, ENDPOINTS.teacher);
+    },
+  });
