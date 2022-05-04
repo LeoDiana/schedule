@@ -1,8 +1,8 @@
 import {
-  createAcademicStatus,
-  createTeacher,
-  readAllAcademicStatuses,
-  updateAcademicStatus,
+  createEntityApi,
+  ENDPOINTS,
+  readEntities,
+  updateEntityApi,
 } from "../api/apiCalls";
 import { AcademicStatus, AcademicStatusId } from "../interfaces/AcademicStatus";
 import CommonForm from "./CommonForm";
@@ -21,7 +21,7 @@ export const CreateAcademicStatusForm = () =>
         name: obj.name || "",
         shortName: obj.shortName || "",
       };
-      return await createAcademicStatus(newAcademicStatus);
+      return await createEntityApi(newAcademicStatus, ENDPOINTS.academicStatus);
     },
   });
 
@@ -40,7 +40,10 @@ export const UpdateAcademicStatusForm = (obj: AcademicStatus) =>
           name: obj.name || "",
           shortName: obj.shortName || "",
         };
-        return await updateAcademicStatus(newAcademicStatus);
+        return await updateEntityApi(
+          newAcademicStatus,
+          ENDPOINTS.academicStatus
+        );
       },
     },
     obj
@@ -58,7 +61,7 @@ export const CreateTeacherForm = () =>
         label: "Academic status",
         type: "entity",
         getEntitiesForList: async () => {
-          return await readAllAcademicStatuses();
+          return await readEntities(ENDPOINTS.academicStatus);
         },
         makeShortShownName: (obj: AcademicStatus) => {
           // @ts-ignore
@@ -73,7 +76,7 @@ export const CreateTeacherForm = () =>
         patronymic: obj.patronymic || "",
         academicStatus: obj.academicStatus || ({} as AcademicStatusId),
       };
-      return await createTeacher(newTeacher);
+      return await createEntityApi(newTeacher, ENDPOINTS.teacher);
     },
   });
 

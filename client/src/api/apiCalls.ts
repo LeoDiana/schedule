@@ -5,20 +5,26 @@ import { Teacher } from "../interfaces/Teacher";
 export const ERROR_MESSAGE = "Error occurred";
 export const SUCCESS_MESSAGE = "Success";
 
-export const readAllAcademicStatuses = async (): Promise<AcademicStatus[]> => {
+export const ENDPOINTS = {
+  academicStatus: "academic-statuses",
+  teacher: "teachers",
+};
+
+export const readEntities = async (endpoint: string): Promise<any[]> => {
   try {
-    const response = await axios.get("academic-status");
+    const response = await axios.get(endpoint);
     return response.data as AcademicStatusId[];
   } catch (error) {
     return [];
   }
 };
 
-export const createAcademicStatus = async (
-  academicStatus: AcademicStatus
+export const createEntityApi = async (
+  entity: any,
+  endpoint: string
 ): Promise<string> => {
   try {
-    const response = await axios.post("academic-status", academicStatus);
+    const response = await axios.post(endpoint, entity);
     return SUCCESS_MESSAGE;
   } catch (error) {
     console.log(error);
@@ -26,14 +32,12 @@ export const createAcademicStatus = async (
   }
 };
 
-export const updateAcademicStatus = async (
-  academicStatus: AcademicStatus
+export const updateEntityApi = async (
+  entity: any,
+  endpoint: string
 ): Promise<string> => {
   try {
-    const response = await axios.put(
-      `academic-status/${academicStatus.id}`,
-      academicStatus
-    );
+    const response = await axios.put(`${endpoint}/${entity.id}`, entity);
     return SUCCESS_MESSAGE;
   } catch (error) {
     console.log(error);
@@ -41,19 +45,12 @@ export const updateAcademicStatus = async (
   }
 };
 
-export const deleteAcademicStatus = async (id: string): Promise<string> => {
+export const deleteEntityApi = async (
+  id: string,
+  endpoint: string
+): Promise<string> => {
   try {
-    const response = await axios.delete(`academic-status/${id}`);
-    return SUCCESS_MESSAGE;
-  } catch (error) {
-    console.log(error);
-    return ERROR_MESSAGE;
-  }
-};
-
-export const createTeacher = async (teacher: Teacher): Promise<string> => {
-  try {
-    const response = await axios.post("teachers", teacher);
+    const response = await axios.delete(`${endpoint}/${id}`);
     return SUCCESS_MESSAGE;
   } catch (error) {
     console.log(error);
