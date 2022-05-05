@@ -10,7 +10,6 @@ import { ClassroomsModule } from './classrooms/classrooms.module';
 import { DaysModule } from './days/days.module';
 import { GroupsModule } from './groups/groups.module';
 import { SubgroupsModule } from './subgroups/subgroups.module';
-import { GrouplessonsModule } from './grouplessons/grouplessons.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { LessonTypesModule } from './lesson-types/lesson-types.module';
 import { LessonTimesModule } from './lesson-times/lesson-times.module';
@@ -18,6 +17,7 @@ import { ClassFacilitiesModule } from './class-facilities/class-facilities.modul
 import { LessonFacilitiesModule } from './lesson-facilities/lesson-facilities.module';
 import { FacilitiesModule } from './facilities/facilities.module';
 import { WeekTypesModule } from './week-types/week-types.module';
+import { GroupLessonsModule } from './group-lessons/group-lessons.module';
 
 @Module({
   imports: [
@@ -35,7 +35,6 @@ import { WeekTypesModule } from './week-types/week-types.module';
     DaysModule,
     GroupsModule,
     SubgroupsModule,
-    GrouplessonsModule,
     SubjectsModule,
     LessonTypesModule,
     LessonTimesModule,
@@ -43,6 +42,7 @@ import { WeekTypesModule } from './week-types/week-types.module';
     LessonFacilitiesModule,
     FacilitiesModule,
     WeekTypesModule,
+    GroupLessonsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

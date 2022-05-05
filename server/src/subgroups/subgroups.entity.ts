@@ -16,9 +16,8 @@ export class Subgroup {
   name: string;
 
   @Column()
-  studentsNumber: number;
+  groupName: string;
 
-  @ManyToOne(() => Group)
-  @JoinColumn()
-  group: Group;
+  @Column()
+  studentsNumber: number;
 }
