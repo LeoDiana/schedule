@@ -25,16 +25,18 @@ export class AcademicStatusesController {
   }
 
   @Post()
-  async create(@Body() teacher: AcademicStatus): Promise<AcademicStatus> {
-    return await this.academicStatusService.create(teacher);
+  async create(
+    @Body() academicStatus: AcademicStatus,
+  ): Promise<AcademicStatus> {
+    return await this.academicStatusService.create(academicStatus);
   }
 
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() teacher: AcademicStatus,
+    @Body() academicStatus: AcademicStatus,
   ): Promise<AcademicStatus> {
-    return await this.academicStatusService.update(teacher);
+    return await this.academicStatusService.update(academicStatus);
   }
 
   @Delete(':id')
