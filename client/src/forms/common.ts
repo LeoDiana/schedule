@@ -9,16 +9,16 @@ export interface FormStatusProps {
 
 export const formStatusProps: FormStatusProps = {
   success: {
-    message: "Added successfully.",
-    type: "success",
+    message: 'Success',
+    type: 'success',
   },
   duplicate: {
-    message: "Same entity already exist.",
-    type: "error",
+    message: 'Same entity already exist.',
+    type: 'error',
   },
   error: {
-    message: "Something went wrong. Please try again.",
-    type: "error",
+    message: 'Something went wrong. Please try again.',
+    type: 'error',
   },
 };
 
