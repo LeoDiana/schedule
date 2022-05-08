@@ -21,7 +21,7 @@ export class Teacher {
   @Column()
   patronymic: string;
 
-  @ManyToOne(() => AcademicStatus)
+  @ManyToOne(() => AcademicStatus, { eager: true })
   @JoinColumn()
   academicStatus: AcademicStatus;
 }

@@ -18,7 +18,7 @@ export class Classroom {
   @Column()
   capacity: number;
 
-  @ManyToOne(() => Building)
+  @ManyToOne(() => Building, { eager: true })
   @JoinColumn()
   building: Building;
 }
