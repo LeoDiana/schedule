@@ -8,7 +8,7 @@ export const ENDPOINTS = {
   teacher: 'teachers',
 };
 
-export const readEntities = async (endpoint: string): Promise<any[]> => {
+export const readEntitiesApi = async (endpoint: string): Promise<any[]> => {
   try {
     const response = await axios.get(endpoint);
     return response.data;
@@ -17,10 +17,7 @@ export const readEntities = async (endpoint: string): Promise<any[]> => {
   }
 };
 
-export const createEntityApi = async (
-  entity: any,
-  endpoint: string,
-): Promise<string> => {
+export const createEntityApi = async (entity: any, endpoint: string): Promise<string> => {
   try {
     const response = await axios.post(endpoint, entity);
     return SUCCESS_MESSAGE;
@@ -30,10 +27,7 @@ export const createEntityApi = async (
   }
 };
 
-export const updateEntityApi = async (
-  entity: any,
-  endpoint: string,
-): Promise<string> => {
+export const updateEntityApi = async (entity: any, endpoint: string): Promise<string> => {
   try {
     const response = await axios.put(`${endpoint}/${entity.id}`, entity);
     return SUCCESS_MESSAGE;
@@ -43,10 +37,7 @@ export const updateEntityApi = async (
   }
 };
 
-export const deleteEntityApi = async (
-  id: string,
-  endpoint: string,
-): Promise<string> => {
+export const deleteEntityApi = async (id: string, endpoint: string): Promise<string> => {
   try {
     const response = await axios.delete(`${endpoint}/${id}`);
     return SUCCESS_MESSAGE;

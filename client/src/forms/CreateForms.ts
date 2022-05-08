@@ -1,9 +1,4 @@
-import {
-  createEntityApi,
-  ENDPOINTS,
-  readEntities,
-  updateEntityApi,
-} from '../api/apiCalls';
+import { createEntityApi, ENDPOINTS, readEntitiesApi, updateEntityApi } from '../api/apiCalls';
 import CommonForm from './CommonForm';
 import { AcademicStatus, Teacher } from '../types/types';
 
@@ -42,10 +37,7 @@ export const UpdateAcademicStatusForm = (obj: AcademicStatus) =>
           name: obj.name || '',
           shortName: obj.shortName || '',
         };
-        return await updateEntityApi(
-          newAcademicStatus,
-          ENDPOINTS.academicStatus,
-        );
+        return await updateEntityApi(newAcademicStatus, ENDPOINTS.academicStatus);
       },
     },
     obj,
@@ -59,7 +51,7 @@ const teacherFormFields = {
     label: 'Academic status',
     type: 'entity',
     getEntitiesForList: async () => {
-      return await readEntities(ENDPOINTS.academicStatus);
+      return await readEntitiesApi(ENDPOINTS.academicStatus);
     },
     makeShortShownName: academicStatusShortShownName,
   },

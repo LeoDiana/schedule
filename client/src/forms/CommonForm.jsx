@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+
 import React, { useEffect, useState } from 'react';
 import { Button, Grid, MenuItem, Select, TextField } from '@mui/material';
 import { Form, Formik } from 'formik';
@@ -45,9 +47,7 @@ const CommonForm = (formScheme, obj) => {
       Object.keys(formScheme.fields)
         .filter((fieldName) => formScheme.fields[fieldName].type === 'entity')
         .map(async (fieldName) => {
-          fetchedEntities[fieldName] = await formScheme.fields[
-            fieldName
-          ].getEntitiesForList();
+          fetchedEntities[fieldName] = await formScheme.fields[fieldName].getEntitiesForList();
         });
       setEntityFieldsData(fetchedEntities);
     };
@@ -91,14 +91,7 @@ const CommonForm = (formScheme, obj) => {
         validationSchema={validationSchema}
       >
         {(props) => {
-          const {
-            values,
-            touched,
-            errors,
-            handleBlur,
-            handleChange,
-            isSubmitting,
-          } = props;
+          const { values, touched, errors, handleBlur, handleChange, isSubmitting } = props;
           return (
             <Form>
               <h1>{formScheme.title}</h1>
@@ -131,12 +124,10 @@ const CommonForm = (formScheme, obj) => {
                       if (formScheme.fields[fieldName].type === 'entity') {
                         return (
                           <Select
-                            name={fieldName}
                             id={fieldName}
                             label={formScheme.fields[fieldName].label}
                             labelId={formScheme.fields[fieldName].label}
                             value={values[fieldName]}
-                            type="text"
                             error={!!(errors.name && touched.name)}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -144,12 +135,16 @@ const CommonForm = (formScheme, obj) => {
                             <MenuItem value="">
                               <em>None</em>
                             </MenuItem>
+                            {obj ? (
+                              <MenuItem value={values[fieldName]}>
+                                {formScheme.fields[fieldName].makeShortShownName(values[fieldName])}
+                              </MenuItem>
+                            ) : null}
                             {entityFieldsData[fieldName]
-                              ? entityFieldsData[fieldName].map((item, i) => (
-                                  <MenuItem value={item} key={item.name + i}>
-                                    {formScheme.fields[
-                                      fieldName
-                                    ].makeShortShownName(item) || item.name}
+                              ? entityFieldsData[fieldName].map((item) => (
+                                  <MenuItem value={item} key={JSON.stringify(item)}>
+                                    {formScheme.fields[fieldName].makeShortShownName(item) ||
+                                      item.name}
                                   </MenuItem>
                                 ))
                               : null}
@@ -160,12 +155,7 @@ const CommonForm = (formScheme, obj) => {
                   </Grid>
                 ))}
                 <Grid item lg={10} md={10} sm={10} xs={10}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    disabled={isSubmitting}
-                  >
+                  <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
                     Submit
                   </Button>
                   {displayFormStatus && (
