@@ -6,6 +6,14 @@ export const SUCCESS_MESSAGE = 'Success';
 export const ENDPOINTS = {
   academicStatus: 'academic-statuses',
   teacher: 'teachers',
+  subject: 'subjects',
+  lessonType: 'lesson-types',
+  lessonTime: 'lesson-times',
+  day: 'days',
+  weekType: 'week-types',
+  building: 'buildings',
+  classroom: 'classrooms',
+  subgroup: 'subgroups',
 };
 
 export const readEntitiesApi = async (endpoint: string): Promise<any[]> => {
