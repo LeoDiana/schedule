@@ -29,7 +29,7 @@ const useDialog = () => {
   return [isOpen, open, close];
 };
 
-export const EntityPage = ({ entityName, fields, api, CreateForm, UpdateForm }) => {
+export const EntityPage = ({ name, fields, api, CreateForm, UpdateForm }) => {
   const [entities, setEntities] = useState();
   const [entityToUpdate, setEntityToUpdate] = useState();
   const [isOpenCreateDialog, openCreateDialog, closeCreateDialog] = useDialog();
@@ -80,13 +80,13 @@ export const EntityPage = ({ entityName, fields, api, CreateForm, UpdateForm }) 
           <UpdateForm {...entityToUpdate} />
         </DialogContent>
       </Dialog>
-      <h1>{entityName}</h1>
+      <h1>{name}</h1>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
               {Object.keys(fields).map((fieldName) => (
-                <TableCell key={fieldName}>{fields[fieldName]}</TableCell>
+                <TableCell key={fieldName}>{fields[fieldName].label}</TableCell>
               ))}
               <TableCell>Edit</TableCell>
               <TableCell>Delete</TableCell>
@@ -101,19 +101,23 @@ export const EntityPage = ({ entityName, fields, api, CreateForm, UpdateForm }) 
                   >
                     {Object.keys(fields).map((fieldName) => (
                       <TableCell key={`${JSON.stringify(entity)}-${fieldName}`}>
-                        {entity[fieldName]}
+                        {entity[fieldName]
+                          ? fields[fieldName].type === 'entity'
+                            ? fields[fieldName].makeShortShownName(entity[fieldName])
+                            : entity[fieldName]
+                          : null}
                       </TableCell>
                     ))}
                     <TableCell align="right">
                       <Button
                         data-id={entity.id}
                         onClick={(e) => {
-                          openUpdateDialog();
                           setEntityToUpdate({
                             ...entities.filter(
                               (ent) => ent.id.toString() === e.target.dataset.id.toString(),
                             )[0],
                           });
+                          openUpdateDialog();
                         }}
                       >
                         Edit
