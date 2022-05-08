@@ -9,13 +9,13 @@ import { Link } from 'react-router-dom';
 function App() {
   // return <EntityPage {...academicStatusInfo} />;
   return (
-    <>
+    <ul>
       {Object.keys(commonEntitiesInfo).map((entityName) => (
-        <Link key={entityName} to={`/${entityName}`}>
-          {commonEntitiesInfo[entityName].name}
-        </Link>
+        <li key={entityName}>
+          <Link to={`/${entityName}`}>{commonEntitiesInfo[entityName].name}</Link>
+        </li>
       ))}
-    </>
+    </ul>
   );
 }
 
