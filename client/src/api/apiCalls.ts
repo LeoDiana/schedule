@@ -14,6 +14,7 @@ export const ENDPOINTS = {
   building: 'buildings',
   classroom: 'classrooms',
   subgroup: 'subgroups',
+  lesson: 'lesson',
 };
 
 export const readEntitiesApi = async (endpoint: string): Promise<any[]> => {

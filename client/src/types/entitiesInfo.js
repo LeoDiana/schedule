@@ -195,6 +195,84 @@ export const subgroupInfo = {
 subgroupInfo.CreateForm = generateCommonFormFor('create', subgroupInfo);
 subgroupInfo.UpdateForm = generateCommonFormFor('update', subgroupInfo);
 
+export const lessonInfo = {
+  name: 'Lesson',
+  fields: {
+    teacher: {
+      label: 'Teacher',
+      type: 'entity',
+      getEntitiesForList: async () => {
+        return await readEntitiesApi(ENDPOINTS.teacher);
+      },
+      makeShortShownName: (obj) => teacherInfo.shortShownName(obj),
+    },
+    subject: {
+      label: 'Subject',
+      type: 'entity',
+      getEntitiesForList: async () => {
+        return await readEntitiesApi(ENDPOINTS.subject);
+      },
+      makeShortShownName: (obj) => subjectInfo.shortShownName(obj),
+    },
+    lessonType: {
+      label: 'Lesson type',
+      type: 'entity',
+      getEntitiesForList: async () => {
+        return await readEntitiesApi(ENDPOINTS.lessonType);
+      },
+      makeShortShownName: (obj) => lessonTypeInfo.shortShownName(obj),
+    },
+    lessonTime: {
+      label: 'Lesson time',
+      type: 'entity',
+      getEntitiesForList: async () => {
+        return await readEntitiesApi(ENDPOINTS.lessonTime);
+      },
+      makeShortShownName: (obj) => lessonTimeInfo.shortShownName(obj),
+    },
+    classroom: {
+      label: 'Classroom',
+      type: 'entity',
+      getEntitiesForList: async () => {
+        return await readEntitiesApi(ENDPOINTS.classroom);
+      },
+      makeShortShownName: (obj) => classroomInfo.shortShownName(obj),
+    },
+    day: {
+      label: 'Day',
+      type: 'entity',
+      getEntitiesForList: async () => {
+        return await readEntitiesApi(ENDPOINTS.day);
+      },
+      makeShortShownName: (obj) => dayInfo.shortShownName(obj),
+    },
+    weekType: {
+      label: 'Week type',
+      type: 'entity',
+      getEntitiesForList: async () => {
+        return await readEntitiesApi(ENDPOINTS.weekType);
+      },
+      makeShortShownName: (obj) => weekTypeInfo.shortShownName(obj),
+    },
+    subgroup: {
+      label: 'Subgroup',
+      type: 'entity',
+      getEntitiesForList: async () => {
+        return await readEntitiesApi(ENDPOINTS.subgroup);
+      },
+      makeShortShownName: (obj) => subgroupInfo.shortShownName(obj),
+    },
+  },
+  shortShownName: (obj) => {
+    return `Lesson`;
+  },
+  api: generateApiCallsObjectFor(ENDPOINTS.lesson),
+  CreateForm: null,
+  UpdateForm: null,
+};
+lessonInfo.CreateForm = generateCommonFormFor('create', lessonInfo);
+lessonInfo.UpdateForm = generateCommonFormFor('update', lessonInfo);
+
 const convertToKebab = (str) => {
   return str.toLowerCase().replace(' ', '-');
 };
@@ -210,4 +288,5 @@ export const commonEntitiesInfo = {
   [convertToKebab(buildingInfo.name)]: buildingInfo,
   [convertToKebab(classroomInfo.name)]: classroomInfo,
   [convertToKebab(subgroupInfo.name)]: subgroupInfo,
+  [convertToKebab(lessonInfo.name)]: lessonInfo,
 };

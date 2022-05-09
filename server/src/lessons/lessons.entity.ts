@@ -19,35 +19,35 @@ export class Lesson {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Teacher)
+  @ManyToOne(() => Teacher, { eager: true })
   @JoinColumn()
   teacher: Teacher;
 
-  @ManyToOne(() => Subject)
+  @ManyToOne(() => Subject, { eager: true })
   @JoinColumn()
   subject: Subject;
 
-  @ManyToOne(() => LessonType)
+  @ManyToOne(() => LessonType, { eager: true })
   @JoinColumn()
   lessonType: LessonType;
 
-  @ManyToOne(() => LessonTime)
+  @ManyToOne(() => LessonTime, { eager: true })
   @JoinColumn()
   lessonTime: LessonTime;
 
-  @ManyToOne(() => Classroom)
+  @ManyToOne(() => Classroom, { eager: true })
   @JoinColumn()
   classroom: Classroom;
 
-  @ManyToOne(() => Day)
+  @ManyToOne(() => Day, { eager: true })
   @JoinColumn()
   day: Day;
 
-  @ManyToOne(() => WeekType)
+  @ManyToOne(() => WeekType, { eager: true })
   @JoinColumn()
   weekType: WeekType;
 
-  @ManyToMany(() => Subgroup)
+  @ManyToMany(() => Subgroup, { eager: true })
   @JoinColumn()
   subgroup: Subgroup;
 }
