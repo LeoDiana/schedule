@@ -47,7 +47,7 @@ export class Lesson {
   @JoinColumn()
   weekType: WeekType;
 
-  @ManyToMany(() => Subgroup, { eager: true })
+  @ManyToOne(() => Subgroup, { eager: true }) // MANY TO MANY
   @JoinColumn()
   subgroup: Subgroup;
 }

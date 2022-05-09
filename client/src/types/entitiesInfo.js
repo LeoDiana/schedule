@@ -66,7 +66,7 @@ export const subjectInfo = {
     shortName: { label: 'Short name', type: 'text' },
   },
   shortShownName: (obj) => {
-    return `${obj.shortName}.`;
+    return `${obj.shortName}`;
   },
   api: generateApiCallsObjectFor(ENDPOINTS.subject),
   CreateForm: null,
@@ -169,7 +169,7 @@ export const classroomInfo = {
     },
   },
   shortShownName: (obj) => {
-    return `${obj.number} ${obj.building.makeShortShownName(obj)}`;
+    return `${obj.number} ${buildingInfo.shortShownName(obj.building)}`;
   },
   api: generateApiCallsObjectFor(ENDPOINTS.classroom),
   CreateForm: null,
