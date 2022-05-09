@@ -38,7 +38,7 @@ const createFormValidationSchema = (fields) => {
 };
 
 // this is common form for creating and updating entities
-const CommonForm = (formScheme, obj) => {
+const CommonForm = ({ formScheme, obj }) => {
   const [entityFieldsData, setEntityFieldsData] = useState({});
 
   useEffect(() => {
@@ -124,6 +124,7 @@ const CommonForm = (formScheme, obj) => {
                       if (formScheme.fields[fieldName].type === 'entity') {
                         return (
                           <Select
+                            name={fieldName}
                             id={fieldName}
                             label={formScheme.fields[fieldName].label}
                             labelId={formScheme.fields[fieldName].label}
@@ -135,7 +136,7 @@ const CommonForm = (formScheme, obj) => {
                             <MenuItem value="">
                               <em>None</em>
                             </MenuItem>
-                            {obj ? (
+                            {(obj || {})[fieldName] ? (
                               <MenuItem value={values[fieldName]}>
                                 {formScheme.fields[fieldName].makeShortShownName(values[fieldName])}
                               </MenuItem>

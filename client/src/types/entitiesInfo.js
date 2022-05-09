@@ -7,6 +7,7 @@ import {
 } from '../api/apiCalls';
 import CommonForm from '../forms/CommonForm';
 import { Teacher } from './types';
+import { generateCommonFormFor } from './generateCommomFormFor';
 
 const generateApiCallsObjectFor = (endpoint) => {
   return {
@@ -15,21 +16,6 @@ const generateApiCallsObjectFor = (endpoint) => {
     update: (obj) => updateEntityApi(obj, endpoint),
     delete: (id) => deleteEntityApi(id, endpoint),
   };
-};
-
-const generateCommonFormFor = (formType, infoObj) => {
-  return (obj) =>
-    CommonForm(
-      {
-        title: `${formType} ${infoObj.name}`,
-        type: formType,
-        fields: infoObj.fields,
-        apiCall: async (obj) => {
-          return await infoObj.api[formType](obj);
-        },
-      },
-      obj,
-    );
 };
 
 export const academicStatusInfo = {
