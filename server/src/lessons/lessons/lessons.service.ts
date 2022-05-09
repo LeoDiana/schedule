@@ -14,6 +14,18 @@ export class LessonsService {
     return await this.lessonRepository.find();
   }
 
+  async findBySubgroup(id: string): Promise<Lesson[]> {
+    return await this.lessonRepository.find({
+      where: { subgroup: { id: id } },
+    });
+  }
+
+  async findByTeacher(id: string): Promise<Lesson[]> {
+    return await this.lessonRepository.find({
+      where: { teacher: { id: id } },
+    });
+  }
+
   async findOne(id: string): Promise<Lesson> {
     return await this.lessonRepository.findOne(id);
   }

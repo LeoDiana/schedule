@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { LessonsService } from './lessons.service';
 import { Lesson } from '../lessons.entity';
@@ -17,6 +18,16 @@ export class LessonsController {
   @Get()
   async findAll(): Promise<Lesson[]> {
     return await this.lessonsService.findAll();
+  }
+
+  @Get('/subgroup/:id')
+  async findBySubgroup(@Param('id') id: string): Promise<Lesson[]> {
+    return await this.lessonsService.findBySubgroup(id);
+  }
+
+  @Get('/teacher/:id')
+  async findByTeacher(@Param('id') id: string): Promise<Lesson[]> {
+    return await this.lessonsService.findByTeacher(id);
   }
 
   @Get(':id')
