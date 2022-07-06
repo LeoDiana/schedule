@@ -92,6 +92,7 @@ const Schedule = ({ days, lessonTimes, lessons }) => {
         {lessons
           ? lessons.map((item, i) => (
               <div
+                draggable
                 key={i}
                 style={{
                   gridColumn: indexInGrid(days, item.day),

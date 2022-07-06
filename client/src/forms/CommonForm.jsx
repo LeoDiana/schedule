@@ -83,7 +83,7 @@ const CommonForm = ({ formScheme, obj }) => {
         key={initialValues}
         initialValues={initialValues}
         onSubmit={(values, actions) => {
-          apiCall(values, actions.resetForm);
+          apiCall(values);
           setTimeout(() => {
             actions.setSubmitting(false);
           }, 500);

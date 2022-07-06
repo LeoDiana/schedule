@@ -55,3 +55,13 @@ export const deleteEntityApi = async (id: string, endpoint: string): Promise<str
     return ERROR_MESSAGE;
   }
 };
+
+export const readLessonsWithFilter = async (id: string, filter: string): Promise<any[]> => {
+  try {
+    const response = await axios.get(`${ENDPOINTS.lesson}/${filter}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};
