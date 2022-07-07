@@ -5,10 +5,11 @@ import {
   readEntitiesApi,
   updateEntityApi,
 } from '../api/apiCalls';
-import { Teacher } from './types';
 import { generateCommonFormFor } from './generateCommomFormFor';
 
-export default interface AllEntities<T> {
+export type FormTypes = 'create' | 'update';
+
+export interface AllEntities<T> {
   academicStatus: T;
   teacher: T;
   subject: T;
@@ -55,7 +56,7 @@ interface ApiEndpoints {
   delete: (id: string) => Promise<string>;
 }
 
-interface EntityInfoInterface {
+export interface EntityInfoInterface {
   name: string;
   fields: EntityInfoFields;
   shortShownName: (obj: any) => string;
@@ -87,13 +88,8 @@ class EntityInfo implements EntityInfoInterface {
   }
 }
 
-const convertToKebab = (str: string) => {
-  return str.toLowerCase().replace(' ', '-');
-};
-
-// TODO don't use here convertToKebab
-export const commonEntitiesInfo = {
-  [convertToKebab('Academic status')]: new EntityInfo(
+export const commonEntitiesInfo: AllEntities<EntityInfoInterface> = {
+  academicStatus: new EntityInfo(
     'academicStatus',
     {
       name: { label: 'Name', type: 'text' },
@@ -103,7 +99,7 @@ export const commonEntitiesInfo = {
       return `${obj.shortName}.`;
     },
   ),
-  [convertToKebab('Subject')]: new EntityInfo(
+  subject: new EntityInfo(
     'subject',
     {
       name: { label: 'Name', type: 'text' },
@@ -113,7 +109,7 @@ export const commonEntitiesInfo = {
       return `${obj.shortName}`;
     },
   ),
-  [convertToKebab('Lesson type')]: new EntityInfo(
+  lessonType: new EntityInfo(
     'lessonType',
     {
       name: { label: 'Name', type: 'text' },
@@ -123,7 +119,7 @@ export const commonEntitiesInfo = {
       return `${obj.shortName}.`;
     },
   ),
-  [convertToKebab('Lesson time')]: new EntityInfo(
+  lessonTime: new EntityInfo(
     'lessonTime',
     {
       number: { label: 'Number', type: 'text' },
@@ -134,7 +130,7 @@ export const commonEntitiesInfo = {
       return `${obj.number} ${obj.timeStart}`;
     },
   ),
-  [convertToKebab('Day')]: new EntityInfo(
+  day: new EntityInfo(
     'day',
     {
       name: { label: 'Name', type: 'text' },
@@ -143,7 +139,7 @@ export const commonEntitiesInfo = {
       return `${obj.name}`;
     },
   ),
-  [convertToKebab('Week Type')]: new EntityInfo(
+  weekType: new EntityInfo(
     'weekType',
     {
       name: { label: 'Name', type: 'text' },
@@ -152,7 +148,7 @@ export const commonEntitiesInfo = {
       return `${obj.name}`;
     },
   ),
-  [convertToKebab('Building')]: new EntityInfo(
+  building: new EntityInfo(
     'building',
     {
       name: { label: 'Name', type: 'text' },
@@ -162,7 +158,7 @@ export const commonEntitiesInfo = {
       return `${obj.name}`;
     },
   ),
-  [convertToKebab('Group')]: new EntityInfo(
+  subgroup: new EntityInfo(
     'subgroup',
     {
       name: { label: 'Name', type: 'text' },
@@ -173,55 +169,53 @@ export const commonEntitiesInfo = {
       return `${obj.groupName} ${obj.name}`;
     },
   ),
-};
+} as AllEntities<EntityInfoInterface>;
 
-const createFieldOfEntityType = (label: string): EntityInfoFieldComplex => {
+const createFieldOfEntityType = (label: keyof AllEntities<any>): EntityInfoFieldComplex => {
   return {
     label,
     type: 'entity',
-    getEntitiesForList: commonEntitiesInfo[convertToKebab(label)].api.readAll,
-    makeShortShownName: (obj) => commonEntitiesInfo[convertToKebab(label)].shortShownName(obj),
+    getEntitiesForList: commonEntitiesInfo[label].api.readAll,
+    makeShortShownName: (obj) => commonEntitiesInfo[label].shortShownName(obj),
   };
 };
 
-commonEntitiesInfo[convertToKebab('Teacher')] = new EntityInfo(
+commonEntitiesInfo.teacher = new EntityInfo(
   'teacher',
   {
     surname: { label: 'Surname', type: 'text' },
     firstName: { label: 'First name', type: 'text' },
     patronymic: { label: 'Patronymic', type: 'text' },
-    academicStatus: createFieldOfEntityType('Academic status'),
+    academicStatus: createFieldOfEntityType('academicStatus'),
   },
   (obj) => {
     return `${obj.surname} ${obj.firstName[0]}.${obj.patronymic[0]}.`;
   },
 );
 
-commonEntitiesInfo[convertToKebab('Classroom')] = new EntityInfo(
+commonEntitiesInfo.classroom = new EntityInfo(
   'classroom',
   {
     number: { label: 'Number', type: 'text' },
     capacity: { label: 'Capacity', type: 'number' },
-    building: createFieldOfEntityType('Building'),
+    building: createFieldOfEntityType('building'),
   },
   (obj) => {
-    return `${obj.number} ${commonEntitiesInfo[convertToKebab('Building')].shortShownName(
-      obj.building,
-    )}`;
+    return `${obj.number} ${commonEntitiesInfo['building'].shortShownName(obj.building)}`;
   },
 );
 
-commonEntitiesInfo[convertToKebab('Lesson')] = new EntityInfo(
+commonEntitiesInfo.lesson = new EntityInfo(
   'lesson',
   {
-    teacher: createFieldOfEntityType('Teacher'),
-    subject: createFieldOfEntityType('Subject'),
-    lessonType: createFieldOfEntityType('Lesson type'),
-    lessonTime: createFieldOfEntityType('Lesson time'),
-    classroom: createFieldOfEntityType('Classroom'),
-    day: createFieldOfEntityType('Day'),
-    weekType: createFieldOfEntityType('Week type'),
-    subgroup: createFieldOfEntityType('Subgroup'),
+    teacher: createFieldOfEntityType('teacher'),
+    subject: createFieldOfEntityType('subject'),
+    lessonType: createFieldOfEntityType('lessonType'),
+    lessonTime: createFieldOfEntityType('lessonTime'),
+    classroom: createFieldOfEntityType('classroom'),
+    day: createFieldOfEntityType('day'),
+    weekType: createFieldOfEntityType('weekType'),
+    subgroup: createFieldOfEntityType('subgroup'),
   },
   (obj) => {
     return `Lesson`; // TODO
