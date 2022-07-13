@@ -6,22 +6,13 @@ import {
   updateEntityApi,
 } from '../api/apiCalls';
 import { generateCommonFormFor } from './generateCommomFormFor';
-
-export type FormTypes = 'create' | 'update';
-
-export interface AllEntities<T> {
-  academicStatus: T;
-  teacher: T;
-  subject: T;
-  lessonType: T;
-  lessonTime: T;
-  day: T;
-  weekType: T;
-  building: T;
-  classroom: T;
-  subgroup: T;
-  lesson: T;
-}
+import {
+  AllEntities,
+  AllEntitiesOfType,
+  ApiEndpoints,
+  EntityInfoFieldComplex,
+  EntityInfoFields,
+} from './types';
 
 const generateApiCallsObjectFor = (endpoint: string): ApiEndpoints => {
   return {
@@ -32,50 +23,26 @@ const generateApiCallsObjectFor = (endpoint: string): ApiEndpoints => {
   };
 };
 
-type EntityInfoFieldTypes = 'text' | 'number' | 'entity';
-
-interface EntityInfoFieldSimple {
-  label: string;
-  type: EntityInfoFieldTypes;
-}
-
-interface EntityInfoFieldComplex extends EntityInfoFieldSimple {
-  type: 'entity';
-  getEntitiesForList: () => Promise<any>;
-  makeShortShownName: (obj: any) => string;
-}
-
-interface EntityInfoFields {
-  [name: string]: EntityInfoFieldSimple | EntityInfoFieldComplex;
-}
-
-interface ApiEndpoints {
-  readAll: () => Promise<any[]>;
-  create: (obj: any) => Promise<string>;
-  update: (obj: any) => Promise<string>;
-  delete: (id: string) => Promise<string>;
-}
-
-export interface EntityInfoInterface {
+export interface EntityInfoInterface<T extends AllEntities> {
   name: string;
-  fields: EntityInfoFields;
+  fields: EntityInfoFields<T>;
   shortShownName: (obj: any) => string;
   api: ApiEndpoints;
   CreateForm: any;
   UpdateForm: any;
 }
 
-class EntityInfo implements EntityInfoInterface {
+class EntityInfo<T extends AllEntities> implements EntityInfoInterface<T> {
   name: string;
-  fields: EntityInfoFields;
+  fields: EntityInfoFields<T>;
   shortShownName: (obj: any) => string;
   api: ApiEndpoints;
   CreateForm: any;
   UpdateForm: any;
 
   constructor(
-    name: keyof AllEntities<any>,
-    fields: EntityInfoFields,
+    name: AllEntities,
+    fields: EntityInfoFields<T>,
     shortShownName: (obj: any) => string,
   ) {
     this.name = name;
@@ -88,7 +55,7 @@ class EntityInfo implements EntityInfoInterface {
   }
 }
 
-const createAllEntities = (): AllEntities<EntityInfoInterface> => {
+const createAllEntities = (): AllEntitiesOfType<EntityInfoInterface<AllEntities>> => {
   type lvl0DependencyEntitiesNames =
     | 'academicStatus'
     | 'subject'
@@ -101,8 +68,8 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
   type lvl1DependencyEntitiesNames = 'teacher' | 'classroom';
   type lvl2DependencyEntitiesNames = 'lesson';
 
-  const lvl0DependencyEntities: { [K in lvl0DependencyEntitiesNames]: EntityInfoInterface } = {
-    academicStatus: new EntityInfo(
+  const lvl0DependencyEntities: { [K in lvl0DependencyEntitiesNames]: EntityInfoInterface<any> } = {
+    academicStatus: new EntityInfo<'academicStatus'>(
       'academicStatus',
       {
         name: { label: 'Name', type: 'text' },
@@ -112,7 +79,7 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
         return `${obj.shortName}.`;
       },
     ),
-    subject: new EntityInfo(
+    subject: new EntityInfo<'subject'>(
       'subject',
       {
         name: { label: 'Name', type: 'text' },
@@ -122,7 +89,7 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
         return `${obj.shortName}`;
       },
     ),
-    lessonType: new EntityInfo(
+    lessonType: new EntityInfo<'lessonType'>(
       'lessonType',
       {
         name: { label: 'Name', type: 'text' },
@@ -132,7 +99,7 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
         return `${obj.shortName}.`;
       },
     ),
-    lessonTime: new EntityInfo(
+    lessonTime: new EntityInfo<'lessonTime'>(
       'lessonTime',
       {
         number: { label: 'Number', type: 'text' },
@@ -143,7 +110,7 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
         return `${obj.number} ${obj.timeStart}`;
       },
     ),
-    day: new EntityInfo(
+    day: new EntityInfo<'day'>(
       'day',
       {
         name: { label: 'Name', type: 'text' },
@@ -152,7 +119,7 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
         return `${obj.name}`;
       },
     ),
-    weekType: new EntityInfo(
+    weekType: new EntityInfo<'weekType'>(
       'weekType',
       {
         name: { label: 'Name', type: 'text' },
@@ -161,7 +128,7 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
         return `${obj.name}`;
       },
     ),
-    building: new EntityInfo(
+    building: new EntityInfo<'building'>(
       'building',
       {
         name: { label: 'Name', type: 'text' },
@@ -171,7 +138,7 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
         return `${obj.name}`;
       },
     ),
-    subgroup: new EntityInfo(
+    subgroup: new EntityInfo<'subgroup'>(
       'subgroup',
       {
         name: { label: 'Name', type: 'text' },
@@ -195,8 +162,8 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
     };
   };
 
-  const lvl1DependencyEntities: { [K in lvl1DependencyEntitiesNames]: EntityInfoInterface } = {
-    teacher: new EntityInfo(
+  const lvl1DependencyEntities: { [K in lvl1DependencyEntitiesNames]: EntityInfoInterface<any> } = {
+    teacher: new EntityInfo<'teacher'>(
       'teacher',
       {
         surname: { label: 'Surname', type: 'text' },
@@ -208,7 +175,7 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
         return `${obj.surname} ${obj.firstName[0]}.${obj.patronymic[0]}.`;
       },
     ),
-    classroom: new EntityInfo(
+    classroom: new EntityInfo<'classroom'>(
       'classroom',
       {
         number: { label: 'Number', type: 'text' },
@@ -233,8 +200,8 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
     };
   };
 
-  const lvl2DependencyEntities: { [K in lvl2DependencyEntitiesNames]: EntityInfoInterface } = {
-    lesson: new EntityInfo(
+  const lvl2DependencyEntities: { [K in lvl2DependencyEntitiesNames]: EntityInfoInterface<any> } = {
+    lesson: new EntityInfo<'lesson'>(
       'lesson',
       {
         teacher: createFieldOfEntityTypeLvl2('teacher'),
@@ -259,4 +226,5 @@ const createAllEntities = (): AllEntities<EntityInfoInterface> => {
   } as const;
 };
 
-export const commonEntitiesInfo: AllEntities<EntityInfoInterface> = createAllEntities();
+export const commonEntitiesInfo: AllEntitiesOfType<EntityInfoInterface<AllEntities>> =
+  createAllEntities();
