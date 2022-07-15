@@ -14,8 +14,15 @@ import {
   TableRow,
 } from '@mui/material';
 import { SUCCESS_MESSAGE } from '../api/apiCalls';
+import {
+  AllEntities,
+  EntityInfoFieldComplex,
+  EntityInfoFields,
+  FieldsOfType,
+} from '../common/types';
+import { EntityInfoInterface } from '../common/entitiesInfo';
 
-const useDialog = () => {
+const useDialog = (): [boolean, () => void, () => void] => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const open = () => {
@@ -29,12 +36,18 @@ const useDialog = () => {
   return [isOpen, open, close];
 };
 
-export const EntityPage = ({ name, fields, api, CreateForm, UpdateForm }) => {
-  const [entities, setEntities] = useState();
-  const [entityToUpdate, setEntityToUpdate] = useState();
+export function EntityPage<T extends AllEntities>({
+  name,
+  fields,
+  api,
+  CreateForm,
+  UpdateForm,
+}: EntityInfoInterface<T>) {
+  const [entities, setEntities] = useState([] as FieldsOfType<T>[]);
+  const [entityToUpdate, setEntityToUpdate] = useState({} as FieldsOfType<T>);
   const [isOpenCreateDialog, openCreateDialog, closeCreateDialog] = useDialog();
   const [isOpenUpdateDialog, openUpdateDialog, closeUpdateDialog] = useDialog();
-  const [executedOperation, setExecutedOperation] = useState();
+  const [executedOperation, setExecutedOperation] = useState(null as string | null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,9 +98,11 @@ export const EntityPage = ({ name, fields, api, CreateForm, UpdateForm }) => {
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
-              {Object.keys(fields).map((fieldName) => (
-                <TableCell key={fieldName}>{fields[fieldName].label}</TableCell>
-              ))}
+              {(() => {
+                for (const fieldName in fields) {
+                  return <TableCell key={fieldName}>{fields[fieldName].label}</TableCell>;
+                }
+              })()}
               <TableCell>Edit</TableCell>
               <TableCell>Delete</TableCell>
             </TableRow>
@@ -99,22 +114,34 @@ export const EntityPage = ({ name, fields, api, CreateForm, UpdateForm }) => {
                     key={JSON.stringify(entity)}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    {Object.keys(fields).map((fieldName) => (
-                      <TableCell key={`${JSON.stringify(entity)}-${fieldName}`}>
-                        {entity[fieldName]
-                          ? fields[fieldName].type === 'entity'
-                            ? fields[fieldName].makeShortShownName(entity[fieldName])
-                            : entity[fieldName]
-                          : null}
-                      </TableCell>
-                    ))}
+                    {(() => {
+                      const tableCells = [];
+                      for (const fieldName in fields) {
+                        tableCells.push(
+                          <TableCell key={`${JSON.stringify(entity)}-${fieldName}`}>
+                            {entity[fieldName]
+                              ? fields[fieldName].type === 'entity'
+                                ? (fields[fieldName] as EntityInfoFieldComplex).makeShortShownName(
+                                    entity[fieldName],
+                                  )
+                                : entity[fieldName]
+                              : null}
+                          </TableCell>,
+                        );
+                      }
+                      return tableCells;
+                    })()}
                     <TableCell align="right">
                       <Button
                         data-id={entity.id}
                         onClick={(e) => {
                           setEntityToUpdate({
                             ...entities.filter(
-                              (ent) => ent.id.toString() === e.target.dataset.id.toString(),
+                              (ent) =>
+                                (ent as { id: any }).id.toString() ===
+                                (
+                                  e.target as unknown as { dataset: { id: any } }
+                                ).dataset.id.toString(),
                             )[0],
                           });
                           openUpdateDialog();
@@ -128,7 +155,11 @@ export const EntityPage = ({ name, fields, api, CreateForm, UpdateForm }) => {
                         data-id={entity.id}
                         onClick={(e) => {
                           (async () => {
-                            const response = await api.delete(e.target.dataset.id.toString());
+                            const response = await api.delete(
+                              (
+                                e.target as unknown as { dataset: { id: any } }
+                              ).dataset.id.toString(),
+                            );
                             if (response === SUCCESS_MESSAGE) {
                               setExecutedOperation('delete');
                             }
@@ -146,4 +177,4 @@ export const EntityPage = ({ name, fields, api, CreateForm, UpdateForm }) => {
       </TableContainer>
     </>
   );
-};
+}
