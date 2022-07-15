@@ -12,6 +12,7 @@ import {
   ApiEndpoints,
   EntityInfoFieldComplex,
   EntityInfoFields,
+  FieldsOfType,
 } from './types';
 
 const generateApiCallsObjectFor = (endpoint: string): ApiEndpoints => {
@@ -225,6 +226,120 @@ const createAllEntities = (): AllEntitiesOfType<EntityInfoInterface<AllEntities>
     ...lvl2DependencyEntities,
   } as const;
 };
+
+export function createEmptyEntity<T extends AllEntities>(
+  typeOfEntity: AllEntities,
+): FieldsOfType<AllEntities> {
+  switch (typeOfEntity) {
+    case 'academicStatus':
+      return {
+        name: '',
+        shortName: '',
+      };
+    case 'subject':
+      return {
+        name: '',
+        shortName: '',
+      };
+
+    case 'lessonType':
+      return {
+        name: '',
+        shortName: '',
+      };
+    case 'lessonTime':
+      return {
+        number: '',
+        timeStart: '',
+        timeEnd: '',
+      };
+    case 'day':
+      return {
+        name: '',
+      } as FieldsOfType<'day'>;
+    case 'weekType':
+      return {
+        name: '',
+      };
+    case 'building':
+      return {
+        name: '',
+        address: '',
+      };
+    case 'subgroup':
+      return {
+        name: '',
+        groupName: '',
+        studentsNumber: 0,
+      };
+    case 'teacher':
+      return {
+        firstName: '',
+        surname: '',
+        patronymic: '',
+        academicStatus: {
+          name: '',
+          shortName: '',
+        },
+      };
+    case 'classroom':
+      return {
+        number: '',
+        capacity: 0,
+        building: {
+          name: '',
+          address: '',
+        },
+      };
+    case 'lesson':
+      return {
+        teacher: {
+          firstName: '',
+          surname: '',
+          patronymic: '',
+          academicStatus: {
+            name: '',
+            shortName: '',
+          },
+        },
+        subject: {
+          name: '',
+          shortName: '',
+        },
+        lessonType: {
+          name: '',
+          shortName: '',
+        },
+        lessonTime: {
+          number: '',
+          timeStart: '',
+          timeEnd: '',
+        },
+        classroom: {
+          number: '',
+          capacity: 0,
+          building: {
+            name: '',
+            address: '',
+          },
+        },
+        day: {
+          name: '',
+        },
+        weekType: {
+          name: '',
+        },
+        subgroup: {
+          name: '',
+          groupName: '',
+          studentsNumber: 0,
+        },
+      };
+    default: {
+      return typeOfEntity as never;
+    }
+  }
+}
 
 export const commonEntitiesInfo: AllEntitiesOfType<EntityInfoInterface<AllEntities>> =
   createAllEntities();
