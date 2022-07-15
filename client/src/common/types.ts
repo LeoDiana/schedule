@@ -56,12 +56,16 @@ export type FieldsOfType<T extends AllEntities> = T extends 'academicStatus'
   ? Lesson
   : never;
 
-export interface EntityInfoFieldSimple {
+export interface EntityInfoFieldCommon {
   label: string;
   type: EntityInfoFieldTypes;
 }
 
-export interface EntityInfoFieldComplex extends EntityInfoFieldSimple {
+export interface EntityInfoFieldSimple extends EntityInfoFieldCommon {
+  type: 'number' | 'text';
+}
+
+export interface EntityInfoFieldComplex extends EntityInfoFieldCommon {
   type: 'entity';
   getEntitiesForList: () => Promise<any>;
   makeShortShownName: (obj: any) => string;
@@ -79,8 +83,9 @@ export interface ApiEndpoints {
 }
 
 export interface FormScheme<T extends AllEntities> {
+  name: AllEntities;
   title: string;
   type: FormTypes;
   fields: EntityInfoFields<T>;
-  apiCall: ApiEndpoints;
+  apiCall: (entity: FieldsOfType<T>) => Promise<string>; // create or update
 }
