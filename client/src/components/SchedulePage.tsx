@@ -1,24 +1,19 @@
 /* eslint-disable react/prop-types */
 
 import React, { useEffect, useState } from 'react';
-import {
-  classroomInfo,
-  dayInfo,
-  lessonTimeInfo,
-  subgroupInfo,
-  teacherInfo,
-} from '../types/entitiesInfo';
 import { readLessonsWithFilter } from '../api/apiCalls';
+import { commonEntitiesInfo } from '../common/entitiesInfo';
+import { FieldsOfType } from '../common/types';
 
 export const SchedulePage = ({ filter = 'subgroup', filteredEntityId = '1' }) => {
-  const [days, setDays] = useState();
-  const [lessonTimes, setLessonTimes] = useState();
-  const [lessons, setLessons] = useState();
+  const [days, setDays] = useState([] as FieldsOfType<'day'>[]);
+  const [lessonTimes, setLessonTimes] = useState([] as FieldsOfType<'lessonTime'>[]);
+  const [lessons, setLessons] = useState([] as FieldsOfType<'lesson'>[]);
 
   useEffect(() => {
     const fetchData = async () => {
-      setDays(await dayInfo.api.readAll());
-      setLessonTimes(await lessonTimeInfo.api.readAll());
+      setDays(await commonEntitiesInfo.day.api.readAll());
+      setLessonTimes(await commonEntitiesInfo.lessonTime.api.readAll());
       setLessons(await readLessonsWithFilter(filteredEntityId, filter));
     };
 
@@ -33,22 +28,17 @@ export const SchedulePage = ({ filter = 'subgroup', filteredEntityId = '1' }) =>
   );
 };
 
-const les = [
-  {
-    day: { id: 1, name: 'Понеділок' },
-    lessonTime: { id: 1, number: 'I', timeStart: '8:00', timeEnd: '9:20' },
-  },
-  {
-    day: { id: 2, name: 'Вівторок' },
-    lessonTime: { id: 2, number: 'II', timeStart: '9:45', timeEnd: '11:05' },
-  },
-];
-
-const indexInGrid = (list, val) => {
-  return list.findIndex((item) => item.id.toString() === val.id.toString()) + 2;
+const indexInGrid = (list: any, val: any) => {
+  return list.findIndex((item: any) => item.id.toString() === val.id.toString()) + 2;
 };
 
-const Schedule = ({ days, lessonTimes, lessons }) => {
+type ScheduleParams = {
+  days: FieldsOfType<'day'>[];
+  lessonTimes: FieldsOfType<'lessonTime'>[];
+  lessons: FieldsOfType<'lesson'>[];
+};
+
+const Schedule = ({ days, lessonTimes, lessons }: ScheduleParams) => {
   return (
     <>
       <div
@@ -110,10 +100,10 @@ const Schedule = ({ days, lessonTimes, lessons }) => {
                   <strong>{item.subject.shortName}</strong>
                 </p>
                 <p style={{ margin: 0, color: 'white' }}>
-                  {teacherInfo.shortShownName(item.teacher)}
+                  {commonEntitiesInfo.teacher.shortShownName(item.teacher)}
                 </p>
                 <p style={{ margin: 0, color: 'white' }}>
-                  {classroomInfo.shortShownName(item.classroom)}
+                  {commonEntitiesInfo.classroom.shortShownName(item.classroom)}
                 </p>
               </div>
             ))

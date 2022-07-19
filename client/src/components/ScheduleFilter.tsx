@@ -1,32 +1,33 @@
 import { MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { subgroupInfo, teacherInfo } from '../types/entitiesInfo';
 import { SchedulePage } from './SchedulePage';
+import { commonEntitiesInfo } from '../common/entitiesInfo';
 
-const filterTypes = ['subgroup', 'teacher'];
+const filterTypes: Filters[] = ['subgroup', 'teacher'];
+type Filters = 'subgroup' | 'teacher';
 
 export const ScheduleFilter = () => {
   const [typeFilter, setTypeFilter] = useState(filterTypes[0]);
   const [selectedEntity, setSelectedEntity] = useState();
 
-  const [entities, setEntities] = useState({});
+  const [entities, setEntities] = useState({} as { [k in Filters]: any });
 
   useEffect(() => {
-    const fetchedEntities = {};
+    const fetchedEntities: { [k in Filters]: any } = {} as { [k in Filters]: any };
     const fetchData = async () => {
-      fetchedEntities['subgroup'] = await subgroupInfo.api.readAll();
-      fetchedEntities['teacher'] = await teacherInfo.api.readAll();
+      fetchedEntities['subgroup'] = await commonEntitiesInfo.subgroup.api.readAll();
+      fetchedEntities['teacher'] = await commonEntitiesInfo.teacher.api.readAll();
       setEntities(fetchedEntities);
     };
 
     fetchData();
   }, []);
 
-  const handleTypeChange = (e) => {
+  const handleTypeChange = (e: any) => {
     setTypeFilter(e.target.value);
   };
 
-  const handleEntityChange = (e) => {
+  const handleEntityChange = (e: any) => {
     setSelectedEntity(e.target.value);
   };
 
@@ -41,17 +42,22 @@ export const ScheduleFilter = () => {
       </Select>
       {typeFilter && entities[typeFilter] ? (
         <Select id="entity" label="entity" value={selectedEntity} onChange={handleEntityChange}>
-          {entities[typeFilter].map((item) => (
+          {entities[typeFilter].map((item: any) => (
             <MenuItem value={item} key={JSON.stringify(item)}>
               {typeFilter === 'teacher'
-                ? teacherInfo.shortShownName(item)
-                : subgroupInfo.shortShownName(item)}
+                ? commonEntitiesInfo.teacher.shortShownName(item)
+                : commonEntitiesInfo.subgroup.shortShownName(item)}
             </MenuItem>
           ))}
         </Select>
       ) : null}
       {typeFilter && selectedEntity ? (
-        <SchedulePage {...{ filter: typeFilter, filteredEntityId: selectedEntity.id }} />
+        <SchedulePage
+          {...{
+            filter: typeFilter,
+            filteredEntityId: (selectedEntity as unknown as { id: any }).id,
+          }}
+        />
       ) : null}
     </>
   );
