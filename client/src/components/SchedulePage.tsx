@@ -20,6 +20,14 @@ export const SchedulePage = ({ filter = 'subgroup', filteredEntityId = '1' }) =>
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setLessons(await readLessonsWithFilter(filteredEntityId, filter));
+    };
+
+    fetchData();
+  }, [filter, filteredEntityId]);
+
   return (
     <>
       <h1>Title</h1>
