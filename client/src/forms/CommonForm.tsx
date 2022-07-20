@@ -18,15 +18,16 @@ TODO add error message in validation form
 const createFormValidationSchema = (fields: any) => {
   const validationSchema: { [k: string]: any } = {};
   Object.keys(fields).forEach((fieldName) => {
+    const requiredError = `${fields[fieldName].label} is required`;
     switch (fields[fieldName].type) {
       case 'text':
-        validationSchema[fieldName] = Yup.string().required();
+        validationSchema[fieldName] = Yup.string().required(requiredError);
         break;
       case 'number':
-        validationSchema[fieldName] = Yup.number().required();
+        validationSchema[fieldName] = Yup.number().required(requiredError);
         break;
       case 'entity':
-        validationSchema[fieldName] = Yup.object().required();
+        validationSchema[fieldName] = Yup.object().required(requiredError);
         break;
     }
   });
@@ -86,6 +87,7 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
         initialValues={initialValues}
         onSubmit={(values, actions) => {
           apiCall(values);
+          setDisplayFormStatus(true);
           setTimeout(() => {
             actions.setSubmitting(false);
           }, 500);
@@ -96,8 +98,8 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
           const { values, touched, errors, handleBlur, handleChange, isSubmitting } = props;
           return (
             <Form>
-              <h1>{formScheme.title}</h1>
-              <Grid container direction="row">
+              <h1 style={{ textAlign: 'center' }}>{formScheme.title}</h1>
+              <Grid container direction="row" justifyContent="center">
                 {(() => {
                   const fieldComponents = [];
                   for (const fieldName in formScheme.fields) {
@@ -106,8 +108,9 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
                         {(() => {
                           const vals = values as FieldsOfType<T>;
                           const fieldVal = vals[fieldName];
-                          const errName = (errors as { name: string }).name;
-                          const touchedName = (touched as { name: string }).name;
+                          const errName = (errors as { [k: string]: boolean })[fieldName];
+                          const touchedName = (touched as { [k: string]: boolean })[fieldName];
+                          console.log(formScheme.fields);
                           if (
                             formScheme.fields[fieldName].type === 'text' ||
                             formScheme.fields[fieldName].type === 'number'
@@ -119,14 +122,17 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
                                 label={formScheme.fields[fieldName].label}
                                 value={fieldVal}
                                 type={formScheme.fields[fieldName].type}
-                                helperText={
-                                  errName && touchedName
-                                    ? errName
-                                    : `Enter ${formScheme.fields[fieldName].label}`
-                                }
-                                error={!!(errName && touchedName)}
+                                helperText={errName && touchedName ? errName : null}
+                                error={errName && touchedName}
                                 onChange={handleChange}
+                                onFocus={() => {
+                                  setDisplayFormStatus(false);
+                                }}
                                 onBlur={handleBlur}
+                                required
+                                autoComplete="off"
+                                margin="dense"
+                                fullWidth
                               />
                             );
                           }
@@ -135,26 +141,32 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
                               fieldName
                             ];
                             return (
-                              <Select
+                              <TextField
                                 name={fieldName}
                                 id={fieldName}
+                                select
                                 label={formScheme.fields[fieldName].label}
-                                labelId={formScheme.fields[fieldName].label}
                                 value={fieldVal}
-                                error={!!(errName && touchedName)}
+                                error={errName && touchedName}
                                 onChange={handleChange}
+                                onFocus={() => {
+                                  setDisplayFormStatus(false);
+                                }}
                                 onBlur={handleBlur}
+                                required
+                                margin="dense"
+                                fullWidth
                               >
                                 <MenuItem value="">
                                   <em>None</em>
                                 </MenuItem>
-                                {obj && obj[fieldName] ? (
-                                  <MenuItem value={JSON.stringify(fieldVal)}>
-                                    {(
-                                      formScheme.fields[fieldName] as EntityInfoFieldComplex
-                                    ).makeShortShownName(fieldVal)}
-                                  </MenuItem>
-                                ) : null}
+                                {/*{obj && obj[fieldName] ? (*/}
+                                {/*  <MenuItem value={JSON.stringify(fieldVal)}>*/}
+                                {/*    {(*/}
+                                {/*      formScheme.fields[fieldName] as EntityInfoFieldComplex*/}
+                                {/*    ).makeShortShownName(fieldVal)}*/}
+                                {/*  </MenuItem>*/}
+                                {/*) : null}*/}
                                 {fetchedEntities
                                   ? fetchedEntities.map((item: any) => (
                                       <MenuItem value={item} key={JSON.stringify(item)}>
@@ -164,7 +176,7 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
                                       </MenuItem>
                                     ))
                                   : null}
-                              </Select>
+                              </TextField>
                             );
                           }
                         })()}
@@ -173,8 +185,15 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
                   }
                   return fieldComponents;
                 })()}
-                <Grid item lg={10} md={10} sm={10} xs={10}>
-                  <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+                <Grid item lg={10} md={10} sm={10} xs={10} margin={'1em'}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    disabled={isSubmitting}
+                    fullWidth
+                    size="large"
+                  >
                     Submit
                   </Button>
                   {displayFormStatus && (

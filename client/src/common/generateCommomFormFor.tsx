@@ -10,15 +10,20 @@ export const ENTITY_SHOWN_NAMES: AllEntities<string> = {
   academicStatus: 'Academic status',
   teacher: 'Teacher',
   subject: 'Subject',
-  lessonType: 'Lesson types',
-  lessonTime: 'Lesson times',
-  day: 'Days',
-  weekType: 'Week types',
-  building: 'Buildings',
-  classroom: 'Classrooms',
-  subgroup: 'Subgroups',
-  lesson: 'Lessons',
+  lessonType: 'Lesson type',
+  lessonTime: 'Lesson time',
+  day: 'Day',
+  weekType: 'Week type',
+  building: 'Building',
+  classroom: 'Classroom',
+  subgroup: 'Subgroup',
+  group: 'Group',
+  lesson: 'Lesson',
 };
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 export const generateCommonFormFor = (formType: FormTypes, infoObj: EntityInfoInterface) => {
   if (formType === 'create') {
@@ -26,7 +31,7 @@ export const generateCommonFormFor = (formType: FormTypes, infoObj: EntityInfoIn
       <CommonForm
         {...{
           formScheme: {
-            title: `${formType} ${ENTITY_SHOWN_NAMES[infoObj.name]}`,
+            title: `${capitalize(formType)} ${ENTITY_SHOWN_NAMES[infoObj.name]}`,
             type: formType,
             fields: infoObj.fields,
             apiCall: async (obj: any) => {
@@ -41,7 +46,7 @@ export const generateCommonFormFor = (formType: FormTypes, infoObj: EntityInfoIn
     <CommonForm
       {...{
         formScheme: {
-          title: `${formType} ${infoObj.name}`,
+          title: `${capitalize(formType)} ${ENTITY_SHOWN_NAMES[infoObj.name]}`,
           type: formType,
           fields: infoObj.fields,
           apiCall: async (obj: any) => {

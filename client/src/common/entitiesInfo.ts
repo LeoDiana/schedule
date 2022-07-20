@@ -5,7 +5,7 @@ import {
   readEntitiesApi,
   updateEntityApi,
 } from '../api/apiCalls';
-import { generateCommonFormFor } from './generateCommomFormFor';
+import { ENTITY_SHOWN_NAMES, generateCommonFormFor } from './generateCommomFormFor';
 import {
   AllEntities,
   AllEntitiesOfType,
@@ -155,7 +155,7 @@ const createAllEntities = (): AllEntitiesOfType<EntityInfoInterface<AllEntities>
     label: lvl0DependencyEntitiesNames,
   ): EntityInfoFieldComplex => {
     return {
-      label,
+      label: ENTITY_SHOWN_NAMES[label],
       type: 'entity',
       getEntitiesForList: lvl0DependencyEntities[label].api.readAll,
       makeShortShownName: (obj) => lvl0DependencyEntities[label].shortShownName(obj),
@@ -207,7 +207,7 @@ const createAllEntities = (): AllEntitiesOfType<EntityInfoInterface<AllEntities>
   ): EntityInfoFieldComplex => {
     const availableEntities = { ...lvl0DependencyEntities, ...lvl1DependencyEntities };
     return {
-      label,
+      label: ENTITY_SHOWN_NAMES[label],
       type: 'entity',
       getEntitiesForList: availableEntities[label].api.readAll,
       makeShortShownName: (obj) => availableEntities[label].shortShownName(obj),
