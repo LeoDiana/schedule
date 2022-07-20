@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Group } from '../groups/groups.entity';
+import { AcademicStatus } from '../academic-statuses/academic-statuses.entity';
 
 @Entity()
 export class Subgroup {
@@ -16,8 +17,9 @@ export class Subgroup {
   name: string;
 
   @Column()
-  groupName: string;
-
-  @Column()
   studentsNumber: number;
+
+  @ManyToOne(() => Group, { eager: true })
+  @JoinColumn()
+  group: Group;
 }

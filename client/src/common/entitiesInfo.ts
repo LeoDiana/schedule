@@ -65,8 +65,8 @@ const createAllEntities = (): AllEntitiesOfType<EntityInfoInterface<AllEntities>
     | 'day'
     | 'weekType'
     | 'building'
-    | 'subgroup';
-  type lvl1DependencyEntitiesNames = 'teacher' | 'classroom';
+    | 'group';
+  type lvl1DependencyEntitiesNames = 'teacher' | 'classroom' | 'subgroup';
   type lvl2DependencyEntitiesNames = 'lesson';
 
   const lvl0DependencyEntities: { [K in lvl0DependencyEntitiesNames]: EntityInfoInterface<any> } = {
@@ -139,15 +139,14 @@ const createAllEntities = (): AllEntitiesOfType<EntityInfoInterface<AllEntities>
         return `${obj.name}`;
       },
     ),
-    subgroup: new EntityInfo<'subgroup'>(
-      'subgroup',
+    group: new EntityInfo<'group'>(
+      'group',
       {
         name: { label: 'Name', type: 'text' },
-        groupName: { label: 'Group name', type: 'text' },
-        studentsNumber: { label: 'Students number', type: 'number' },
+        startYear: { label: 'Start year', type: 'number' },
       },
       (obj) => {
-        return `${obj.groupName} ${obj.name}`;
+        return `${obj.name}`;
       },
     ),
   };
@@ -185,6 +184,20 @@ const createAllEntities = (): AllEntitiesOfType<EntityInfoInterface<AllEntities>
       },
       (obj) => {
         return `${obj.number} ${commonEntitiesInfo['building'].shortShownName(obj.building)}`;
+      },
+    ),
+    subgroup: new EntityInfo<'subgroup'>(
+      'subgroup',
+      {
+        name: { label: 'Name', type: 'text' },
+        studentsNumber: { label: 'Students number', type: 'number' },
+        group: createFieldOfEntityTypeLvl1('group'),
+      },
+      (obj) => {
+        if (obj.group.name === obj.name) {
+          return `${obj.name}`;
+        }
+        return `${obj.group.name} ${obj.name}`;
       },
     ),
   };
@@ -266,11 +279,10 @@ export function createEmptyEntity<T extends AllEntities>(
         name: '',
         address: '',
       };
-    case 'subgroup':
+    case 'group':
       return {
         name: '',
-        groupName: '',
-        studentsNumber: 0,
+        startYear: 0,
       };
     case 'teacher':
       return {
@@ -289,6 +301,15 @@ export function createEmptyEntity<T extends AllEntities>(
         building: {
           name: '',
           address: '',
+        },
+      };
+    case 'subgroup':
+      return {
+        name: '',
+        studentsNumber: 0,
+        group: {
+          name: '',
+          startYear: 0,
         },
       };
     case 'lesson':
@@ -331,7 +352,10 @@ export function createEmptyEntity<T extends AllEntities>(
         },
         subgroup: {
           name: '',
-          groupName: '',
+          group: {
+            name: '',
+            startYear: 0,
+          },
           studentsNumber: 0,
         },
       };

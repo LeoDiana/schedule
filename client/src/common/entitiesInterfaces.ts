@@ -39,10 +39,16 @@ export interface Building {
   address: string;
 }
 
+export interface Group {
+  id?: string;
+  name: string;
+  startYear: number;
+}
+
 export interface Subgroup {
   id?: string;
   name: string;
-  groupName: string;
+  group: Group;
   studentsNumber: number;
 }
 

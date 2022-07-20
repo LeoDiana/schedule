@@ -14,6 +14,7 @@ export const ENDPOINTS = {
   building: 'buildings',
   classroom: 'classrooms',
   subgroup: 'subgroups',
+  group: 'groups',
   lesson: 'lessons',
 };
 

@@ -9,8 +9,5 @@ export class Group {
   name: string;
 
   @Column()
-  studentsNumber: number;
-
-  @Column()
   startYear: number;
 }

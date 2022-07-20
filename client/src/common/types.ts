@@ -3,6 +3,7 @@ import {
   Building,
   Classroom,
   Day,
+  Group,
   Lesson,
   LessonTime,
   LessonType,
@@ -25,6 +26,7 @@ export interface AllEntitiesOfType<T> {
   building: T;
   classroom: T;
   subgroup: T;
+  group: T;
   lesson: T;
 }
 
@@ -52,6 +54,8 @@ export type FieldsOfType<T extends AllEntities> = T extends 'academicStatus'
   ? Classroom
   : T extends 'subgroup'
   ? Subgroup
+  : T extends 'group'
+  ? Group
   : T extends 'lesson'
   ? Lesson
   : never;
