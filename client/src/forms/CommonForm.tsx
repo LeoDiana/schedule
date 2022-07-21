@@ -5,15 +5,38 @@ import { Button, Grid, MenuItem, Select, TextField } from '@mui/material';
 import { Form, Formik, FormikValues } from 'formik';
 import * as Yup from 'yup';
 
-import { ERROR_MESSAGE, SUCCESS_MESSAGE } from '../api/apiCalls';
-import { formStatusProps } from './common';
 import { AllEntities, EntityInfoFieldComplex, FieldsOfType, FormScheme } from '../common/types';
 import { createEmptyEntity } from '../common/entitiesInfo';
+import { ERROR_MESSAGE, SUCCESS_MESSAGE } from '../common/constants';
 
 /*
 TODO config form status
 TODO add error message in validation form
 * */
+
+export interface FormStatus {
+  message: string;
+  type: string;
+}
+
+export interface FormStatusProps {
+  [key: string]: FormStatus;
+}
+
+export const formStatusProps: FormStatusProps = {
+  success: {
+    message: 'Success',
+    type: 'success',
+  },
+  duplicate: {
+    message: 'Same entity already exist.',
+    type: 'error',
+  },
+  error: {
+    message: 'Something went wrong. Please try again.',
+    type: 'error',
+  },
+};
 
 const createFormValidationSchema = (fields: any) => {
   const validationSchema: { [k: string]: any } = {};

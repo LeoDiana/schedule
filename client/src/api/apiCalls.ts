@@ -1,22 +1,5 @@
 import { instance as axios } from './axiosConfig';
-
-export const ERROR_MESSAGE = 'Error occurred';
-export const SUCCESS_MESSAGE = 'Success';
-
-export const ENDPOINTS = {
-  academicStatus: 'academic-statuses',
-  teacher: 'teachers',
-  subject: 'subjects',
-  lessonType: 'lesson-types',
-  lessonTime: 'lesson-times',
-  day: 'days',
-  weekType: 'week-types',
-  building: 'buildings',
-  classroom: 'classrooms',
-  subgroup: 'subgroups',
-  group: 'groups',
-  lesson: 'lessons',
-};
+import { ENDPOINTS, ERROR_MESSAGE, SUCCESS_MESSAGE } from '../common/constants';
 
 export const readEntitiesApi = async (endpoint: string): Promise<any[]> => {
   try {

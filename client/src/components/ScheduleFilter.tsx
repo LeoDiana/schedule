@@ -2,18 +2,17 @@ import { MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { SchedulePage } from './SchedulePage';
 import { commonEntitiesInfo } from '../common/entitiesInfo';
-
-const filterTypes: Filters[] = ['subgroup', 'teacher'];
-type Filters = 'subgroup' | 'teacher';
+import { FILTERS } from '../common/constants';
+import { FilterTypes } from '../common/types';
 
 export const ScheduleFilter = () => {
-  const [typeFilter, setTypeFilter] = useState(filterTypes[0]);
+  const [typeFilter, setTypeFilter] = useState(FILTERS[0]);
   const [selectedEntity, setSelectedEntity] = useState();
 
-  const [entities, setEntities] = useState({} as { [k in Filters]: any });
+  const [entities, setEntities] = useState({} as { [k in FilterTypes]: any });
 
   useEffect(() => {
-    const fetchedEntities: { [k in Filters]: any } = {} as { [k in Filters]: any };
+    const fetchedEntities: { [k in FilterTypes]: any } = {} as { [k in FilterTypes]: any };
     const fetchData = async () => {
       fetchedEntities['subgroup'] = await commonEntitiesInfo.subgroup.api.readAll();
       fetchedEntities['teacher'] = await commonEntitiesInfo.teacher.api.readAll();
@@ -34,7 +33,7 @@ export const ScheduleFilter = () => {
   return (
     <>
       <Select id="type" label="Type" value={typeFilter} onChange={handleTypeChange}>
-        {filterTypes.map((item) => (
+        {FILTERS.map((item) => (
           <MenuItem value={item} key={item}>
             {item}
           </MenuItem>

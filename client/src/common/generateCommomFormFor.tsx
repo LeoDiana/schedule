@@ -5,21 +5,7 @@
 import CommonForm from '../forms/CommonForm';
 import React from 'react';
 import { AllEntities, EntityInfoInterface, FormTypes } from './entitiesInfo';
-
-export const ENTITY_SHOWN_NAMES: AllEntities<string> = {
-  academicStatus: 'Academic status',
-  teacher: 'Teacher',
-  subject: 'Subject',
-  lessonType: 'Lesson type',
-  lessonTime: 'Lesson time',
-  day: 'Day',
-  weekType: 'Week type',
-  building: 'Building',
-  classroom: 'Classroom',
-  subgroup: 'Subgroup',
-  group: 'Group',
-  lesson: 'Lesson',
-};
+import { ENTITY_SHOWN_NAMES } from './constants';
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);

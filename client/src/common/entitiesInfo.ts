@@ -1,20 +1,19 @@
 import {
-  ENDPOINTS,
   createEntityApi,
   deleteEntityApi,
   readEntitiesApi,
   updateEntityApi,
 } from '../api/apiCalls';
-import { ENTITY_SHOWN_NAMES, generateCommonFormFor } from './generateCommomFormFor';
+import { generateCommonFormFor } from './generateCommomFormFor';
 import {
   AllEntities,
   AllEntitiesOfType,
   ApiEndpoints,
   EntityInfoFieldComplex,
   EntityInfoFields,
-  FieldsOfType,
   SimpleFieldsOfType,
 } from './types';
+import { ENDPOINTS, ENTITY_SHOWN_NAMES } from './constants';
 
 const generateApiCallsObjectFor = (endpoint: string): ApiEndpoints => {
   return {

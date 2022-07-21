@@ -13,14 +13,9 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { SUCCESS_MESSAGE } from '../api/apiCalls';
-import {
-  AllEntities,
-  EntityInfoFieldComplex,
-  EntityInfoFields,
-  FieldsOfType,
-} from '../common/types';
+import { AllEntities, EntityInfoFieldComplex, FieldsOfType } from '../common/types';
 import { EntityInfoInterface } from '../common/entitiesInfo';
+import { ENTITY_SHOWN_NAMES, SUCCESS_MESSAGE } from '../common/constants';
 
 const useDialog = (): [boolean, () => void, () => void] => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -79,9 +74,6 @@ export function EntityPage<T extends AllEntities>({
           <CreateForm />
         </DialogContent>
       </Dialog>
-      <Button onClick={openCreateDialog} variant="contained" color="primary">
-        Add new
-      </Button>
       <Dialog
         open={isOpenUpdateDialog}
         onClose={() => {
@@ -93,15 +85,24 @@ export function EntityPage<T extends AllEntities>({
           <UpdateForm {...entityToUpdate} />
         </DialogContent>
       </Dialog>
-      <h1>{name}</h1>
+      <div style={{ margin: '15px 0' }}>
+        <h1 style={{ display: 'inline-block', margin: '0 15px' }}>
+          {ENTITY_SHOWN_NAMES[name as AllEntities]}
+        </h1>
+        <Button onClick={openCreateDialog} variant="contained" color="primary">
+          Add new
+        </Button>
+      </div>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
               {(() => {
+                const rows = [];
                 for (const fieldName in fields) {
-                  return <TableCell key={fieldName}>{fields[fieldName].label}</TableCell>;
+                  rows.push(<TableCell key={fieldName}>{fields[fieldName].label}</TableCell>);
                 }
+                return rows;
               })()}
               <TableCell>Edit</TableCell>
               <TableCell>Delete</TableCell>
@@ -152,6 +153,7 @@ export function EntityPage<T extends AllEntities>({
                     </TableCell>
                     <TableCell align="right">
                       <Button
+                        color="warning"
                         data-id={entity.id}
                         onClick={(e) => {
                           (async () => {

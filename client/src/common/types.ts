@@ -14,6 +14,7 @@ import {
 } from './entitiesInterfaces';
 
 export type FormTypes = 'create' | 'update';
+export type FilterTypes = 'subgroup' | 'teacher';
 
 export interface AllEntitiesOfType<T> {
   academicStatus: T;
