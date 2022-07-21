@@ -27,7 +27,7 @@ const createFormValidationSchema = (fields: any) => {
         validationSchema[fieldName] = Yup.number().required(requiredError);
         break;
       case 'entity':
-        validationSchema[fieldName] = Yup.object().required(requiredError);
+        validationSchema[fieldName] = Yup.string().required(requiredError); //Yup.object().required(requiredError);
         break;
     }
   });
@@ -67,7 +67,24 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
   const initialValues = obj || createEmptyEntity(formScheme.name) || {};
   const validationSchema = createFormValidationSchema(formScheme.fields);
 
-  const apiCall = async (data: FormikValues, resetForm?: any) => {
+  const transformEntityFieldsValuesToObject = (formValues: FormikValues) => {
+    let updatedData = { ...formValues };
+    for (const fieldName in formScheme.fields) {
+      if (formScheme.fields[fieldName].type === 'entity') {
+        const selectedEntity = (entityFieldsData as { [k: string]: any[] })[fieldName].find(
+          (el: any) => el.id === formValues[fieldName],
+        );
+        updatedData = {
+          ...updatedData,
+          [fieldName]: selectedEntity,
+        };
+      }
+    }
+    return updatedData;
+  };
+
+  const apiCall = async (formValues: FormikValues, resetForm?: any) => {
+    const data = transformEntityFieldsValuesToObject(formValues);
     const newEntity = (obj ? { id: obj.id, ...data } : data) as FieldsOfType<T>;
     const response = await formScheme.apiCall(newEntity);
     if (response === ERROR_MESSAGE) {
@@ -110,7 +127,6 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
                           const fieldVal = vals[fieldName];
                           const errName = (errors as { [k: string]: boolean })[fieldName];
                           const touchedName = (touched as { [k: string]: boolean })[fieldName];
-                          console.log(formScheme.fields);
                           if (
                             formScheme.fields[fieldName].type === 'text' ||
                             formScheme.fields[fieldName].type === 'number'
@@ -146,7 +162,13 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
                                 id={fieldName}
                                 select
                                 label={formScheme.fields[fieldName].label}
-                                value={fieldVal}
+                                value={
+                                  fieldVal
+                                    ? (fieldVal as unknown as { id: any }).id
+                                      ? (fieldVal as unknown as { id: any }).id
+                                      : fieldVal
+                                    : undefined
+                                }
                                 error={errName && touchedName}
                                 onChange={handleChange}
                                 onFocus={() => {
@@ -157,19 +179,9 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
                                 margin="dense"
                                 fullWidth
                               >
-                                <MenuItem value="">
-                                  <em>None</em>
-                                </MenuItem>
-                                {/*{obj && obj[fieldName] ? (*/}
-                                {/*  <MenuItem value={JSON.stringify(fieldVal)}>*/}
-                                {/*    {(*/}
-                                {/*      formScheme.fields[fieldName] as EntityInfoFieldComplex*/}
-                                {/*    ).makeShortShownName(fieldVal)}*/}
-                                {/*  </MenuItem>*/}
-                                {/*) : null}*/}
                                 {fetchedEntities
                                   ? fetchedEntities.map((item: any) => (
-                                      <MenuItem value={item} key={JSON.stringify(item)}>
+                                      <MenuItem value={item.id} key={JSON.stringify(item)}>
                                         {(
                                           formScheme.fields[fieldName] as EntityInfoFieldComplex
                                         ).makeShortShownName(item) || item.name}
