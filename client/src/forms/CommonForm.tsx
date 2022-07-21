@@ -64,7 +64,20 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
     type: '',
   });
 
-  const initialValues = obj || createEmptyEntity(formScheme.name) || {};
+  const simplifyEntityFields = (obj: any) => {
+    if (!obj) {
+      return obj;
+    }
+    const newObj = { ...obj };
+    for (const fieldName in formScheme.fields) {
+      if (formScheme.fields[fieldName].type === 'entity') {
+        newObj[fieldName] = newObj[fieldName].id;
+      }
+    }
+    return newObj;
+  };
+
+  const initialValues = simplifyEntityFields(obj) || createEmptyEntity(formScheme.name) || {};
   const validationSchema = createFormValidationSchema(formScheme.fields);
 
   const transformEntityFieldsValuesToObject = (formValues: FormikValues) => {
@@ -125,7 +138,9 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
                         {(() => {
                           const vals = values as FieldsOfType<T>;
                           const fieldVal = vals[fieldName];
-                          const errName = (errors as { [k: string]: boolean })[fieldName];
+                          const errName = (errors as unknown as { [k: string]: boolean })[
+                            fieldName
+                          ];
                           const touchedName = (touched as { [k: string]: boolean })[fieldName];
                           if (
                             formScheme.fields[fieldName].type === 'text' ||
@@ -162,13 +177,7 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
                                 id={fieldName}
                                 select
                                 label={formScheme.fields[fieldName].label}
-                                value={
-                                  fieldVal
-                                    ? (fieldVal as unknown as { id: any }).id
-                                      ? (fieldVal as unknown as { id: any }).id
-                                      : fieldVal
-                                    : undefined
-                                }
+                                value={fieldVal}
                                 error={errName && touchedName}
                                 onChange={handleChange}
                                 onFocus={() => {

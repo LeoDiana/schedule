@@ -13,6 +13,7 @@ import {
   EntityInfoFieldComplex,
   EntityInfoFields,
   FieldsOfType,
+  SimpleFieldsOfType,
 } from './types';
 
 const generateApiCallsObjectFor = (endpoint: string): ApiEndpoints => {
@@ -242,123 +243,77 @@ const createAllEntities = (): AllEntitiesOfType<EntityInfoInterface<AllEntities>
 
 export function createEmptyEntity<T extends AllEntities>(
   typeOfEntity: AllEntities,
-): FieldsOfType<AllEntities> {
+): SimpleFieldsOfType<AllEntities> {
   switch (typeOfEntity) {
     case 'academicStatus':
       return {
         name: '',
         shortName: '',
-      };
+      } as SimpleFieldsOfType<'academicStatus'>;
     case 'subject':
       return {
         name: '',
         shortName: '',
-      };
-
+      } as SimpleFieldsOfType<'subject'>;
     case 'lessonType':
       return {
         name: '',
         shortName: '',
-      };
+      } as SimpleFieldsOfType<'lessonType'>;
     case 'lessonTime':
       return {
         number: '',
         timeStart: '',
         timeEnd: '',
-      };
+      } as SimpleFieldsOfType<'lessonTime'>;
     case 'day':
       return {
         name: '',
-      } as FieldsOfType<'day'>;
+      } as SimpleFieldsOfType<'day'>;
     case 'weekType':
       return {
         name: '',
-      };
+      } as SimpleFieldsOfType<'weekType'>;
     case 'building':
       return {
         name: '',
         address: '',
-      };
+      } as SimpleFieldsOfType<'building'>;
     case 'group':
       return {
         name: '',
         startYear: 0,
-      };
+      } as SimpleFieldsOfType<'group'>;
     case 'teacher':
       return {
         firstName: '',
         surname: '',
         patronymic: '',
-        academicStatus: {
-          name: '',
-          shortName: '',
-        },
-      };
+        academicStatus: 0,
+      } as SimpleFieldsOfType<'teacher'>;
     case 'classroom':
       return {
         number: '',
         capacity: 0,
-        building: {
-          name: '',
-          address: '',
-        },
-      };
+        building: 0,
+      } as SimpleFieldsOfType<'classroom'>;
     case 'subgroup':
       return {
         name: '',
         studentsNumber: 0,
-        group: {
-          name: '',
-          startYear: 0,
-        },
-      };
+        group: 0,
+      } as SimpleFieldsOfType<'subgroup'>;
     case 'lesson':
       return {
-        teacher: {
-          firstName: '',
-          surname: '',
-          patronymic: '',
-          academicStatus: {
-            name: '',
-            shortName: '',
-          },
-        },
-        subject: {
-          name: '',
-          shortName: '',
-        },
-        lessonType: {
-          name: '',
-          shortName: '',
-        },
-        lessonTime: {
-          number: '',
-          timeStart: '',
-          timeEnd: '',
-        },
-        classroom: {
-          number: '',
-          capacity: 0,
-          building: {
-            name: '',
-            address: '',
-          },
-        },
-        day: {
-          name: '',
-        },
-        weekType: {
-          name: '',
-        },
-        subgroup: {
-          name: '',
-          group: {
-            name: '',
-            startYear: 0,
-          },
-          studentsNumber: 0,
-        },
-      };
+        teacher: 0,
+        subject: 0,
+        lessonType: 0,
+        lessonTime: 0,
+        classroom: 0,
+        day: 0,
+        weekType: 0,
+        subgroup: 0,
+      } as SimpleFieldsOfType<'lesson'>;
     default: {
       return typeOfEntity as never;
     }

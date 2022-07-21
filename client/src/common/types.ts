@@ -60,6 +60,10 @@ export type FieldsOfType<T extends AllEntities> = T extends 'academicStatus'
   ? Lesson
   : never;
 
+export type SimpleFieldsOfType<T extends AllEntities> = {
+  [k in keyof FieldsOfType<T>]: string | number;
+};
+
 export interface EntityInfoFieldCommon {
   label: string;
   type: EntityInfoFieldTypes;
