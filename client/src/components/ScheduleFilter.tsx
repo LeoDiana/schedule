@@ -1,6 +1,6 @@
 import { MenuItem, Select } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { SchedulePage } from './SchedulePage';
+import { SchedulePage } from '../pages/SchedulePage';
 import { commonEntitiesInfo } from '../common/entitiesInfo';
 import { FILTERS } from '../common/constants';
 import { FilterTypes } from '../common/types';

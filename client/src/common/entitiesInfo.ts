@@ -4,7 +4,7 @@ import {
   readEntitiesApi,
   updateEntityApi,
 } from '../api/apiCalls';
-import { generateCommonFormFor } from './generateCommomFormFor';
+import { generateCommonFormFor } from '../forms/generateCommomFormFor';
 import {
   AllEntities,
   AllEntitiesOfType,

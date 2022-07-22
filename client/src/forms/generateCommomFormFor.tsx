@@ -2,11 +2,11 @@
 // @ts-nocheck
 // eslint-disable react/display-name
 
-import CommonForm from '../forms/CommonForm';
+import CommonForm from './CommonForm';
 import React from 'react';
-import { AllEntities, EntityInfoInterface, FormTypes } from './entitiesInfo';
-import { ENTITY_SHOWN_NAMES } from './constants';
-import { capitalize } from './utilities';
+import { AllEntities, EntityInfoInterface, FormTypes } from '../common/entitiesInfo';
+import { ENTITY_SHOWN_NAMES } from '../common/constants';
+import { capitalize } from '../common/utilities';
 
 export const generateCommonFormFor = (formType: FormTypes, infoObj: EntityInfoInterface) => {
   if (formType === 'create') {

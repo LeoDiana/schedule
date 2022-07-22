@@ -10,7 +10,7 @@ import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { commonEntitiesInfo } from './common/entitiesInfo';
-import { EntityPage } from './components/EntityPage';
+import { EntityPage } from './pages/EntityPage';
 import { convertToKebab } from './common/utilities';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
