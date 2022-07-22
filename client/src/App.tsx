@@ -7,12 +7,7 @@ import { commonEntitiesInfo } from './common/entitiesInfo';
 import { Link } from 'react-router-dom';
 import { ScheduleFilter } from './components/ScheduleFilter';
 import { SchedulePage } from './components/SchedulePage';
-
-const convertToKebab = (str: string): string => {
-  return str.replace(/[A-Z]/g, (match, offset, string) => {
-    return (offset > 0 ? '-' : '') + match.toLowerCase();
-  });
-};
+import { convertToKebab } from './common/utilities';
 
 function App() {
   return (

@@ -11,12 +11,7 @@ import * as serviceWorker from './serviceWorker';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { commonEntitiesInfo } from './common/entitiesInfo';
 import { EntityPage } from './components/EntityPage';
-
-const convertToKebab = (str: string): string => {
-  return str.replace(/[A-Z]/g, (match, offset, string) => {
-    return (offset > 0 ? '-' : '') + match.toLowerCase();
-  });
-};
+import { convertToKebab } from './common/utilities';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

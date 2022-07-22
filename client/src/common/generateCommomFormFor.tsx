@@ -6,10 +6,7 @@ import CommonForm from '../forms/CommonForm';
 import React from 'react';
 import { AllEntities, EntityInfoInterface, FormTypes } from './entitiesInfo';
 import { ENTITY_SHOWN_NAMES } from './constants';
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+import { capitalize } from './utilities';
 
 export const generateCommonFormFor = (formType: FormTypes, infoObj: EntityInfoInterface) => {
   if (formType === 'create') {

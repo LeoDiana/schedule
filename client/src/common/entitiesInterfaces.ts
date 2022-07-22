@@ -1,59 +1,59 @@
 export interface AcademicStatus {
-  id?: string;
+  id?: number;
   name: string;
   shortName: string;
 }
 
 export interface Subject {
-  id?: string;
+  id?: number;
   name: string;
   shortName: string;
 }
 
 export interface LessonType {
-  id?: string;
+  id?: number;
   name: string;
   shortName: string;
 }
 
 export interface LessonTime {
-  id?: string;
+  id?: number;
   number: string;
   timeStart: string;
   timeEnd: string;
 }
 
 export interface Day {
-  id?: string;
+  id?: number;
   name: string;
 }
 
 export interface WeekType {
-  id?: string;
+  id?: number;
   name: string;
 }
 
 export interface Building {
-  id?: string;
+  id?: number;
   name: string;
   address: string;
 }
 
 export interface Group {
-  id?: string;
+  id?: number;
   name: string;
   startYear: number;
 }
 
 export interface Subgroup {
-  id?: string;
+  id?: number;
   name: string;
   group: Group;
   studentsNumber: number;
 }
 
 export interface Teacher {
-  id?: string;
+  id?: number;
   firstName: string;
   surname: string;
   patronymic: string;
@@ -61,14 +61,14 @@ export interface Teacher {
 }
 
 export interface Classroom {
-  id?: string;
+  id?: number;
   number: string;
   capacity: number;
   building: Building;
 }
 
 export interface Lesson {
-  id?: string;
+  id?: number;
   teacher: Teacher;
   subject: Subject;
   lessonType: LessonType;

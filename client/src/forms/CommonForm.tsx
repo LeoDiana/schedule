@@ -6,7 +6,7 @@ import { Form, Formik, FormikValues } from 'formik';
 import * as Yup from 'yup';
 
 import { AllEntities, EntityInfoFieldComplex, FieldsOfType, FormScheme } from '../common/types';
-import { createEmptyEntity } from '../common/entitiesInfo';
+import { createEmptyEntity, simplifyEntityFields } from '../common/entitiesInfo';
 import { ERROR_MESSAGE, SUCCESS_MESSAGE } from '../common/constants';
 
 /*
@@ -86,19 +86,6 @@ function CommonForm<T extends AllEntities>({ formScheme, obj }: CommonFormProps<
     message: '',
     type: '',
   });
-
-  const simplifyEntityFields = (obj: any) => {
-    if (!obj) {
-      return obj;
-    }
-    const newObj = { ...obj };
-    for (const fieldName in formScheme.fields) {
-      if (formScheme.fields[fieldName].type === 'entity') {
-        newObj[fieldName] = newObj[fieldName].id;
-      }
-    }
-    return newObj;
-  };
 
   const initialValues = simplifyEntityFields(obj) || createEmptyEntity(formScheme.name) || {};
   const validationSchema = createFormValidationSchema(formScheme.fields);

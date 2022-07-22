@@ -11,18 +11,10 @@ import {
   ApiEndpoints,
   EntityInfoFieldComplex,
   EntityInfoFields,
+  FieldsOfType,
   SimpleFieldsOfType,
 } from './types';
 import { ENDPOINTS, ENTITY_SHOWN_NAMES } from './constants';
-
-const generateApiCallsObjectFor = (endpoint: string): ApiEndpoints => {
-  return {
-    readAll: () => readEntitiesApi(endpoint),
-    create: (obj: any) => createEntityApi(obj, endpoint),
-    update: (obj: any) => updateEntityApi(obj, endpoint),
-    delete: (id: string) => deleteEntityApi(id, endpoint),
-  };
-};
 
 export interface EntityInfoInterface<T extends AllEntities> {
   name: string;
@@ -41,6 +33,15 @@ class EntityInfo<T extends AllEntities> implements EntityInfoInterface<T> {
   CreateForm: any;
   UpdateForm: any;
 
+  generateApiCallsObjectFor = (endpoint: string): ApiEndpoints => {
+    return {
+      readAll: () => readEntitiesApi(endpoint),
+      create: (obj: any) => createEntityApi(obj, endpoint),
+      update: (obj: any) => updateEntityApi(obj, endpoint),
+      delete: (id: string) => deleteEntityApi(id, endpoint),
+    };
+  };
+
   constructor(
     name: AllEntities,
     fields: EntityInfoFields<T>,
@@ -50,7 +51,7 @@ class EntityInfo<T extends AllEntities> implements EntityInfoInterface<T> {
     this.fields = fields;
     this.shortShownName = shortShownName;
 
-    this.api = generateApiCallsObjectFor(ENDPOINTS[name]);
+    this.api = this.generateApiCallsObjectFor(ENDPOINTS[name]);
     this.CreateForm = generateCommonFormFor('create', this);
     this.UpdateForm = generateCommonFormFor('update', this);
   }
@@ -317,6 +318,29 @@ export function createEmptyEntity<T extends AllEntities>(
       return typeOfEntity as never;
     }
   }
+}
+
+/**
+ * Change passed object fields of object type to id of corresponding object
+ *
+ * @param {FieldsOfType<AllEntities>} obj - entity object
+ * @return {SimpleFieldsOfType<AllEntities>} transformed object
+ */
+export function simplifyEntityFields(
+  obj: FieldsOfType<AllEntities> | undefined,
+): SimpleFieldsOfType<AllEntities> | undefined {
+  if (!obj) {
+    return obj;
+  }
+  const newObj: SimpleFieldsOfType<AllEntities> = { ...obj };
+  let fieldName: keyof typeof obj;
+  for (fieldName in obj) {
+    if (typeof obj[fieldName] === 'object') {
+      const entity: { id: number } = obj[fieldName] as unknown as { id: number };
+      newObj[fieldName] = entity.id || 0;
+    }
+  }
+  return newObj;
 }
 
 export const commonEntitiesInfo: AllEntitiesOfType<EntityInfoInterface<AllEntities>> =
