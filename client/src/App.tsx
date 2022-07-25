@@ -6,19 +6,14 @@ import './App.css';
 import { commonEntitiesInfo } from './common/entitiesInfo';
 import { Link } from 'react-router-dom';
 import { ScheduleFilter } from './components/ScheduleFilter';
-import { SchedulePage } from './components/SchedulePage';
+import { SchedulePage } from './pages/SchedulePage';
 import { convertToKebab } from './common/utilities';
+import { EntitiesListNavigator } from './components/EntitiesListNavigator';
 
 function App() {
   return (
     <>
-      <ul>
-        {Object.keys(commonEntitiesInfo).map((entityName) => (
-          <li key={entityName}>
-            <Link to={`/${convertToKebab(entityName)}`}>{commonEntitiesInfo[entityName].name}</Link>
-          </li>
-        ))}
-      </ul>
+      <EntitiesListNavigator />
       <ScheduleFilter />
     </>
   );

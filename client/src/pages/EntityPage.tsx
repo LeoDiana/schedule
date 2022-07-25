@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import {
+  Box,
   Button,
   Dialog,
   DialogContent,
+  Grid,
   Paper,
   Table,
   TableBody,
@@ -12,6 +14,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from '@mui/material';
 import { AllEntities, EntityInfoFieldComplex, FieldsOfType } from '../common/types';
 import { EntityInfoInterface } from '../common/entitiesInfo';
@@ -85,98 +88,103 @@ export function EntityPage<T extends AllEntities>({
           <UpdateForm {...entityToUpdate} />
         </DialogContent>
       </Dialog>
-      <div style={{ margin: '15px 0' }}>
-        <h1 style={{ display: 'inline-block', margin: '0 15px' }}>
-          {ENTITY_SHOWN_NAMES[name as AllEntities]}
-        </h1>
-        <Button onClick={openCreateDialog} variant="contained" color="primary">
-          Add new
-        </Button>
-      </div>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow>
-              {(() => {
-                const rows = [];
-                for (const fieldName in fields) {
-                  rows.push(<TableCell key={fieldName}>{fields[fieldName].label}</TableCell>);
-                }
-                return rows;
-              })()}
-              <TableCell>Edit</TableCell>
-              <TableCell>Delete</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {entities
-              ? entities.map((entity) => (
-                  <TableRow
-                    key={JSON.stringify(entity)}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
-                    {(() => {
-                      const tableCells = [];
-                      for (const fieldName in fields) {
-                        tableCells.push(
-                          <TableCell key={`${JSON.stringify(entity)}-${fieldName}`}>
-                            {entity[fieldName]
-                              ? fields[fieldName].type === 'entity'
-                                ? (fields[fieldName] as EntityInfoFieldComplex).makeShortShownName(
-                                    entity[fieldName],
-                                  )
-                                : entity[fieldName]
-                              : null}
-                          </TableCell>,
-                        );
-                      }
-                      return tableCells;
-                    })()}
-                    <TableCell align="right">
-                      <Button
-                        data-id={entity.id}
-                        onClick={(e) => {
-                          setEntityToUpdate({
-                            ...entities.filter(
-                              (ent) =>
-                                (ent as { id: any }).id.toString() ===
+      <Box m={5}>
+        <Grid container spacing={3} mb={3}>
+          <Grid item ml={4}>
+            <Typography variant="h4">{ENTITY_SHOWN_NAMES[name as AllEntities]}</Typography>
+          </Grid>
+          <Grid item>
+            <Button onClick={openCreateDialog} variant="contained" color="primary">
+              Add new
+            </Button>
+          </Grid>
+        </Grid>
+
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                {(() => {
+                  const rows = [];
+                  for (const fieldName in fields) {
+                    rows.push(<TableCell key={fieldName}>{fields[fieldName].label}</TableCell>);
+                  }
+                  return rows;
+                })()}
+                <TableCell>Edit</TableCell>
+                <TableCell>Delete</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {entities
+                ? entities.map((entity) => (
+                    <TableRow
+                      key={JSON.stringify(entity)}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      {(() => {
+                        const tableCells = [];
+                        for (const fieldName in fields) {
+                          tableCells.push(
+                            <TableCell key={`${JSON.stringify(entity)}-${fieldName}`}>
+                              {entity[fieldName]
+                                ? fields[fieldName].type === 'entity'
+                                  ? (
+                                      fields[fieldName] as EntityInfoFieldComplex
+                                    ).makeShortShownName(entity[fieldName])
+                                  : entity[fieldName]
+                                : null}
+                            </TableCell>,
+                          );
+                        }
+                        return tableCells;
+                      })()}
+                      <TableCell align="left">
+                        <Button
+                          data-id={entity.id}
+                          onClick={(e) => {
+                            setEntityToUpdate({
+                              ...entities.filter(
+                                (ent) =>
+                                  (ent as { id: any }).id.toString() ===
+                                  (
+                                    e.target as unknown as { dataset: { id: any } }
+                                  ).dataset.id.toString(),
+                              )[0],
+                            });
+                            openUpdateDialog();
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      </TableCell>
+                      <TableCell align="left">
+                        <Button
+                          color="warning"
+                          data-id={entity.id}
+                          onClick={(e) => {
+                            (async () => {
+                              const response = await api.delete(
                                 (
                                   e.target as unknown as { dataset: { id: any } }
                                 ).dataset.id.toString(),
-                            )[0],
-                          });
-                          openUpdateDialog();
-                        }}
-                      >
-                        Edit
-                      </Button>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Button
-                        color="warning"
-                        data-id={entity.id}
-                        onClick={(e) => {
-                          (async () => {
-                            const response = await api.delete(
-                              (
-                                e.target as unknown as { dataset: { id: any } }
-                              ).dataset.id.toString(),
-                            );
-                            if (response === SUCCESS_MESSAGE) {
-                              setExecutedOperation('delete');
-                            }
-                          })();
-                        }}
-                      >
-                        Del
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              : null}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                              );
+                              if (response === SUCCESS_MESSAGE) {
+                                setExecutedOperation('delete');
+                              }
+                            })();
+                          }}
+                        >
+                          Del
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                : null}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </>
   );
 }
