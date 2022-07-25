@@ -30,7 +30,7 @@ export const updateEntityApi = async (entity: any, endpoint: string): Promise<st
   }
 };
 
-export const deleteEntityApi = async (id: string, endpoint: string): Promise<string> => {
+export const deleteEntityApi = async (id: number, endpoint: string): Promise<string> => {
   try {
     const response = await axios.delete(`${endpoint}/${id}`);
     return SUCCESS_MESSAGE;
@@ -40,7 +40,7 @@ export const deleteEntityApi = async (id: string, endpoint: string): Promise<str
   }
 };
 
-export const readLessonsWithFilter = async (id: string, filter: string): Promise<any[]> => {
+export const readLessonsWithFilter = async (id: number, filter: string): Promise<any[]> => {
   try {
     const response = await axios.get(`${ENDPOINTS.lesson}/${filter}/${id}`);
     return response.data;
