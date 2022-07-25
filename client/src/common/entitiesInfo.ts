@@ -38,7 +38,7 @@ class EntityInfo<T extends AllEntities> implements EntityInfoInterface<T> {
       readAll: () => readEntitiesApi(endpoint),
       create: (obj: any) => createEntityApi(obj, endpoint),
       update: (obj: any) => updateEntityApi(obj, endpoint),
-      delete: (id: string) => deleteEntityApi(id, endpoint),
+      delete: (id: number) => deleteEntityApi(id, endpoint),
     };
   };
 

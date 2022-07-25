@@ -88,7 +88,7 @@ export interface ApiEndpoints {
   readAll: () => Promise<any[]>;
   create: (obj: any) => Promise<string>;
   update: (obj: any) => Promise<string>;
-  delete: (id: string) => Promise<string>;
+  delete: (id: number) => Promise<string>;
 }
 
 export interface FormScheme<T extends AllEntities> {
