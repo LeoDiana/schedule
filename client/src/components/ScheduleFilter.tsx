@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { SchedulePage } from '../pages/SchedulePage';
 import { commonEntitiesInfo } from '../common/entitiesInfo';
 import { FILTERS } from '../common/constants';
-import { FilterTypes } from '../common/types';
+import { AllEntities, FieldsOfType, FilterTypes } from '../common/types';
 
 export const ScheduleFilter = () => {
   const [typeFilter, setTypeFilter] = useState(FILTERS[0]);
@@ -23,7 +23,9 @@ export const ScheduleFilter = () => {
   }, []);
 
   const handleTypeChange = (e: any) => {
-    setTypeFilter(e.target.value);
+    const filter = e.target.value as FilterTypes;
+    setTypeFilter(filter);
+    setSelectedEntity(entities[filter][0]);
   };
 
   const handleEntityChange = (e: any) => {
@@ -54,7 +56,7 @@ export const ScheduleFilter = () => {
         <SchedulePage
           {...{
             filter: typeFilter,
-            filteredEntityId: (selectedEntity as unknown as { id: any }).id,
+            filteredEntity: selectedEntity as unknown as Required<FieldsOfType<AllEntities>>,
           }}
         />
       ) : null}

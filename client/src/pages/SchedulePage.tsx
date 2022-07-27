@@ -3,16 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import { readLessonsWithFilter } from '../api/apiCalls';
 import { commonEntitiesInfo } from '../common/entitiesInfo';
-import { FieldsOfType, FilterTypes } from '../common/types';
+import { AllEntities, FieldsOfType, FilterTypes } from '../common/types';
 import styled from 'styled-components';
 import { Lesson } from '../common/entitiesInterfaces';
+import { Typography } from '@mui/material';
 
 type SchedulePageProps = {
   filter: FilterTypes;
-  filteredEntityId: number;
+  filteredEntity: Required<FieldsOfType<AllEntities>>;
 };
 
-export const SchedulePage = ({ filter, filteredEntityId }: SchedulePageProps) => {
+export const SchedulePage = ({ filter, filteredEntity }: SchedulePageProps) => {
   const [days, setDays] = useState([] as FieldsOfType<'day'>[]);
   const [lessonTimes, setLessonTimes] = useState([] as FieldsOfType<'lessonTime'>[]);
   const [lessons, setLessons] = useState([] as FieldsOfType<'lesson'>[]);
@@ -21,7 +22,7 @@ export const SchedulePage = ({ filter, filteredEntityId }: SchedulePageProps) =>
     const fetchData = async () => {
       setDays(await commonEntitiesInfo.day.api.readAll());
       setLessonTimes(await commonEntitiesInfo.lessonTime.api.readAll());
-      setLessons(await readLessonsWithFilter(filteredEntityId, filter));
+      setLessons(await readLessonsWithFilter(filteredEntity.id, filter));
     };
 
     fetchData();
@@ -29,15 +30,17 @@ export const SchedulePage = ({ filter, filteredEntityId }: SchedulePageProps) =>
 
   useEffect(() => {
     const fetchData = async () => {
-      setLessons(await readLessonsWithFilter(filteredEntityId, filter));
+      setLessons(await readLessonsWithFilter(filteredEntity.id, filter));
     };
 
     fetchData();
-  }, [filter, filteredEntityId]);
+  }, [filter, filteredEntity]);
 
   return (
     <>
-      <h1>Title</h1>
+      <Typography variant="h4">
+        {commonEntitiesInfo[filter].shortShownName(filteredEntity)} schedule
+      </Typography>
       {days && lessonTimes ? (
         <Schedule {...{ days, lessonTimes, lessons, filterType: filter }} />
       ) : null}
