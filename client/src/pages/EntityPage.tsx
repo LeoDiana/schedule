@@ -19,6 +19,8 @@ import {
 import { AllEntities, EntityInfoFieldComplex, FieldsOfType } from '../common/types';
 import { EntityInfoInterface } from '../common/entitiesInfo';
 import { ENTITY_SHOWN_NAMES, SUCCESS_MESSAGE } from '../common/constants';
+import { useSelector } from 'react-redux';
+import { selectAllEntitiesOfType } from '../features/entities/entitiesSlice';
 
 const useDialog = (): [boolean, () => void, () => void] => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -41,28 +43,29 @@ export function EntityPage<T extends AllEntities>({
   CreateForm,
   UpdateForm,
 }: EntityInfoInterface<T>) {
-  const [entities, setEntities] = useState([] as FieldsOfType<T>[]);
+  // const [entities, setEntities] = useState([] as FieldsOfType<T>[]);
+  const entities = useSelector((state: any) => selectAllEntitiesOfType(state, name as AllEntities));
   const [entityToUpdate, setEntityToUpdate] = useState({} as FieldsOfType<T>);
   const [isOpenCreateDialog, openCreateDialog, closeCreateDialog] = useDialog();
   const [isOpenUpdateDialog, openUpdateDialog, closeUpdateDialog] = useDialog();
   const [executedOperation, setExecutedOperation] = useState(null as string | null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setEntities(await api.readAll());
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setEntities(await api.readAll());
-    };
-
-    fetchData();
-    setExecutedOperation(null);
-  }, [executedOperation]);
+  //
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setEntities(await api.readAll());
+  //   };
+  //
+  //   fetchData();
+  // }, []);
+  //
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setEntities(await api.readAll());
+  //   };
+  //
+  //   fetchData();
+  //   setExecutedOperation(null);
+  // }, [executedOperation]);
 
   return (
     <>
@@ -117,22 +120,23 @@ export function EntityPage<T extends AllEntities>({
             </TableHead>
             <TableBody>
               {entities
-                ? entities.map((entity) => (
+                ? entities.map((entity: any) => (
                     <TableRow
                       key={JSON.stringify(entity)}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     >
                       {(() => {
                         const tableCells = [];
-                        for (const fieldName in fields) {
+                        let fieldName: keyof typeof fields;
+                        for (fieldName in fields) {
                           tableCells.push(
                             <TableCell key={`${JSON.stringify(entity)}-${fieldName}`}>
-                              {entity[fieldName]
+                              {entity[fieldName as keyof typeof entity]
                                 ? fields[fieldName].type === 'entity'
                                   ? (
                                       fields[fieldName] as EntityInfoFieldComplex
-                                    ).makeShortShownName(entity[fieldName])
-                                  : entity[fieldName]
+                                    ).makeShortShownName(entity[fieldName as keyof typeof entity])
+                                  : entity[fieldName as keyof typeof entity]
                                 : null}
                             </TableCell>,
                           );
@@ -143,15 +147,16 @@ export function EntityPage<T extends AllEntities>({
                         <Button
                           data-id={entity.id}
                           onClick={(e) => {
+                            const entity = entities.find(
+                              (ent: any) =>
+                                (ent as { id: any }).id.toString() ===
+                                (
+                                  e.target as unknown as { dataset: { id: any } }
+                                ).dataset.id.toString(),
+                            );
                             setEntityToUpdate({
-                              ...entities.filter(
-                                (ent) =>
-                                  (ent as { id: any }).id.toString() ===
-                                  (
-                                    e.target as unknown as { dataset: { id: any } }
-                                  ).dataset.id.toString(),
-                              )[0],
-                            });
+                              ...entity,
+                            } as any);
                             openUpdateDialog();
                           }}
                         >

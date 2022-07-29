@@ -12,6 +12,9 @@ import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { commonEntitiesInfo } from './common/entitiesInfo';
 import { EntityPage } from './pages/EntityPage';
 import { convertToKebab } from './common/utilities';
+import { fetchAllEntities } from './features/entities/entitiesSlice';
+
+store.dispatch(fetchAllEntities());
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
