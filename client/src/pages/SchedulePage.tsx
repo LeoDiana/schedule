@@ -5,8 +5,9 @@ import { readLessonsWithFilter } from '../api/apiCalls';
 import { commonEntitiesInfo } from '../common/entitiesInfo';
 import { AllEntities, FieldsOfType, FilterTypes } from '../common/types';
 import styled from 'styled-components';
-import { Lesson } from '../common/entitiesInterfaces';
+import { Lesson, LessonSubgroups } from '../common/entitiesInterfaces';
 import { Typography } from '@mui/material';
+import { mergeLessons } from '../common/utilities';
 
 type SchedulePageProps = {
   filter: FilterTypes;
@@ -16,13 +17,13 @@ type SchedulePageProps = {
 export const SchedulePage = ({ filter, filteredEntity }: SchedulePageProps) => {
   const [days, setDays] = useState([] as FieldsOfType<'day'>[]);
   const [lessonTimes, setLessonTimes] = useState([] as FieldsOfType<'lessonTime'>[]);
-  const [lessons, setLessons] = useState([] as FieldsOfType<'lesson'>[]);
+  const [lessons, setLessons] = useState([] as LessonSubgroups[]);
 
   useEffect(() => {
     const fetchData = async () => {
       setDays(await commonEntitiesInfo.day.api.readAll());
       setLessonTimes(await commonEntitiesInfo.lessonTime.api.readAll());
-      setLessons(await readLessonsWithFilter(filteredEntity.id, filter));
+      setLessons(mergeLessons(await readLessonsWithFilter(filteredEntity.id, filter)));
     };
 
     fetchData();
@@ -30,7 +31,7 @@ export const SchedulePage = ({ filter, filteredEntity }: SchedulePageProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLessons(await readLessonsWithFilter(filteredEntity.id, filter));
+      setLessons(mergeLessons(await readLessonsWithFilter(filteredEntity.id, filter)));
     };
 
     fetchData();
@@ -77,7 +78,7 @@ const CardText = styled.p`
 `;
 
 type LessonCardProps = {
-  lesson: Lesson;
+  lesson: LessonSubgroups;
   filterType: FilterTypes;
 };
 
@@ -86,7 +87,9 @@ const LessonCard = ({ lesson, filterType }: LessonCardProps) => {
   const subject = lesson.subject.shortName;
   const teacher = commonEntitiesInfo.teacher.shortShownName(lesson.teacher);
   const classroom = commonEntitiesInfo.classroom.shortShownName(lesson.classroom);
-  const group = commonEntitiesInfo.subgroup.shortShownName(lesson.subgroup);
+  const subgroups = lesson.subgroups
+    .map((sg) => commonEntitiesInfo.subgroup.shortShownName(sg))
+    .join(', ');
 
   return (
     <Card>
@@ -99,12 +102,12 @@ const LessonCard = ({ lesson, filterType }: LessonCardProps) => {
           </>
         ) : filterType === 'teacher' ? (
           <>
-            <CardText>{group}</CardText>
+            <CardText>{subgroups}</CardText>
             <CardText>{classroom}</CardText>
           </>
         ) : filterType === 'classroom' ? (
           <>
-            <CardText>{group}</CardText>
+            <CardText>{subgroups}</CardText>
             <CardText>{teacher}</CardText>
           </>
         ) : null}
@@ -148,7 +151,7 @@ const GridCell = styled.div<{ row: number; column: number }>`
 type ScheduleParams = {
   days: FieldsOfType<'day'>[];
   lessonTimes: FieldsOfType<'lessonTime'>[];
-  lessons: FieldsOfType<'lesson'>[];
+  lessons: LessonSubgroups[];
   filterType: FilterTypes;
 };
 

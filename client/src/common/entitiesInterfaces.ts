@@ -78,3 +78,15 @@ export interface Lesson {
   weekType: WeekType;
   subgroup: Subgroup;
 }
+
+export interface LessonSubgroups {
+  ids: number[];
+  teacher: Teacher;
+  subject: Subject;
+  lessonType: LessonType;
+  lessonTime: LessonTime;
+  classroom: Classroom;
+  day: Day;
+  weekType: WeekType;
+  subgroups: Subgroup[];
+}
