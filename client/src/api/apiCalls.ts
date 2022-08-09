@@ -1,7 +1,7 @@
 import { instance as axios } from './axiosConfig';
-import { AllEntities, AllEntitiesNames } from '../common/types';
+import { AllEntities, AllEntitiesNames, DtoOfEntity } from '../common/types';
 
-type ApiMethods<T extends AllEntities> = {
+export type ApiMethods<T extends AllEntities> = {
   create: (obj: T) => Promise<void>;
   update: (obj: T) => Promise<void>;
   delete: (id: number) => void;
@@ -29,9 +29,11 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
   }
 
   endpoint: string;
+  generateObject: (obj: DtoOfEntity<T>) => T;
 
-  constructor(name: AllEntitiesNames) {
+  constructor(name: AllEntitiesNames, generateObject: (obj: DtoOfEntity<T>) => T) {
     this.endpoint = this.convertEntityNameToEndpoint(name);
+    this.generateObject = generateObject;
   }
 
   async create(entity: T): Promise<void> {
@@ -64,7 +66,7 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
   async readAll(): Promise<T[]> {
     try {
       const response = await axios.get(this.endpoint);
-      return response.data as T[];
+      return (response.data as DtoOfEntity<T>[]).map(this.generateObject);
     } catch (error) {
       console.log(error);
       return [];
