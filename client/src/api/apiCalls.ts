@@ -1,9 +1,9 @@
 import { instance as axios } from './axiosConfig';
-import { AllEntities, AllEntitiesNames, DtoOfEntity } from '../common/types';
+import { AllEntities, AllEntitiesNames, DtoOfEntity, Optional } from '../common/types';
 
 export type ApiMethods<T extends AllEntities> = {
-  create: (obj: T) => Promise<void>;
-  update: (obj: T) => Promise<void>;
+  create: (obj: Optional<DtoOfEntity<T>, 'id'>) => Promise<void>;
+  update: (obj: DtoOfEntity<T>) => Promise<void>;
   delete: (id: number) => void;
   readAll: () => Promise<T[]>;
 };
@@ -36,7 +36,7 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
     this.generateObject = generateObject;
   }
 
-  async create(entity: T): Promise<void> {
+  async create(entity: Optional<DtoOfEntity<T>, 'id'>): Promise<void> {
     try {
       await axios.post(this.endpoint, entity);
     } catch (error) {
@@ -44,11 +44,8 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
     }
   }
 
-  async update(entity: T): Promise<void> {
+  async update(entity: DtoOfEntity<T>): Promise<void> {
     try {
-      if (entity.id === undefined) {
-        throw new Error('Entity should have id in order to be updated');
-      }
       await axios.put(`${this.endpoint}/${entity.id}`, entity);
     } catch (error) {
       console.log(error);
