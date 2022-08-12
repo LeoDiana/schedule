@@ -1,4 +1,4 @@
-import { AcademicStatus } from './entitiesClasses';
+import { AcademicStatus, Teacher } from './entitiesClasses';
 
 describe('Entities classes', () => {
   const mockAcademicStatusObj = {
@@ -16,5 +16,15 @@ describe('Entities classes', () => {
   it('should have shown name', () => {
     const academicStatus = new AcademicStatus(mockAcademicStatusObj);
     expect(academicStatus.shownName).toBeDefined();
+  });
+
+  it('should be able to create entity with fields of entity type', () => {
+    const teacher = new Teacher({
+      id: 1,
+      surname: 'Doe',
+      firstName: 'John',
+      patronymic: 'John',
+      academicStatus: new AcademicStatus(mockAcademicStatusObj),
+    });
   });
 });

@@ -12,7 +12,7 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
   private convertEntityNameToEndpoint(name: AllEntitiesNames) {
     const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
       academicStatus: 'academic-statuses',
-      // teacher: 'teachers',
+      teacher: 'teachers',
       // subject: 'subjects',
       // lessonType: 'lesson-types',
       // lessonTime: 'lesson-times',

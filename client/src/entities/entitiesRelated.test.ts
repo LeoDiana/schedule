@@ -1,5 +1,5 @@
 import { AcademicStatusRelated } from './entitiesRelated';
-import { AcademicStatus, AcademicStatusDTO } from './entitiesClasses';
+import { AcademicStatusDTO } from './entitiesDTO';
 
 describe('Entities related', () => {
   // it('should has name', () => {

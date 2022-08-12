@@ -1,5 +1,5 @@
 import { EntityApi } from './apiCalls';
-import { AcademicStatus, AcademicStatusDTO } from '../entities/entitiesClasses';
+import { AcademicStatus } from '../entities/entitiesClasses';
 import mockAxios from 'jest-mock-axios';
 import { AcademicStatusRelated } from '../entities/entitiesRelated';
 
