@@ -13,7 +13,7 @@ export class AcademicStatus implements AcademicStatusDTO {
   name: string;
   shortName: string;
 
-  public get shownName(): string {
+  public get displayName(): string {
     return `${this.shortName}.`;
   }
 
@@ -33,7 +33,7 @@ export class Teacher implements ConstructorFor<TeacherDTO> {
   patronymic: string;
   academicStatus: AcademicStatus;
 
-  public get shownName(): string {
+  public get displayName(): string {
     return `${this.surname} ${this.firstName[0]}.${this.patronymic[0]}.`;
   }
 

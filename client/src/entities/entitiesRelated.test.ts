@@ -46,5 +46,9 @@ describe('Entities related', () => {
   it('should have all entities related functionality in allEntitiesRelated', () => {
     expect(allEntitiesRelated).toBeDefined();
   })
+
+  it('should have fields', () => {
+    expect(academicStatusRelated.fields).toBeDefined();
+  })
 });
 

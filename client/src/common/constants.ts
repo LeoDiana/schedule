@@ -1,4 +1,4 @@
-import { AllEntities, AllEntitiesNames, DtoOfEntity } from './types';
+import {AllEntities, AllEntitiesNames, AllFields, DtoOfEntity} from './types';
 import { instance as axios } from '../api/axiosConfig';
 import { AcademicStatus } from '../entities/entitiesClasses';
 
@@ -18,6 +18,17 @@ import { AcademicStatus } from '../entities/entitiesClasses';
 // } as const;
 
 export const ENTITY_TITLES: {[K in AllEntitiesNames]: string} = {
-  academicStatus: 'Academic status',
-  teacher: 'Teacher'
+  academicStatus: 'Академічний статус',
+  teacher: 'Викладач'
+}
+
+export const FIELD_TITLES: {[K in keyof AllFields]: string} = {
+  id: '',
+  displayName: 'Відображуване імʼя',
+  name: 'Назва',
+  shortName: 'Скорочена назва',
+  firstName: 'Імʼя',
+  surname: 'Прізвище',
+  patronymic: 'По батькові',
+  ...ENTITY_TITLES
 }

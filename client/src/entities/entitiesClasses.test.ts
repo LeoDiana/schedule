@@ -15,7 +15,7 @@ describe('Entities classes', () => {
 
   it('should have shown name', () => {
     const academicStatus = new AcademicStatus(mockAcademicStatusObj);
-    expect(academicStatus.shownName).toBeDefined();
+    expect(academicStatus.displayName).toBeDefined();
   });
 
   it('should be able to create entity with fields of entity type', () => {

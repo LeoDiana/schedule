@@ -22,6 +22,12 @@ type DtoFieldsToCorrespondingClasses<T extends DtoOfEntity<AllEntities>> = {
 };
 export type ConstructorFor<T extends DtoOfEntity<AllEntities>> = DtoFieldsToCorrespondingClasses<T>;
 
+type UnionToIntersection<U> =
+  (U extends any ? (k: U)=>void : never) extends ((k: infer I)=>void) ? I : never
+export type AllFields = UnionToIntersection<AllEntities>;
+
+export type FieldType = 'string' | 'number' | 'entity';
+
 // export type DtoOfEntityName<T extends AllEntitiesNames> = T extends 'academicStatus'
 //   ? AcademicStatusDTO
 //   : never;

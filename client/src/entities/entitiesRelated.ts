@@ -1,7 +1,14 @@
 import {AcademicStatus, Teacher} from './entitiesClasses';
 import { ApiMethods, EntityApi } from '../api/apiCalls';
 import {AcademicStatusDTO, TeacherDTO} from "./entitiesDTO";
-import {AllEntities, AllEntitiesNames, ConstructorFor, DtoOfEntity, EntitiesNamesToTypes} from "../common/types";
+import {
+  AllEntities,
+  AllEntitiesNames,
+  ConstructorFor,
+  DtoOfEntity,
+  EntitiesNamesToTypes, FieldType,
+  Optional
+} from "../common/types";
 
 export abstract class EntityRelated<T extends AllEntities> {
   // name: string;
@@ -11,19 +18,27 @@ export abstract class EntityRelated<T extends AllEntities> {
   // }
 
   abstract api: ApiMethods<T>;
+  abstract fields: {[K in keyof Optional<DtoOfEntity<T>, 'id'>]: K extends AllEntitiesNames ? 'entity' : DtoOfEntity<T>[K]};
   abstract create(obj: ConstructorFor<T>): T;
 
+ // eslint no-empty-function: "error"
   protected constructor() {
+    // not empty, ok
   }
 }
 
 export class AcademicStatusRelated extends EntityRelated<AcademicStatus>{
   // name: string;
   api: ApiMethods<AcademicStatus>;
+  fields: {[K in keyof Optional<AcademicStatusDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : AcademicStatusDTO[K]};
 
   constructor() {
     super();
     this.api = new EntityApi<AcademicStatus>('academicStatus', this.create);
+    this.fields = {
+      name: 'string',
+      shortName: 'string',
+    }
     // this.name = 'academicStatus';
     // super('academicStatus');
   }
@@ -38,10 +53,17 @@ export class AcademicStatusRelated extends EntityRelated<AcademicStatus>{
 
 export class TeacherRelated extends EntityRelated<Teacher>{
   api: ApiMethods<Teacher>;
+  fields: {[K in keyof Optional<TeacherDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : TeacherDTO[K]};
 
   constructor() {
     super();
     this.api = new EntityApi<Teacher>('teacher', this.create);
+    this.fields = {
+      firstName: 'string',
+      surname: 'string',
+      patronymic: 'string',
+      academicStatus: 'entity',
+    }
   }
 
   create(obj: TeacherDTO): Teacher {
