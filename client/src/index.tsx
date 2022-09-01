@@ -6,6 +6,8 @@ import App from './App';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import AdminPanel from "./pages/AdminPanel";
+import Schedule from "./pages/Schedule";
 // import { commonEntitiesInfo } from './common/entitiesInfo';
 // import { EntityPage } from './pages/EntityPage';
 // import { convertToKebab } from './common/utilities';
@@ -13,20 +15,22 @@ import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
-    {/*<Provider store={store}>*/}
-    {/*  <BrowserRouter>*/}
-    {/*    <Routes>*/}
-    {/*      <Route path="/" element={<App />} />*/}
-    {/*      {Object.keys(commonEntitiesInfo).map((entityName) => (*/}
-    {/*        <Route*/}
-    {/*          key={entityName}*/}
-    {/*          path={`/${convertToKebab(entityName)}`}*/}
-    {/*          element={<EntityPage {...commonEntitiesInfo[entityName]} />}*/}
-    {/*        />*/}
-    {/*      ))}*/}
-    {/*    </Routes>*/}
-    {/*  </BrowserRouter>*/}
-    {/*</Provider>*/}
+    {/* <Provider store={store}> */}
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App/>}/>
+        {/* {Object.keys(commonEntitiesInfo).map((entityName) => ( */}
+        {/*   <Route */}
+        {/*     key={entityName} */}
+        {/*     path={`/${convertToKebab(entityName)}`} */}
+        {/*     element={<EntityPage {...commonEntitiesInfo[entityName]} />} */}
+        {/*   /> */}
+        {/* ))} */}
+        <Route path="admin-panel" element={<AdminPanel/>}/>
+        <Route path="schedule" element={<Schedule/>}/>
+      </Routes>
+    </BrowserRouter>
+    {/* </Provider> */}
   </React.StrictMode>,
 );
 

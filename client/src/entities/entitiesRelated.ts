@@ -1,5 +1,6 @@
-import { AcademicStatus, AcademicStatusDTO } from './entitiesClasses';
+import { AcademicStatus } from './entitiesClasses';
 import { ApiMethods, EntityApi } from '../api/apiCalls';
+import {AcademicStatusDTO} from "./entitiesDTO";
 
 // export abstract class EntityRelated {
 //   name: string;
