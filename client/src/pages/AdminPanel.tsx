@@ -1,5 +1,8 @@
 import React from "react";
 import {PencilIcon, TrashIcon} from "@heroicons/react/24/outline";
+import {allEntitiesRelated} from "../entities/entitiesRelated";
+import {ENTITY_TITLES} from "../common/constants";
+import {AllEntitiesNames} from "../common/types";
 
 function AdminPanel(): JSX.Element {
   return (
@@ -7,12 +10,9 @@ function AdminPanel(): JSX.Element {
       <div className='min-w-fit p-4 rounded-md bg-white drop-shadow-md'>
         <h6 className='text-xl font-bold mb-2'>Entities</h6>
         <div className='divide-y divide-gray-200'>
-          <p className='py-2 pr-10'>Teacher</p>
-          <p className='py-2 pr-10'>Academic status</p>
-          <p className='py-2'>Academic status</p>
-          <p className='py-2'>Academic status</p>
-          <p className='py-2'>Academic status</p>
-          <p className='py-2'>Academic status</p>
+          {Object.keys(allEntitiesRelated).map(name =>
+            <p className='py-2 pr-10' key={name}>{ENTITY_TITLES[name as AllEntitiesNames]}</p>
+          )}
         </div>
       </div>
       <div className='w-full p-4 rounded-md bg-white drop-shadow-md'>

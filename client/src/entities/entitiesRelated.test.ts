@@ -1,4 +1,4 @@
-import { AcademicStatusRelated } from './entitiesRelated';
+import {AcademicStatusRelated, allEntitiesRelated} from './entitiesRelated';
 import { AcademicStatusDTO } from './entitiesDTO';
 
 describe('Entities related', () => {
@@ -42,4 +42,9 @@ describe('Entities related', () => {
   it('should have related api', () => {
     expect(academicStatusRelated.api).toBeDefined();
   });
+
+  it('should have all entities related functionality in allEntitiesRelated', () => {
+    expect(allEntitiesRelated).toBeDefined();
+  })
 });
+

@@ -16,3 +16,8 @@ import { AcademicStatus } from '../entities/entitiesClasses';
 //   // group: 'groups',
 //   // lesson: 'lessons',
 // } as const;
+
+export const ENTITY_TITLES: {[K in AllEntitiesNames]: string} = {
+  academicStatus: 'Academic status',
+  teacher: 'Teacher'
+}
