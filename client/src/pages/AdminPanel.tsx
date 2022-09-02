@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {PencilIcon, PlusIcon, TrashIcon} from "@heroicons/react/24/outline";
 import {allEntitiesRelated} from "../entities/entitiesRelated";
 import {ENTITY_TITLES, FIELD_TITLES} from "../common/constants";
@@ -10,12 +10,31 @@ import {AcademicStatus, Teacher} from "../entities/entitiesClasses";
 function AdminPanel(): JSX.Element {
   const [selectedEntityType, setSelectedEntityType] = useState<AllEntitiesNames>('academicStatus');
   const [isModalOpen, openModal, closeModal] = useModal();
+  const [ac, setAC] = useState<Array<any>>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setAC(await allEntitiesRelated.academicStatus.api.readAll());
+    };
+
+    fetchData();
+  }, [])
 
 
   function onEntityTypeClick(entity: AllEntitiesNames) {
     return () => {
       setSelectedEntityType(entity);
     }
+  }
+
+  function handleDelete(id: number) {
+    (async () => {
+      // const response = await allEntitiesRelated.academicStatus.api.delete(id);
+      await allEntitiesRelated.academicStatus.api.delete(id);
+      // if (response === SUCCESS_MESSAGE) {
+      //   setExecutedOperation('delete');
+      // }
+    })();
   }
 
   return (
@@ -26,10 +45,10 @@ function AdminPanel(): JSX.Element {
             onClick={closeModal}
             className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
           <CreateForm<EntitiesNamesToTypes[typeof selectedEntityType]>
-                      apiCreateFunc={allEntitiesRelated[selectedEntityType].api.create as any}
-                      createEmptyEntity={allEntitiesRelated[selectedEntityType].createEmpty}
-                      fields={allEntitiesRelated[selectedEntityType].fields}
-                      name={selectedEntityType}
+            apiCreateFunc={allEntitiesRelated[selectedEntityType].api.create as any}
+            createEmptyEntity={allEntitiesRelated[selectedEntityType].createEmpty}
+            fields={allEntitiesRelated[selectedEntityType].fields}
+            name={selectedEntityType}
           />
         </>
         : null
@@ -65,36 +84,23 @@ function AdminPanel(): JSX.Element {
             </tr>
             </thead>
             <tbody className='space-y-4 divide-y divide-gray-200'>
-            <tr className='h-10'>
-              <td>Доцент</td>
-              <td>доц.</td>
-              <td>
-                <button><PencilIcon className='w-6 stroke-blue-600'/></button>
-              </td>
-              <td>
-                <button><TrashIcon className='w-6 stroke-red-600'/></button>
-              </td>
-            </tr>
-            <tr className='h-10'>
-              <td>Професор</td>
-              <td>проф.</td>
-              <td>
-                <button><PencilIcon className='w-6 stroke-blue-600'/></button>
-              </td>
-              <td>
-                <button><TrashIcon className='w-6 stroke-red-600'/></button>
-              </td>
-            </tr>
-            <tr className='h-10'>
-              <td>Асистент</td>
-              <td>ас.</td>
-              <td>
-                <button><PencilIcon className='w-6 stroke-blue-600'/></button>
-              </td>
-              <td>
-                <button><TrashIcon className='w-6 stroke-red-600'/></button>
-              </td>
-            </tr>
+            {
+              ac.length ?
+                ac.map((item) =>
+                  (<tr key={item.id} className='h-10'>
+                    <td>{item.name}</td>
+                    <td>{item.shortName}.</td>
+                    <td>
+                      <button><PencilIcon className='w-6 stroke-blue-600'/></button>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                      ><TrashIcon className='w-6 stroke-red-600'/></button>
+                    </td>
+                  </tr>)
+                ) : null
+            }
             </tbody>
           </table>
         </div>

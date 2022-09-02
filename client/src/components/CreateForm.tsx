@@ -93,8 +93,20 @@ function CreateForm<T extends AllEntities>({fields, apiCreateFunc, createEmptyEn
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     console.log('SEND');
     console.log(values);
-    event.preventDefault();
+
+    // const newVals: DtoOfEntity<T> = {...values};
+    // const newVals = Object.keys(values).map(fieldName =>
+    //   {
+    //     allEntitiesRelated[name].fields[fieldName] === 'entity' ?
+    //
+    //   }
+    // )
+
+    // @ts-ignore
+    allEntitiesRelated.academicStatus.api.create(values);
+    // @ts-ignore
     // apiCreateFunc(values);
+    event.preventDefault();
   }
 
   return (
