@@ -1,4 +1,4 @@
-import { ConstructorFor } from '../common/types';
+import {ConstructorFor, Optional, ValuesTypeInCreateForm} from '../common/types';
 import { AcademicStatusDTO, TeacherDTO } from './entitiesDTO';
 
 // base class with id and shownName
@@ -24,6 +24,13 @@ export class AcademicStatus implements AcademicStatusDTO {
     this.shortName = shortName;
     this.id = id;
   }
+
+  static createEmpty(): ValuesTypeInCreateForm<AcademicStatus> {
+    return {
+      name: "",
+      shortName: ""
+    }
+  }
 }
 
 export class Teacher implements ConstructorFor<TeacherDTO> {
@@ -44,5 +51,14 @@ export class Teacher implements ConstructorFor<TeacherDTO> {
     this.patronymic = patronymic;
     this.academicStatus = academicStatus;
     this.id = id;
+  }
+
+  static createEmpty(): ValuesTypeInCreateForm<Teacher> {
+    return {
+      firstName: "",
+      patronymic: "",
+      surname: "",
+      academicStatus: 0
+    }
   }
 }

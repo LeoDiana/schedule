@@ -1,5 +1,6 @@
 import {AcademicStatusRelated, allEntitiesRelated} from './entitiesRelated';
 import { AcademicStatusDTO } from './entitiesDTO';
+import {DtoOfEntity, Optional} from "../common/types";
 
 describe('Entities related', () => {
   // it('should has name', () => {
@@ -20,14 +21,14 @@ describe('Entities related', () => {
   //   expect(academicStatusRelated.name).toEqual('academicStatus');
   // });
 
-  // it('should create empty academic status object', () => {
-  //   const mockAcademicStatusObj: AcademicStatusDTO = {
-  //     name: '',
-  //     shortName: '',
-  //   };
-  //
-  //   expect(academicStatusRelated.create()).toEqual(mockAcademicStatusObj);
-  // });
+  it('should create empty academic status object', () => {
+    const mockAcademicStatusObj: Optional<AcademicStatusDTO, 'id'> = {
+      name: '',
+      shortName: '',
+    };
+
+    expect(academicStatusRelated.createEmpty()).toEqual(mockAcademicStatusObj);
+  });
 
   it('should create academic status object from props', () => {
     const mockAcademicStatusObj: AcademicStatusDTO = {

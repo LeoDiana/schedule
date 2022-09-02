@@ -7,7 +7,7 @@ import {
   ConstructorFor,
   DtoOfEntity,
   EntitiesNamesToTypes, FieldType,
-  Optional
+  Optional, ValuesTypeInCreateForm
 } from "../common/types";
 
 export abstract class EntityRelated<T extends AllEntities> {
@@ -18,8 +18,9 @@ export abstract class EntityRelated<T extends AllEntities> {
   // }
 
   abstract api: ApiMethods<T>;
-  abstract fields: {[K in keyof Optional<DtoOfEntity<T>, 'id'>]: K extends AllEntitiesNames ? 'entity' : DtoOfEntity<T>[K]};
+  abstract fields: {[K in keyof Optional<DtoOfEntity<T>, 'id'>]: K extends AllEntitiesNames ? 'entity' : DtoOfEntity<T>[K] extends string ? string : DtoOfEntity<T>[K] extends number ? number : never};
   abstract create(obj: ConstructorFor<T>): T;
+  abstract createEmpty(): ValuesTypeInCreateForm<T>;
 
  // eslint no-empty-function: "error"
   protected constructor() {
@@ -46,9 +47,10 @@ export class AcademicStatusRelated extends EntityRelated<AcademicStatus>{
   create(obj: AcademicStatusDTO): AcademicStatus {
     return new AcademicStatus(obj);
   }
-  // create(obj: AcademicStatusDTO | undefined = undefined) {
-  //   return obj ? new AcademicStatus(obj) : new AcademicStatus();
-  // }
+
+  createEmpty(): ValuesTypeInCreateForm<AcademicStatus> {
+    return AcademicStatus.createEmpty();
+  }
 }
 
 export class TeacherRelated extends EntityRelated<Teacher>{
@@ -68,6 +70,10 @@ export class TeacherRelated extends EntityRelated<Teacher>{
 
   create(obj: TeacherDTO): Teacher {
     return new Teacher({...obj, academicStatus: new AcademicStatus(obj.academicStatus)});
+  }
+
+  createEmpty(): ValuesTypeInCreateForm<Teacher>{
+    return Teacher.createEmpty();
   }
 }
 

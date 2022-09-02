@@ -28,6 +28,13 @@ export type AllFields = UnionToIntersection<AllEntities>;
 
 export type FieldType = 'string' | 'number' | 'entity';
 
+type DtoFieldsToIdType<T extends DtoOfEntity<AllEntities>> = {
+  [K in keyof T]: K extends AllEntitiesNames ? number : T[K];
+};
+
+// it's like DTO, but without id and all fields of DTO type transformed into just id of that object
+export type ValuesTypeInCreateForm<T extends AllEntities> = Omit<DtoFieldsToIdType<DtoOfEntity<T>>, 'id'>;
+
 // export type DtoOfEntityName<T extends AllEntitiesNames> = T extends 'academicStatus'
 //   ? AcademicStatusDTO
 //   : never;

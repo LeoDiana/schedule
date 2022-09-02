@@ -1,4 +1,6 @@
 import { AcademicStatus, Teacher } from './entitiesClasses';
+import {Optional} from "../common/types";
+import {AcademicStatusDTO} from "./entitiesDTO";
 
 describe('Entities classes', () => {
   const mockAcademicStatusObj = {
@@ -27,4 +29,13 @@ describe('Entities classes', () => {
       academicStatus: new AcademicStatus(mockAcademicStatusObj),
     });
   });
+
+  it('should create empty entity', () => {
+    const mockAcademicStatusObj: Optional<AcademicStatusDTO, 'id'> = {
+      name: '',
+      shortName: '',
+    };
+
+    expect(AcademicStatus.createEmpty()).toEqual(mockAcademicStatusObj);
+  })
 });
