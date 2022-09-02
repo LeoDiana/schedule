@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {PencilIcon, PlusIcon, TrashIcon} from "@heroicons/react/24/outline";
 import {allEntitiesRelated} from "../entities/entitiesRelated";
 import {ENTITY_TITLES, FIELD_TITLES} from "../common/constants";
-import {AllEntitiesNames, EntitiesNamesToTypes} from "../common/types";
+import {AllEntities, AllEntitiesNames, EntitiesNamesToTypes} from "../common/types";
 import CreateForm from "../components/CreateForm";
 import {useModal} from "../common/hooks";
 import {AcademicStatus, Teacher} from "../entities/entitiesClasses";
@@ -10,11 +10,18 @@ import {AcademicStatus, Teacher} from "../entities/entitiesClasses";
 function AdminPanel(): JSX.Element {
   const [selectedEntityType, setSelectedEntityType] = useState<AllEntitiesNames>('academicStatus');
   const [isModalOpen, openModal, closeModal] = useModal();
-  const [ac, setAC] = useState<Array<any>>([]);
+  const [entities, setEntities] = useState<{ [K in AllEntitiesNames]: Array<AllEntities> }>({
+    academicStatus: [],
+    teacher: []
+  });
 
   useEffect(() => {
     const fetchData = async () => {
-      setAC(await allEntitiesRelated.academicStatus.api.readAll());
+      let entity: keyof typeof allEntitiesRelated;
+      for (entity in allEntitiesRelated) {
+        const ent = await allEntitiesRelated[entity].api.readAll();
+        setEntities((state) => ({...state, [entity]: ent}));
+      }
     };
 
     fetchData();
@@ -85,11 +92,14 @@ function AdminPanel(): JSX.Element {
             </thead>
             <tbody className='space-y-4 divide-y divide-gray-200'>
             {
-              ac.length ?
-                ac.map((item) =>
+              entities[selectedEntityType].length ?
+                entities[selectedEntityType].map((item) =>
                   (<tr key={item.id} className='h-10'>
-                    <td>{item.name}</td>
-                    <td>{item.shortName}.</td>
+                    {
+                      Object.keys(allEntitiesRelated[selectedEntityType].fields).map((fieldName) =>
+                        <td key={fieldName}>{item[fieldName as keyof typeof item]}</td>
+                      )
+                    }
                     <td>
                       <button><PencilIcon className='w-6 stroke-blue-600'/></button>
                     </td>
@@ -99,7 +109,7 @@ function AdminPanel(): JSX.Element {
                       ><TrashIcon className='w-6 stroke-red-600'/></button>
                     </td>
                   </tr>)
-                ) : null
+                ) : <p className='text-lg mt-4 font-bold'>Тут ще нічого немає</p>
             }
             </tbody>
           </table>
