@@ -18,6 +18,7 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
       <div className='w-full relative'>
         <input id={name} type='text' onChange={(event) => onChange(Number(event.target.value))} required
                value={value ? value.displayName : ''}
+               autoComplete='off'
                className='w-full rounded-md border-2 drop-shadow-sm text-lg pl-2 pr-9 py-1' />
         <ChevronDownIcon onClick={() => setIsOpen(s => !s)}
                          className='w-6 absolute right-2 top-1/2 -translate-y-1/2 stroke-2 text-gray-500' />

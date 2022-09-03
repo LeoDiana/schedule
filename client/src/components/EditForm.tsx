@@ -16,22 +16,22 @@ import DropdownInput from './DropdownInput';
 interface Props<T extends AllEntities> {
   name: AllEntitiesNames
   fields: EntityRelated<T>['fields'],
-  apiCreateFunc: ApiMethods<T>['create'],
-  createEmptyEntity: EntityRelated<T>['createEmpty'],
+  apiUpdateFunc: ApiMethods<T>['update'],
   allEntities: AllEntitiesItems,
+  entity: DtoOfEntity<T>,
 }
 
-function CreateForm<T extends AllEntities>({
+function EditForm<T extends AllEntities>({
                                              fields,
-                                             apiCreateFunc,
-                                             createEmptyEntity,
+                                             apiUpdateFunc,
                                              name,
                                              allEntities,
+  entity
                                            }: Props<T>): JSX.Element {
-  const [values, setValues] = useState<CreationTypeOf<T>>(createEmptyEntity());
+  const [values, setValues] = useState<DtoOfEntity<T>>(entity);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
-    apiCreateFunc(values as Omit<DtoOfEntity<T>, 'id'>);
+    apiUpdateFunc(values);
     event.preventDefault();
   }
 
@@ -73,10 +73,10 @@ function CreateForm<T extends AllEntities>({
       )}
       <button type='submit'
               className='bg-blue-500 rounded-md py-1 mt-2 w-full drop-shadow-sm text-white font-bold text-lg'>
-        Створити
+        Зберегти зміни
       </button>
     </form>
   );
 }
 
-export default CreateForm;
+export default EditForm;

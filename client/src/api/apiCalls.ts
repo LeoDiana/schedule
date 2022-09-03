@@ -38,7 +38,6 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
 
   async create(entity: Omit<DtoOfEntity<T>, 'id'>): Promise<void> {
     try {
-      console.log('s');
       await axios.post(this.endpoint, entity);
     } catch (error) {
       console.log(error);

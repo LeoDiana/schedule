@@ -10,14 +10,18 @@ import {
 import CreateForm from '../components/CreateForm';
 import { useModal } from '../common/hooks';
 import { ApiMethods } from '../api/apiCalls';
+import EditForm from '../components/EditForm';
+import EntityForm from '../components/EntityForm';
 
 function AdminPanel(): JSX.Element {
   const [selectedEntityType, setSelectedEntityType] = useState<AllEntitiesNames>('academicStatus');
-  const [isModalOpen, openModal, closeModal] = useModal();
+  const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
+  const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
   const [entities, setEntities] = useState<AllEntitiesItems>({
     academicStatus: [],
     teacher: [],
   });
+  const [selectedEntityId, setSelectedEntityId] = useState<number>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,18 +70,68 @@ function AdminPanel(): JSX.Element {
 
   return (
     <>
-      {isModalOpen ?
+      {/* {isCreateFormOpen ? */}
+      {/*   <> */}
+      {/*     <div */}
+      {/*       onClick={closeCreateForm} */}
+      {/*       className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div> */}
+      {/*     /!* in apiCreateFunc need to wrap function to save it`s context *!/ */}
+      {/*     <CreateForm<EntitiesNamesToTypes[typeof selectedEntityType]> */}
+      {/*       apiCreateFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any)) as unknown as ApiMethods<EntitiesNamesToTypes[typeof selectedEntityType]>['create']} */}
+      {/*       createEmptyEntity={allEntitiesRelated[selectedEntityType].createEmpty} */}
+      {/*       fields={allEntitiesRelated[selectedEntityType].fields} */}
+      {/*       name={selectedEntityType} */}
+      {/*       allEntities={entities} */}
+      {/*     /> */}
+      {/*   </> */}
+      {/*   : null */}
+      {/* } */}
+      {isCreateFormOpen ?
         <>
           <div
-            onClick={closeModal}
+            onClick={closeCreateForm}
             className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
           {/* in apiCreateFunc need to wrap function to save it`s context */}
-          <CreateForm<EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiCreateFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any)) as unknown as ApiMethods<EntitiesNamesToTypes[typeof selectedEntityType]>['create']}
-            createEmptyEntity={allEntitiesRelated[selectedEntityType].createEmpty}
+          <EntityForm<'create', EntitiesNamesToTypes[typeof selectedEntityType]>
+            apiFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any)) as unknown as ApiMethods<EntitiesNamesToTypes[typeof selectedEntityType]>['create']}
+            entity={allEntitiesRelated[selectedEntityType].createEmpty()}
             fields={allEntitiesRelated[selectedEntityType].fields}
             name={selectedEntityType}
             allEntities={entities}
+            formType='create'
+          />
+        </>
+        : null
+      }
+
+      {/* {isEditFormOpen && selectedEntityId ? */}
+      {/*   <> */}
+      {/*     <div */}
+      {/*       onClick={() => {setSelectedEntityId(undefined); closeEditForm()}} */}
+      {/*       className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div> */}
+      {/*     /!* in apiCreateFunc need to wrap function to save it`s context *!/ */}
+      {/*     <EditForm<EntitiesNamesToTypes[typeof selectedEntityType]> */}
+      {/*       apiUpdateFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any)) as unknown as ApiMethods<EntitiesNamesToTypes[typeof selectedEntityType]>['create']} */}
+      {/*       fields={allEntitiesRelated[selectedEntityType].fields} */}
+      {/*       name={selectedEntityType} */}
+      {/*       allEntities={entities} */}
+      {/*       entity={entities[selectedEntityType].find((item) => item.id === selectedEntityId) as any}/> */}
+      {/*   </> */}
+      {/*   : null */}
+      {/* } */}
+      {isEditFormOpen && selectedEntityId ?
+        <>
+          <div
+            onClick={() => {setSelectedEntityId(undefined); closeEditForm()}}
+            className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
+          {/* in apiCreateFunc need to wrap function to save it`s context */}
+          <EntityForm<'update', EntitiesNamesToTypes[typeof selectedEntityType]>
+            apiFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any)) as unknown as ApiMethods<EntitiesNamesToTypes[typeof selectedEntityType]>['create']}
+            fields={allEntitiesRelated[selectedEntityType].fields}
+            name={selectedEntityType}
+            allEntities={entities}
+            entity={entities[selectedEntityType].find((item) => item.id === selectedEntityId) as any}
+            formType='update'
           />
         </>
         : null
@@ -97,7 +151,7 @@ function AdminPanel(): JSX.Element {
         <div className='w-full p-4 rounded-md bg-white drop-shadow-md mb-2'>
           <div className='flex justify-between'>
             <h6 className='text-xl font-bold'>{ENTITY_TITLES[selectedEntityType as AllEntitiesNames]}</h6>
-            <button onClick={openModal}
+            <button onClick={openCreateForm}
                     className='outline outline-1 px-2 py-1 text-green-500 rounded-md flex items-center gap-1 font-medium'>
               <PlusIcon className='w-5 inline stroke-2' />Додати
             </button>
@@ -124,7 +178,12 @@ function AdminPanel(): JSX.Element {
                       )
                     }
                     <td>
-                      <button><PencilIcon className='w-6 stroke-blue-600' /></button>
+                      <button
+                        onClick={() => {
+                          setSelectedEntityId(item.id);
+                          openEditForm()
+                        }}
+                      ><PencilIcon className='w-6 stroke-blue-600' /></button>
                     </td>
                     <td>
                       <button
