@@ -1,18 +1,22 @@
-import React, {useEffect, useState} from "react";
-import {PencilIcon, PlusIcon, TrashIcon} from "@heroicons/react/24/outline";
-import {allEntitiesRelated} from "../entities/entitiesRelated";
-import {ENTITY_TITLES, FIELD_TITLES} from "../common/constants";
-import {AllEntities, AllEntitiesNames, EntitiesNamesToTypes} from "../common/types";
-import CreateForm from "../components/CreateForm";
-import {useModal} from "../common/hooks";
-import {AcademicStatus, Teacher} from "../entities/entitiesClasses";
+import React, { useEffect, useState } from 'react';
+import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { allEntitiesRelated } from '../entities/entitiesRelated';
+import { ENTITY_TITLES, FIELD_TITLES } from '../common/constants';
+import {
+  AllEntitiesItems,
+  AllEntitiesNames,
+  EntitiesNamesToTypes,
+} from '../common/types';
+import CreateForm from '../components/CreateForm';
+import { useModal } from '../common/hooks';
+import { ApiMethods } from '../api/apiCalls';
 
 function AdminPanel(): JSX.Element {
   const [selectedEntityType, setSelectedEntityType] = useState<AllEntitiesNames>('academicStatus');
   const [isModalOpen, openModal, closeModal] = useModal();
-  const [entities, setEntities] = useState<{ [K in AllEntitiesNames]: Array<AllEntities> }>({
+  const [entities, setEntities] = useState<AllEntitiesItems>({
     academicStatus: [],
-    teacher: []
+    teacher: [],
   });
 
   useEffect(() => {
@@ -20,18 +24,18 @@ function AdminPanel(): JSX.Element {
       let entity: keyof typeof allEntitiesRelated;
       for (entity in allEntitiesRelated) {
         const ent = await allEntitiesRelated[entity].api.readAll();
-        setEntities((state) => ({...state, [entity]: ent}));
+        setEntities((state) => ({ ...state, [entity]: ent }));
       }
     };
 
     fetchData();
-  }, [])
+  }, []);
 
 
   function onEntityTypeClick(entity: AllEntitiesNames) {
     return () => {
       setSelectedEntityType(entity);
-    }
+    };
   }
 
   function handleDelete(id: number) {
@@ -44,6 +48,24 @@ function AdminPanel(): JSX.Element {
     })();
   }
 
+  // function selectEntityFieldsItems(entity: AllEntitiesNames) {
+  //   // const selectedEntities = {} as any;
+  //   // const selectedEntities = {} as ArraysOfEntityFieldsOf<EntitiesNamesToTypes[typeof entity]>;
+  //   const selectedEntities = {} as {[K in keyof EntityFieldsOf<EntitiesNamesToTypes[typeof entity]>]: Array<any>};
+  //   // const selectedEntities = {} as ArraysOfEntityFieldsOf<Teacher>;
+  //   // const selectedEntities = {} as { academicStatus: AcademicStatus[] };
+  //
+  //   const entityFields = allEntitiesRelated[entity].fields;
+  //   for(const fieldName in entityFields){
+  //     if(entityFields[fieldName as keyof typeof entityFields] === 'entity'){
+  //       const fn = fieldName as AllEntitiesNames;
+  //       selectedEntities[fieldName as keyof typeof selectedEntities] = entities[fieldName as keyof typeof entities] as Array<EntitiesNamesToTypes[typeof fn]>;
+  //     }
+  //   }
+  //
+  //   return selectedEntities;
+  // }
+
   return (
     <>
       {isModalOpen ?
@@ -51,11 +73,13 @@ function AdminPanel(): JSX.Element {
           <div
             onClick={closeModal}
             className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
+          {/* in apiCreateFunc need to wrap function to save it`s context */}
           <CreateForm<EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiCreateFunc={allEntitiesRelated[selectedEntityType].api.create as any}
+            apiCreateFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any)) as unknown as ApiMethods<EntitiesNamesToTypes[typeof selectedEntityType]>['create']}
             createEmptyEntity={allEntitiesRelated[selectedEntityType].createEmpty}
             fields={allEntitiesRelated[selectedEntityType].fields}
             name={selectedEntityType}
+            allEntities={entities}
           />
         </>
         : null
@@ -68,7 +92,7 @@ function AdminPanel(): JSX.Element {
             {Object.keys(allEntitiesRelated).map(name =>
               <p className='py-2 pr-10' key={name} onClick={onEntityTypeClick(name as AllEntitiesNames)}>
                 {ENTITY_TITLES[name as AllEntitiesNames]}
-              </p>
+              </p>,
             )}
           </div>
         </div>
@@ -77,14 +101,14 @@ function AdminPanel(): JSX.Element {
             <h6 className='text-xl font-bold'>{ENTITY_TITLES[selectedEntityType as AllEntitiesNames]}</h6>
             <button onClick={openModal}
                     className='outline outline-1 px-2 py-1 text-green-500 rounded-md flex items-center gap-1 font-medium'>
-              <PlusIcon className='w-5 inline stroke-2'/>Додати
+              <PlusIcon className='w-5 inline stroke-2' />Додати
             </button>
           </div>
-          <table className="table-fixed w-full mt-5">
+          <table className='table-fixed w-full mt-5'>
             <thead className='pb-6 border-b'>
             <tr className='text-left'>
               {Object.keys(allEntitiesRelated[selectedEntityType].fields).map(field =>
-                <th className='pb-2' key={field}>{FIELD_TITLES[field as keyof typeof FIELD_TITLES]}</th>
+                <th className='pb-2' key={field}>{FIELD_TITLES[field as keyof typeof FIELD_TITLES]}</th>,
               )}
               <th className='w-10'></th>
               <th className='w-10'></th>
@@ -97,26 +121,27 @@ function AdminPanel(): JSX.Element {
                   (<tr key={item.id} className='h-10'>
                     {
                       Object.keys(allEntitiesRelated[selectedEntityType].fields).map((fieldName) =>
-                        <td key={fieldName}>{item[fieldName as keyof typeof item]}</td>
+                        <td
+                          key={fieldName}>{typeof item[fieldName as keyof typeof item] === 'object' ? (item[fieldName as keyof typeof item] as any).displayName : item[fieldName as keyof typeof item]}</td>,
                       )
                     }
                     <td>
-                      <button><PencilIcon className='w-6 stroke-blue-600'/></button>
+                      <button><PencilIcon className='w-6 stroke-blue-600' /></button>
                     </td>
                     <td>
                       <button
                         onClick={() => handleDelete(item.id)}
-                      ><TrashIcon className='w-6 stroke-red-600'/></button>
+                      ><TrashIcon className='w-6 stroke-red-600' /></button>
                     </td>
-                  </tr>)
-                ) : <p className='text-lg mt-4 font-bold'>Тут ще нічого немає</p>
+                  </tr>),
+                ) : <tr className='text-lg mt-4 font-bold'><td>Тут ще нічого немає</td></tr>
             }
             </tbody>
           </table>
         </div>
       </div>
     </>
-  )
+  );
 }
 
 export default AdminPanel;

@@ -1,4 +1,4 @@
-import {ConstructorFor, Optional, ValuesTypeInCreateForm} from '../common/types';
+import { ConstructorFor, EmptyEntityOf } from '../common/types';
 import { AcademicStatusDTO, TeacherDTO } from './entitiesDTO';
 
 // base class with id and shownName
@@ -18,18 +18,17 @@ export class AcademicStatus implements AcademicStatusDTO {
   }
 
   constructor(obj: AcademicStatusDTO) {
-    // const { name = '', shortName = '', id = undefined } = obj || {};
     const { name, shortName, id } = obj;
     this.name = name;
     this.shortName = shortName;
     this.id = id;
   }
 
-  static createEmpty(): ValuesTypeInCreateForm<AcademicStatus> {
+  static createEmpty(): EmptyEntityOf<AcademicStatus> {
     return {
-      name: "",
-      shortName: ""
-    }
+      name: undefined,
+      shortName: undefined,
+    };
   }
 }
 
@@ -53,12 +52,12 @@ export class Teacher implements ConstructorFor<TeacherDTO> {
     this.id = id;
   }
 
-  static createEmpty(): ValuesTypeInCreateForm<Teacher> {
+  static createEmpty(): EmptyEntityOf<Teacher> {
     return {
-      firstName: "",
-      patronymic: "",
-      surname: "",
-      academicStatus: 0
-    }
+      academicStatus: undefined,
+      firstName: undefined,
+      patronymic: undefined,
+      surname: undefined,
+    };
   }
 }

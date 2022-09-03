@@ -19,6 +19,5 @@ module.exports = {
   plugins: ['react', '@typescript-eslint'],
   rules: {
     'no-empty-function': 'warn',
-    'ban-ts-comment': 'warn',
   },
 };

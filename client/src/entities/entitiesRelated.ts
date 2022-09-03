@@ -1,37 +1,32 @@
-import {AcademicStatus, Teacher} from './entitiesClasses';
+import { AcademicStatus, Teacher } from './entitiesClasses';
 import { ApiMethods, EntityApi } from '../api/apiCalls';
-import {AcademicStatusDTO, TeacherDTO} from "./entitiesDTO";
+import { AcademicStatusDTO, TeacherDTO } from './entitiesDTO';
 import {
   AllEntities,
   AllEntitiesNames,
   ConstructorFor,
-  DtoOfEntity,
-  EntitiesNamesToTypes, FieldType,
-  Optional, ValuesTypeInCreateForm
-} from "../common/types";
+  EmptyEntityOf,
+  EntitiesNamesToTypes,
+  FieldsOf,
+} from '../common/types';
+
 
 export abstract class EntityRelated<T extends AllEntities> {
-  // name: string;
-
-  // constructor(name = 'base class') {
-  //   this.name = name;
-  // }
-
   abstract api: ApiMethods<T>;
-  abstract fields: {[K in keyof Optional<DtoOfEntity<T>, 'id'>]: K extends AllEntitiesNames ? 'entity' : DtoOfEntity<T>[K] extends string ? string : DtoOfEntity<T>[K] extends number ? number : never};
-  abstract create(obj: ConstructorFor<T>): T;
-  abstract createEmpty(): ValuesTypeInCreateForm<T>;
+  abstract fields: FieldsOf<T>;
 
- // eslint no-empty-function: "error"
+  abstract create(obj: ConstructorFor<T>): T;
+
+  abstract createEmpty(): EmptyEntityOf<T>;
+
   protected constructor() {
     // not empty, ok
   }
 }
 
-export class AcademicStatusRelated extends EntityRelated<AcademicStatus>{
-  // name: string;
+export class AcademicStatusRelated extends EntityRelated<AcademicStatus> {
   api: ApiMethods<AcademicStatus>;
-  fields: {[K in keyof Optional<AcademicStatusDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : AcademicStatusDTO[K]};
+  fields: { [K in keyof Omit<AcademicStatusDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : AcademicStatusDTO[K] extends string ? 'string' : AcademicStatusDTO[K] extends number ? 'number' : never };
 
   constructor() {
     super();
@@ -39,23 +34,21 @@ export class AcademicStatusRelated extends EntityRelated<AcademicStatus>{
     this.fields = {
       name: 'string',
       shortName: 'string',
-    }
-    // this.name = 'academicStatus';
-    // super('academicStatus');
+    };
   }
 
   create(obj: AcademicStatusDTO): AcademicStatus {
     return new AcademicStatus(obj);
   }
 
-  createEmpty(): ValuesTypeInCreateForm<AcademicStatus> {
+  createEmpty() {
     return AcademicStatus.createEmpty();
   }
 }
 
-export class TeacherRelated extends EntityRelated<Teacher>{
+export class TeacherRelated extends EntityRelated<Teacher> {
   api: ApiMethods<Teacher>;
-  fields: {[K in keyof Optional<TeacherDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : TeacherDTO[K]};
+  fields: { [K in keyof Omit<TeacherDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : TeacherDTO[K] extends string ? 'string' : TeacherDTO[K] extends number ? 'number' : never };
 
   constructor() {
     super();
@@ -65,19 +58,19 @@ export class TeacherRelated extends EntityRelated<Teacher>{
       surname: 'string',
       patronymic: 'string',
       academicStatus: 'entity',
-    }
+    };
   }
 
   create(obj: TeacherDTO): Teacher {
-    return new Teacher({...obj, academicStatus: new AcademicStatus(obj.academicStatus)});
+    return new Teacher({ ...obj, academicStatus: new AcademicStatus(obj.academicStatus) });
   }
 
-  createEmpty(): ValuesTypeInCreateForm<Teacher>{
+  createEmpty() {
     return Teacher.createEmpty();
   }
 }
 
-export const allEntitiesRelated: {[K in AllEntitiesNames]: EntityRelated<EntitiesNamesToTypes[K]>} = {
+export const allEntitiesRelated: { [K in AllEntitiesNames]: EntityRelated<EntitiesNamesToTypes[K]> } = {
   academicStatus: new AcademicStatusRelated(),
   teacher: new TeacherRelated(),
-}
+};
