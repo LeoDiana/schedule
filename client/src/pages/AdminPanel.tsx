@@ -40,11 +40,9 @@ function AdminPanel(): JSX.Element {
 
   function handleDelete(id: number) {
     (async () => {
-      // const response = await allEntitiesRelated.academicStatus.api.delete(id);
-      await allEntitiesRelated.academicStatus.api.delete(id);
-      // if (response === SUCCESS_MESSAGE) {
-      //   setExecutedOperation('delete');
-      // }
+      await allEntitiesRelated[selectedEntityType].api.delete(id);
+      const filtered = entities[selectedEntityType].filter((item) => item.id !== id);
+      setEntities((ents) => ({...ents, [selectedEntityType]: filtered}));
     })();
   }
 
@@ -134,7 +132,7 @@ function AdminPanel(): JSX.Element {
                       ><TrashIcon className='w-6 stroke-red-600' /></button>
                     </td>
                   </tr>),
-                ) : <tr className='text-lg mt-4 font-bold'><td>Тут ще нічого немає</td></tr>
+                ) : <tr className='text-lg mt-4 font-bold'><td colSpan={10}>Тут ще нічого немає</td></tr>
             }
             </tbody>
           </table>
