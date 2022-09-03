@@ -7,10 +7,7 @@ import {
   AllEntitiesNames,
   EntitiesNamesToTypes,
 } from '../common/types';
-import CreateForm from '../components/CreateForm';
 import { useModal } from '../common/hooks';
-import { ApiMethods } from '../api/apiCalls';
-import EditForm from '../components/EditForm';
 import EntityForm from '../components/EntityForm';
 
 function AdminPanel(): JSX.Element {
@@ -70,30 +67,14 @@ function AdminPanel(): JSX.Element {
 
   return (
     <>
-      {/* {isCreateFormOpen ? */}
-      {/*   <> */}
-      {/*     <div */}
-      {/*       onClick={closeCreateForm} */}
-      {/*       className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div> */}
-      {/*     /!* in apiCreateFunc need to wrap function to save it`s context *!/ */}
-      {/*     <CreateForm<EntitiesNamesToTypes[typeof selectedEntityType]> */}
-      {/*       apiCreateFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any)) as unknown as ApiMethods<EntitiesNamesToTypes[typeof selectedEntityType]>['create']} */}
-      {/*       createEmptyEntity={allEntitiesRelated[selectedEntityType].createEmpty} */}
-      {/*       fields={allEntitiesRelated[selectedEntityType].fields} */}
-      {/*       name={selectedEntityType} */}
-      {/*       allEntities={entities} */}
-      {/*     /> */}
-      {/*   </> */}
-      {/*   : null */}
-      {/* } */}
       {isCreateFormOpen ?
         <>
           <div
             onClick={closeCreateForm}
             className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
-          {/* in apiCreateFunc need to wrap function to save it`s context */}
+          {/* in Func need to wrap function to save it`s context */}
           <EntityForm<'create', EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any)) as unknown as ApiMethods<EntitiesNamesToTypes[typeof selectedEntityType]>['create']}
+            apiFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any))}
             entity={allEntitiesRelated[selectedEntityType].createEmpty()}
             fields={allEntitiesRelated[selectedEntityType].fields}
             name={selectedEntityType}
@@ -104,29 +85,14 @@ function AdminPanel(): JSX.Element {
         : null
       }
 
-      {/* {isEditFormOpen && selectedEntityId ? */}
-      {/*   <> */}
-      {/*     <div */}
-      {/*       onClick={() => {setSelectedEntityId(undefined); closeEditForm()}} */}
-      {/*       className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div> */}
-      {/*     /!* in apiCreateFunc need to wrap function to save it`s context *!/ */}
-      {/*     <EditForm<EntitiesNamesToTypes[typeof selectedEntityType]> */}
-      {/*       apiUpdateFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any)) as unknown as ApiMethods<EntitiesNamesToTypes[typeof selectedEntityType]>['create']} */}
-      {/*       fields={allEntitiesRelated[selectedEntityType].fields} */}
-      {/*       name={selectedEntityType} */}
-      {/*       allEntities={entities} */}
-      {/*       entity={entities[selectedEntityType].find((item) => item.id === selectedEntityId) as any}/> */}
-      {/*   </> */}
-      {/*   : null */}
-      {/* } */}
       {isEditFormOpen && selectedEntityId ?
         <>
           <div
             onClick={() => {setSelectedEntityId(undefined); closeEditForm()}}
             className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
-          {/* in apiCreateFunc need to wrap function to save it`s context */}
+          {/* in Func need to wrap function to save it`s context */}
           <EntityForm<'update', EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any)) as unknown as ApiMethods<EntitiesNamesToTypes[typeof selectedEntityType]>['create']}
+            apiFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.update(params as any)) as any}
             fields={allEntitiesRelated[selectedEntityType].fields}
             name={selectedEntityType}
             allEntities={entities}

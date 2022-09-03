@@ -5,33 +5,47 @@ import {
   AllEntities,
   AllEntitiesItems,
   AllEntitiesNames, CreationTypeOf,
-  DtoOfEntity,
+  DtoOfEntity, EmptyEntityOf,
 } from '../common/types';
 import { EntityRelated } from '../entities/entitiesRelated';
 import NumberInput from './NumberInput';
 import TextInput from './TextInput';
 import DropdownInput from './DropdownInput';
 
-
-interface Props<T extends AllEntities> {
+interface BaseFormProps<T extends AllEntities> {
   name: AllEntitiesNames
   fields: EntityRelated<T>['fields'],
-  apiUpdateFunc: ApiMethods<T>['update'],
   allEntities: AllEntitiesItems,
+  formType: FormType,
+}
+
+interface UpdateFormProps<T extends AllEntities> extends BaseFormProps<T> {
+  apiFunc: ApiMethods<T>['update'],
   entity: DtoOfEntity<T>,
 }
 
-function EditForm<T extends AllEntities>({
-                                             fields,
-                                             apiUpdateFunc,
-                                             name,
-                                             allEntities,
-  entity
-                                           }: Props<T>): JSX.Element {
-  const [values, setValues] = useState<DtoOfEntity<T>>(entity);
+interface CreateFormProps<T extends AllEntities> extends BaseFormProps<T> {
+  apiFunc: ApiMethods<T>['create'],
+  entity: EmptyEntityOf<T>,
+}
+
+type FormType = 'update' | 'create';
+
+type EntityFormType<T extends FormType, E extends AllEntities> = T extends 'create' ?
+  CreateFormProps<E> : UpdateFormProps<E>
+
+function EntityForm<T extends FormType, E extends AllEntities>({
+                                                                 fields,
+                                                                 apiFunc,
+                                                                 entity,
+                                                                 name,
+                                                                 allEntities,
+                                                                 formType,
+                                                               }: EntityFormType<T, E>): JSX.Element {
+  const [values, setValues] = useState<CreationTypeOf<E> | DtoOfEntity<E>>(entity);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
-    apiUpdateFunc(values);
+    apiFunc(values as any);
     event.preventDefault();
   }
 
@@ -73,10 +87,10 @@ function EditForm<T extends AllEntities>({
       )}
       <button type='submit'
               className='bg-blue-500 rounded-md py-1 mt-2 w-full drop-shadow-sm text-white font-bold text-lg'>
-        Зберегти зміни
+        {formType === 'create' ? 'Створити' : 'Зберегти зміни'}
       </button>
     </form>
   );
 }
 
-export default EditForm;
+export default EntityForm;
