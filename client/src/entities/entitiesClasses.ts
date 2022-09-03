@@ -1,14 +1,12 @@
 import { ConstructorFor, EmptyEntityOf } from '../common/types';
 import { AcademicStatusDTO, TeacherDTO } from './entitiesDTO';
 
-// base class with id and shownName
-//
-// abstract class Entity {
-//   id: number;
-//   abstract get shownName: () => string;
-// }
+interface Entity {
+  id: number;
+  displayName: string
+}
 
-export class AcademicStatus implements AcademicStatusDTO {
+export class AcademicStatus implements AcademicStatusDTO, Entity {
   id: number;
   name: string;
   shortName: string;
@@ -32,7 +30,7 @@ export class AcademicStatus implements AcademicStatusDTO {
   }
 }
 
-export class Teacher implements ConstructorFor<TeacherDTO> {
+export class Teacher implements ConstructorFor<TeacherDTO>, Entity {
   id: number;
   firstName: string;
   surname: string;
