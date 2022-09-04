@@ -19,7 +19,9 @@ import { AcademicStatus } from '../entities/entitiesClasses';
 
 export const ENTITY_TITLES: {[K in AllEntitiesNames]: string} = {
   academicStatus: 'Академічний статус',
-  teacher: 'Викладач'
+  teacher: 'Викладач',
+  lessonTime: 'Розклад пар',
+  day: 'День',
 }
 
 export const FIELD_TITLES: {[K in keyof AllFields]: string} = {
@@ -30,5 +32,8 @@ export const FIELD_TITLES: {[K in keyof AllFields]: string} = {
   firstName: 'Імʼя',
   surname: 'Прізвище',
   patronymic: 'По батькові',
+  number: 'Номер пари',
+  timeStart: 'Час початку',
+  timeEnd: 'Час закінчення',
   ...ENTITY_TITLES
 }

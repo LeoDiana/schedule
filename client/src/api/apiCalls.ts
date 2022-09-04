@@ -13,10 +13,10 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
     const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
       academicStatus: 'academic-statuses',
       teacher: 'teachers',
-      // subject: 'subjects',
+      lessonTime: 'lesson-times',
+      day: 'days',
       // lessonType: 'lesson-types',
-      // lessonTime: 'lesson-times',
-      // day: 'days',
+      // subject: 'subjects',
       // weekType: 'week-types',
       // building: 'buildings',
       // classroom: 'classrooms',

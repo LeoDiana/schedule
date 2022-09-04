@@ -17,16 +17,20 @@ function AdminPanel(): JSX.Element {
   const [entities, setEntities] = useState<AllEntitiesItems>({
     academicStatus: [],
     teacher: [],
+    lessonTime: [],
+    day: [],
   });
   const [selectedEntityId, setSelectedEntityId] = useState<number>();
 
   useEffect(() => {
     const fetchData = async () => {
       let entity: keyof typeof allEntitiesRelated;
+      const fetched = {} as AllEntitiesItems;
       for (entity in allEntitiesRelated) {
         const ent = await allEntitiesRelated[entity].api.readAll();
-        setEntities((state) => ({ ...state, [entity]: ent }));
+        fetched[entity] = ent;
       }
+      setEntities(fetched);
     };
 
     fetchData();
@@ -43,7 +47,7 @@ function AdminPanel(): JSX.Element {
     (async () => {
       await allEntitiesRelated[selectedEntityType].api.delete(id);
       const filtered = entities[selectedEntityType].filter((item) => item.id !== id);
-      setEntities((ents) => ({...ents, [selectedEntityType]: filtered}));
+      setEntities((ents) => ({ ...ents, [selectedEntityType]: filtered }));
     })();
   }
 
@@ -64,6 +68,10 @@ function AdminPanel(): JSX.Element {
   //
   //   return selectedEntities;
   // }
+
+  function fieldsCount(ent: AllEntitiesNames) {
+    return Object.keys(allEntitiesRelated[ent].fields).length + 2;
+  }
 
   return (
     <>
@@ -88,7 +96,10 @@ function AdminPanel(): JSX.Element {
       {isEditFormOpen && selectedEntityId ?
         <>
           <div
-            onClick={() => {setSelectedEntityId(undefined); closeEditForm()}}
+            onClick={() => {
+              setSelectedEntityId(undefined);
+              closeEditForm();
+            }}
             className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
           {/* in Func need to wrap function to save it`s context */}
           <EntityForm<'update', EntitiesNamesToTypes[typeof selectedEntityType]>
@@ -147,7 +158,7 @@ function AdminPanel(): JSX.Element {
                       <button
                         onClick={() => {
                           setSelectedEntityId(item.id);
-                          openEditForm()
+                          openEditForm();
                         }}
                       ><PencilIcon className='w-6 stroke-blue-600' /></button>
                     </td>
@@ -157,7 +168,11 @@ function AdminPanel(): JSX.Element {
                       ><TrashIcon className='w-6 stroke-red-600' /></button>
                     </td>
                   </tr>),
-                ) : <tr className='text-lg mt-4 font-bold'><td colSpan={10}>Тут ще нічого немає</td></tr>
+                ) : <tr className='text-lg mt-4 font-bold'>
+                      <td colSpan={fieldsCount(selectedEntityType)}>
+                        Тут ще нічого немає
+                      </td>
+                    </tr>
             }
             </tbody>
           </table>

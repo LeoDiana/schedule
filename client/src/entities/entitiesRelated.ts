@@ -1,6 +1,6 @@
-import { AcademicStatus, Teacher } from './entitiesClasses';
+import { AcademicStatus, Day, LessonTime, Teacher } from './entitiesClasses';
 import { ApiMethods, EntityApi } from '../api/apiCalls';
-import { AcademicStatusDTO, TeacherDTO } from './entitiesDTO';
+import { AcademicStatusDTO, DayDTO, LessonTimeDTO, TeacherDTO } from './entitiesDTO';
 import {
   AllEntities,
   AllEntitiesNames,
@@ -70,7 +70,53 @@ export class TeacherRelated extends EntityRelated<Teacher> {
   }
 }
 
+export class LessonTimeRelated extends EntityRelated<LessonTime> {
+  api: ApiMethods<LessonTime>;
+  fields: { [K in keyof Omit<LessonTimeDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : LessonTimeDTO[K] extends string ? 'string' : LessonTimeDTO[K] extends number ? 'number' : never };
+
+  constructor() {
+    super();
+    this.api = new EntityApi<LessonTime>('lessonTime', this.create);
+    this.fields = {
+      number: "string",
+      timeStart: "string",
+      timeEnd: "string",
+    };
+  }
+
+  create(obj: LessonTimeDTO): LessonTime {
+    return new LessonTime(obj);
+  }
+
+  createEmpty() {
+    return LessonTime.createEmpty();
+  }
+}
+
+export class DayRelated extends EntityRelated<Day> {
+  api: ApiMethods<Day>;
+  fields: { [K in keyof Omit<DayDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : DayDTO[K] extends string ? 'string' : DayDTO[K] extends number ? 'number' : never };
+
+  constructor() {
+    super();
+    this.api = new EntityApi<Day>('day', this.create);
+    this.fields = {
+      name: "string",
+    };
+  }
+
+  create(obj: DayDTO): Day {
+    return new Day(obj);
+  }
+
+  createEmpty() {
+    return Day.createEmpty();
+  }
+}
+
 export const allEntitiesRelated: { [K in AllEntitiesNames]: EntityRelated<EntitiesNamesToTypes[K]> } = {
   academicStatus: new AcademicStatusRelated(),
   teacher: new TeacherRelated(),
+  lessonTime: new LessonTimeRelated(),
+  day: new DayRelated(),
 };
