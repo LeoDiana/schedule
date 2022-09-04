@@ -43,13 +43,18 @@ function EntityForm<T extends FormType, E extends AllEntities>({
                                                                  formType,
                                                                }: EntityFormType<T, E>): JSX.Element {
   const [values, setValues] = useState<CreationTypeOf<E> | DtoOfEntity<E>>(entity);
+  const [showNotification, setShowNotification] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     apiFunc(values as any);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 3*1000);
     event.preventDefault();
   }
 
   return (
+    <>
+      {showNotification ? <SuccessfulNotification /> : null}
     <form
       onSubmit={handleSubmit}
       className='fixed bg-white z-20 p-7 w-96 flex flex-col items-center gap-3 rounded-3xl drop-shadow-2xl left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2'>
@@ -90,7 +95,16 @@ function EntityForm<T extends FormType, E extends AllEntities>({
         {formType === 'create' ? 'Створити' : 'Зберегти зміни'}
       </button>
     </form>
+    </>
   );
+}
+
+function SuccessfulNotification():JSX.Element {
+  return (
+    <div className='bg-green-500 font-bold fixed z-50 left-1/2 -translate-x-1/2 bottom-10 rounded-lg py-2 px-6 drop-shadow-md'>
+      Entity created/edited
+    </div>
+  )
 }
 
 export default EntityForm;
