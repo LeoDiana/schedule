@@ -19,6 +19,11 @@ function AdminPanel(): JSX.Element {
     teacher: [],
     lessonTime: [],
     day: [],
+    lessonType: [],
+    subject: [],
+    group: [],
+    subgroup: [],
+    weekType: [],
   });
   const [selectedEntityId, setSelectedEntityId] = useState<number>();
 
@@ -27,8 +32,7 @@ function AdminPanel(): JSX.Element {
       let entity: keyof typeof allEntitiesRelated;
       const fetched = {} as AllEntitiesItems;
       for (entity in allEntitiesRelated) {
-        const ent = await allEntitiesRelated[entity].api.readAll();
-        fetched[entity] = ent;
+        fetched[entity] = await allEntitiesRelated[entity].api.readAll();
       }
       setEntities(fetched);
     };

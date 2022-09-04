@@ -1,30 +1,18 @@
-import {AllEntities, AllEntitiesNames, AllFields, DtoOfEntity} from './types';
-import { instance as axios } from '../api/axiosConfig';
-import { AcademicStatus } from '../entities/entitiesClasses';
+import { AllEntitiesNames, AllFields } from './types';
 
-// export const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
-//   academicStatus: 'academic-statuses',
-//   // teacher: 'teachers',
-//   // subject: 'subjects',
-//   // lessonType: 'lesson-types',
-//   // lessonTime: 'lesson-times',
-//   // day: 'days',
-//   // weekType: 'week-types',
-//   // building: 'buildings',
-//   // classroom: 'classrooms',
-//   // subgroup: 'subgroups',
-//   // group: 'groups',
-//   // lesson: 'lessons',
-// } as const;
-
-export const ENTITY_TITLES: {[K in AllEntitiesNames]: string} = {
+export const ENTITY_TITLES: { [K in AllEntitiesNames]: string } = {
   academicStatus: 'Академічний статус',
   teacher: 'Викладач',
   lessonTime: 'Розклад пар',
   day: 'День',
-}
+  subject: 'Предмет',
+  lessonType: 'Тип заняття',
+  group: 'Група',
+  subgroup: 'Підгрупа',
+  weekType: 'Тип тижня',
+};
 
-export const FIELD_TITLES: {[K in keyof AllFields]: string} = {
+export const FIELD_TITLES: { [K in keyof AllFields]: string } = {
   id: '',
   displayName: 'Відображуване імʼя',
   name: 'Назва',
@@ -35,5 +23,7 @@ export const FIELD_TITLES: {[K in keyof AllFields]: string} = {
   number: 'Номер пари',
   timeStart: 'Час початку',
   timeEnd: 'Час закінчення',
-  ...ENTITY_TITLES
-}
+  startYear: 'Рік початку',
+  studentsNumber: 'Кількість студентів',
+  ...ENTITY_TITLES,
+};

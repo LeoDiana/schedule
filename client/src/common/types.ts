@@ -1,5 +1,21 @@
-import { AcademicStatus, Day, LessonTime, Teacher } from '../entities/entitiesClasses';
-import { AcademicStatusDTO, DayDTO, LessonTimeDTO, TeacherDTO } from '../entities/entitiesDTO';
+import {
+  AcademicStatus,
+  Day, Group,
+  LessonTime,
+  LessonType,
+  Subgroup,
+  Subject,
+  Teacher,
+  WeekType,
+} from '../entities/entitiesClasses';
+import {
+  AcademicStatusDTO,
+  DayDTO, GroupDTO,
+  LessonTimeDTO,
+  LessonTypeDTO, SubgroupDTO,
+  SubjectDTO,
+  TeacherDTO, WeekTypeDTO,
+} from '../entities/entitiesDTO';
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
@@ -8,6 +24,11 @@ export type EntitiesNamesToTypes = {
   teacher: Teacher;
   lessonTime: LessonTime;
   day: Day;
+  subject: Subject;
+  lessonType: LessonType;
+  weekType: WeekType;
+  group: Group;
+  subgroup: Subgroup;
 };
 
 export type AllEntities = EntitiesNamesToTypes[keyof EntitiesNamesToTypes];
@@ -17,7 +38,12 @@ export type DtoOfEntity<T extends AllEntities> =
     T extends AcademicStatus ? AcademicStatusDTO
   : T extends Teacher ? TeacherDTO
   : T extends LessonTime ? LessonTimeDTO
+  : T extends Subject ? SubjectDTO
+  : T extends LessonType ? LessonTypeDTO
+  : T extends Group ? GroupDTO
+  : T extends Subgroup ? SubgroupDTO
   : T extends Day ? DayDTO
+  : T extends WeekType ? WeekTypeDTO
   : never;
 
 type DtoFieldsToCorrespondingClasses<T extends DtoOfEntity<AllEntities>> = {

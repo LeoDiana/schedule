@@ -24,52 +24,44 @@ export interface DayDTO {
   name: string;
 }
 
-// export interface Subject {
-//   id?: number;
-//   name: string;
-//   shortName: string;
-// }
-//
-// export interface LessonType {
-//   id?: number;
-//   name: string;
-//   shortName: string;
-// }
-//
-//
-//
-// export interface WeekType {
-//   id?: number;
-//   name: string;
-// }
-//
+export interface SubjectDTO {
+  id: number;
+  name: string;
+  shortName: string;
+}
+
+export interface LessonTypeDTO {
+  id: number;
+  name: string;
+  shortName: string;
+}
+
+export interface WeekTypeDTO {
+  id: number;
+  name: string;
+}
+
+export interface GroupDTO {
+  id: number;
+  name: string;
+  startYear: number;
+}
+
+export interface SubgroupDTO {
+  id: number;
+  name: string;
+  group: GroupDTO;
+  studentsNumber: number;
+}
+
+
 // export interface Building {
 //   id?: number;
 //   name: string;
 //   address: string;
 // }
 //
-// export interface Group {
-//   id?: number;
-//   name: string;
-//   startYear: number;
-// }
-//
-// export interface Subgroup {
-//   id?: number;
-//   name: string;
-//   group: Group;
-//   studentsNumber: number;
-// }
-//
-// export interface Teacher {
-//   id?: number;
-//   firstName: string;
-//   surname: string;
-//   patronymic: string;
-//   academicStatus: AcademicStatus;
-// }
-//
+
 // export interface Classroom {
 //   id?: number;
 //   number: string;

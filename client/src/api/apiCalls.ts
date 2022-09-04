@@ -15,13 +15,13 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
       teacher: 'teachers',
       lessonTime: 'lesson-times',
       day: 'days',
-      // lessonType: 'lesson-types',
-      // subject: 'subjects',
-      // weekType: 'week-types',
+      lessonType: 'lesson-types',
+      subject: 'subjects',
+      weekType: 'week-types',
+      subgroup: 'subgroups',
+      group: 'groups',
       // building: 'buildings',
       // classroom: 'classrooms',
-      // subgroup: 'subgroups',
-      // group: 'groups',
       // lesson: 'lessons',
     };
 

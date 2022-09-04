@@ -1,6 +1,24 @@
-import { AcademicStatus, Day, LessonTime, Teacher } from './entitiesClasses';
+import {
+  AcademicStatus,
+  Day,
+  Group,
+  LessonTime,
+  LessonType,
+  Subgroup,
+  Subject,
+  Teacher,
+  WeekType,
+} from './entitiesClasses';
 import { ApiMethods, EntityApi } from '../api/apiCalls';
-import { AcademicStatusDTO, DayDTO, LessonTimeDTO, TeacherDTO } from './entitiesDTO';
+import {
+  AcademicStatusDTO,
+  DayDTO, GroupDTO,
+  LessonTimeDTO,
+  LessonTypeDTO,
+  SubgroupDTO,
+  SubjectDTO,
+  TeacherDTO, WeekTypeDTO,
+} from './entitiesDTO';
 import {
   AllEntities,
   AllEntitiesNames,
@@ -114,9 +132,150 @@ export class DayRelated extends EntityRelated<Day> {
   }
 }
 
+
+export class SubjectRelated extends EntityRelated<Subject> {
+  api: ApiMethods<Subject>;
+  fields: { [K in keyof Omit<SubjectDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : SubjectDTO[K] extends string ? 'string' : SubjectDTO[K] extends number ? 'number' : never };
+
+  constructor() {
+    super();
+    this.api = new EntityApi<Subject>('subject', this.create);
+    this.fields = {
+      name: 'string',
+      shortName: 'string',
+    };
+  }
+
+  create(obj: SubjectDTO): Subject {
+    return new Subject(obj);
+  }
+
+  createEmpty() {
+    return Subject.createEmpty();
+  }
+}
+
+export class LessonTypeRelated extends EntityRelated<LessonType> {
+  api: ApiMethods<LessonType>;
+  fields: { [K in keyof Omit<LessonTypeDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : LessonTypeDTO[K] extends string ? 'string' : LessonTypeDTO[K] extends number ? 'number' : never };
+
+  constructor() {
+    super();
+    this.api = new EntityApi<LessonType>('lessonType', this.create);
+    this.fields = {
+      name: 'string',
+      shortName: 'string',
+    };
+  }
+
+  create(obj: LessonTypeDTO): LessonType {
+    return new LessonType(obj);
+  }
+
+  createEmpty() {
+    return LessonType.createEmpty();
+  }
+}
+
+export class WeekTypeRelated extends EntityRelated<WeekType> {
+  api: ApiMethods<WeekType>;
+  fields: { [K in keyof Omit<WeekTypeDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : WeekTypeDTO[K] extends string ? 'string' : WeekTypeDTO[K] extends number ? 'number' : never };
+
+  constructor() {
+    super();
+    this.api = new EntityApi<WeekType>('weekType', this.create);
+    this.fields = {
+      name: 'string',
+    };
+  }
+
+  create(obj: WeekTypeDTO): WeekType {
+    return new WeekType(obj);
+  }
+
+  createEmpty() {
+    return WeekType.createEmpty();
+  }
+}
+
+export class GroupRelated extends EntityRelated<Group> {
+  api: ApiMethods<Group>;
+  fields: { [K in keyof Omit<GroupDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : GroupDTO[K] extends string ? 'string' : GroupDTO[K] extends number ? 'number' : never };
+
+  constructor() {
+    super();
+    this.api = new EntityApi<Group>('group', this.create);
+    this.fields = {
+      name: 'string',
+      startYear: 'number',
+    };
+  }
+
+  create(obj: GroupDTO): Group {
+    return new Group(obj);
+  }
+
+  createEmpty() {
+    return Group.createEmpty();
+  }
+}
+
+export class SubgroupRelated extends EntityRelated<Subgroup> {
+  api: ApiMethods<Subgroup>;
+  fields: { [K in keyof Omit<SubgroupDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : SubgroupDTO[K] extends string ? 'string' : SubgroupDTO[K] extends number ? 'number' : never };
+
+  constructor() {
+    super();
+    this.api = new EntityApi<Subgroup>('subgroup', this.create);
+    this.fields = {
+      name: 'string',
+      studentsNumber: 'number',
+      group: 'entity',
+    };
+  }
+
+  create(obj: SubgroupDTO): Subgroup {
+    return new Subgroup({ ...obj, group: new Group(obj.group) });
+  }
+
+  createEmpty() {
+    return Subgroup.createEmpty();
+  }
+}
+
+
+//
+// export class OoORelated extends EntityRelated<OoO> {
+//   api: ApiMethods<OoO>;
+//   fields: { [K in keyof Omit<OoODTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : OoODTO[K] extends string ? 'string' : OoODTO[K] extends number ? 'number' : never };
+//
+//   constructor() {
+//     super();
+//     this.api = new EntityApi<OoO>('ooO', this.create);
+//     this.fields = {
+//       name: 'string',
+//       shortName: 'string',
+//     };
+//   }
+//
+//   create(obj: OoODTO): OoO {
+//     return new OoO(obj);
+//   }
+//
+//   createEmpty() {
+//     return OoO.createEmpty();
+//   }
+// }
+
+
 export const allEntitiesRelated: { [K in AllEntitiesNames]: EntityRelated<EntitiesNamesToTypes[K]> } = {
   academicStatus: new AcademicStatusRelated(),
   teacher: new TeacherRelated(),
   lessonTime: new LessonTimeRelated(),
   day: new DayRelated(),
+  subject: new SubjectRelated(),
+  lessonType: new LessonTypeRelated(),
+  weekType: new WeekTypeRelated(),
+  group: new GroupRelated(),
+  subgroup: new SubgroupRelated(),
 };
