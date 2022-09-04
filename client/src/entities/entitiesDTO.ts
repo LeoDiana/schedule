@@ -49,34 +49,33 @@ export interface GroupDTO {
 
 export interface SubgroupDTO {
   id: number;
-  name: string;
+  name?: string;
   group: GroupDTO;
   studentsNumber: number;
 }
 
+export interface BuildingDTO {
+  id: number;
+  name: string;
+  address: string;
+}
 
-// export interface Building {
-//   id?: number;
-//   name: string;
-//   address: string;
-// }
-//
 
-// export interface Classroom {
-//   id?: number;
-//   number: string;
-//   capacity: number;
-//   building: Building;
-// }
-//
-// export interface Lesson {
-//   id?: number;
-//   teacher: Teacher;
-//   subject: Subject;
-//   lessonType: LessonType;
-//   lessonTime: LessonTime;
-//   classroom: Classroom;
-//   day: Day;
-//   weekType: WeekType;
-//   subgroup: Subgroup;
-// }
+export interface ClassroomDTO {
+  id: number;
+  number: string;
+  capacity: number;
+  building: BuildingDTO;
+}
+
+export interface LessonDTO {
+  id: number;
+  teacher: TeacherDTO;
+  subject: SubjectDTO;
+  lessonType: LessonTypeDTO;
+  lessonTime: LessonTimeDTO;
+  classroom?: ClassroomDTO;
+  day: DayDTO;
+  weekType: WeekTypeDTO;
+  subgroup: SubgroupDTO;
+}

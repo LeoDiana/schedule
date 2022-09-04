@@ -16,7 +16,7 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
     <div className='w-full flex flex-col'>
       <label htmlFor={name} className='font-medium mb-0.5'>{FIELD_TITLES[name as keyof typeof FIELD_TITLES]}</label>
       <div className='w-full relative'>
-        <input id={name} type='text' onChange={(event) => onChange(Number(event.target.value))} required
+        <input id={name} type='text' onChange={(event) => onChange(Number(event.target.value))}
                value={value ? value.displayName : ''}
                autoComplete='off'
                className='w-full rounded-md border-2 drop-shadow-sm text-lg pl-2 pr-9 py-1' />

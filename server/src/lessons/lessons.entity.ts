@@ -1,7 +1,7 @@
 import {
+  Column,
   Entity,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -37,6 +37,7 @@ export class Lesson {
 
   @ManyToOne(() => Classroom, { eager: true })
   @JoinColumn()
+  @Column({ nullable: true })
   classroom: Classroom;
 
   @ManyToOne(() => Day, { eager: true })

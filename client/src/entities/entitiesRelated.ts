@@ -1,7 +1,7 @@
 import {
-  AcademicStatus,
+  AcademicStatus, Building, Classroom,
   Day,
-  Group,
+  Group, Lesson,
   LessonTime,
   LessonType,
   Subgroup,
@@ -11,8 +11,8 @@ import {
 } from './entitiesClasses';
 import { ApiMethods, EntityApi } from '../api/apiCalls';
 import {
-  AcademicStatusDTO,
-  DayDTO, GroupDTO,
+  AcademicStatusDTO, BuildingDTO, ClassroomDTO,
+  DayDTO, GroupDTO, LessonDTO,
   LessonTimeDTO,
   LessonTypeDTO,
   SubgroupDTO,
@@ -25,7 +25,7 @@ import {
   ConstructorFor,
   EmptyEntityOf,
   EntitiesNamesToTypes,
-  FieldsOf,
+  FieldsOf, FieldType,
 } from '../common/types';
 
 
@@ -222,7 +222,7 @@ export class GroupRelated extends EntityRelated<Group> {
 
 export class SubgroupRelated extends EntityRelated<Subgroup> {
   api: ApiMethods<Subgroup>;
-  fields: { [K in keyof Omit<SubgroupDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : SubgroupDTO[K] extends string ? 'string' : SubgroupDTO[K] extends number ? 'number' : never };
+  fields: { [K in keyof Required<Omit<SubgroupDTO, 'id'>>]: FieldType};
 
   constructor() {
     super();
@@ -243,6 +243,90 @@ export class SubgroupRelated extends EntityRelated<Subgroup> {
   }
 }
 
+export class BuildingRelated extends EntityRelated<Building> {
+  api: ApiMethods<Building>;
+  fields: { [K in keyof Omit<BuildingDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : BuildingDTO[K] extends string ? 'string' : BuildingDTO[K] extends number ? 'number' : never };
+
+  constructor() {
+    super();
+    this.api = new EntityApi<Building>('building', this.create);
+    this.fields = {
+      name: 'string',
+      address: 'string'
+    };
+  }
+
+  create(obj: BuildingDTO): Building {
+    return new Building(obj);
+  }
+
+  createEmpty() {
+    return Building.createEmpty();
+  }
+}
+
+
+export class ClassroomRelated extends EntityRelated<Classroom> {
+  api: ApiMethods<Classroom>;
+  fields: { [K in keyof Omit<ClassroomDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : ClassroomDTO[K] extends string ? 'string' : ClassroomDTO[K] extends number ? 'number' : never };
+
+  constructor() {
+    super();
+    this.api = new EntityApi<Classroom>('classroom', this.create);
+    this.fields = {
+      number: 'string',
+      capacity: 'number',
+      building: 'entity',
+    };
+  }
+
+  create(obj: ClassroomDTO): Classroom {
+    return new Classroom({ ...obj, building: new Building(obj.building) });
+  }
+
+  createEmpty() {
+    return Classroom.createEmpty();
+  }
+}
+
+
+export class LessonRelated extends EntityRelated<Lesson> {
+  api: ApiMethods<Lesson>;
+  fields: { [K in keyof Omit<LessonDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : LessonDTO[K] extends string ? 'string' : LessonDTO[K] extends number ? 'number' : never };
+
+  constructor() {
+    super();
+    this.api = new EntityApi<Lesson>('lesson', this.create);
+    this.fields = {
+      teacher: "entity",
+      subject: "entity",
+      lessonType: "entity",
+      lessonTime: "entity",
+      classroom: "entity",
+      day: "entity",
+      weekType: "entity",
+      subgroup: "entity"
+    };
+  }
+
+  create(obj: LessonDTO): Lesson {
+    return new Lesson({
+      ...obj,
+      teacher: new Teacher({...obj.teacher, academicStatus: new AcademicStatus(obj.teacher.academicStatus)}),
+      subject: new Subject(obj.subject),
+      lessonType: new LessonType(obj.lessonType),
+      lessonTime: new LessonTime(obj.lessonTime),
+      classroom: obj.classroom ? new Classroom({...obj.classroom, building: new Building(obj.classroom.building)}) : undefined,
+      day: new Day(obj.day),
+      weekType: new WeekType(obj.weekType),
+      subgroup: new Subgroup({...obj.subgroup, group: new Group(obj.subgroup.group)}),
+    });
+  }
+
+  createEmpty() {
+    return Lesson.createEmpty();
+  }
+}
 
 //
 // export class OoORelated extends EntityRelated<OoO> {
@@ -278,4 +362,7 @@ export const allEntitiesRelated: { [K in AllEntitiesNames]: EntityRelated<Entiti
   weekType: new WeekTypeRelated(),
   group: new GroupRelated(),
   subgroup: new SubgroupRelated(),
+  building: new BuildingRelated(),
+  classroom: new ClassroomRelated(),
+  lesson: new LessonRelated(),
 };

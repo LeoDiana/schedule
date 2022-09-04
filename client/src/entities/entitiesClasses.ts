@@ -1,7 +1,7 @@
 import { ConstructorFor, EmptyEntityOf } from '../common/types';
 import {
-  AcademicStatusDTO,
-  DayDTO, GroupDTO,
+  AcademicStatusDTO, BuildingDTO, ClassroomDTO,
+  DayDTO, GroupDTO, LessonDTO,
   LessonTimeDTO,
   LessonTypeDTO,
   SubgroupDTO,
@@ -75,7 +75,7 @@ export class LessonTime implements LessonTimeDTO, Entity {
   timeEnd: string;
 
   public get displayName(): string {
-    return `${this.number} ${this.timeStart}`;
+    return `${this.number} ${this.timeStart}-${this.timeEnd}`;
   }
 
   constructor(obj: ConstructorFor<LessonTimeDTO>) {
@@ -212,17 +212,17 @@ export class Group implements ConstructorFor<GroupDTO>, Entity {
 
 export class Subgroup implements ConstructorFor<SubgroupDTO>, Entity {
   id: number;
-  name: string; // if there is no subgroup, it should = '-'
+  name?: string;
   group: Group;
   studentsNumber: number;
 
   public get displayName(): string {
-    return `${this.group.displayName} ${this.name}`;
+    return `${this.group.displayName} ${this.name ? this.name : ''}`;
   }
 
   constructor(obj: ConstructorFor<SubgroupDTO>) {
     const { name, group, studentsNumber, id } = obj;
-    this.name = name;
+    this.name = name || undefined;
     this.studentsNumber = studentsNumber;
     this.group = group;
     this.id = id;
@@ -233,6 +233,101 @@ export class Subgroup implements ConstructorFor<SubgroupDTO>, Entity {
       name: undefined,
       studentsNumber: undefined,
       group: undefined,
+    };
+  }
+}
+
+export class Building implements ConstructorFor<BuildingDTO>, Entity {
+  id: number;
+  name: string;
+  address: string;
+
+  public get displayName(): string {
+    return this.name;
+  }
+
+  constructor(obj: ConstructorFor<BuildingDTO>) {
+    const { name, address, id } = obj;
+    this.name = name;
+    this.address = address;
+    this.id = id;
+  }
+
+  static createEmpty(): EmptyEntityOf<Building> {
+    return {
+      name: undefined,
+      address: undefined,
+    };
+  }
+}
+
+
+export class Classroom implements ConstructorFor<ClassroomDTO>, Entity {
+  id: number;
+  number: string;
+  capacity: number;
+  building: Building;
+
+  public get displayName(): string {
+    return `${this.number} ${this.building.displayName}`;
+  }
+
+  constructor(obj: ConstructorFor<ClassroomDTO>) {
+    const { number, capacity, building, id } = obj;
+    this.number = number;
+    this.capacity = capacity;
+    this.building = building;
+    this.id = id;
+  }
+
+  static createEmpty(): EmptyEntityOf<Classroom> {
+    return {
+      number: undefined,
+      capacity: undefined,
+      building: undefined,
+    };
+  }
+}
+
+
+export class Lesson implements ConstructorFor<LessonDTO>, Entity {
+  id: number;
+  teacher: Teacher;
+  subject: Subject;
+  lessonType: LessonType;
+  lessonTime: LessonTime;
+  classroom?: any;
+  day: Day;
+  weekType: WeekType;
+  subgroup: Subgroup;
+
+  public get displayName(): string {
+    return `${this.day.displayName} ${this.lessonTime.displayName} ${this.weekType.displayName} ${this.subject.displayName} ${this.teacher.displayName} ${this.subgroup.displayName}`;
+  }
+
+  constructor(obj: ConstructorFor<LessonDTO>) {
+    const { teacher, subject, lessonTime, lessonType, weekType, day, subgroup, classroom, id } = obj;
+    this.teacher = teacher;
+    this.subject = subject;
+    this.lessonTime = lessonTime;
+    this.lessonType = lessonType;
+    this.weekType = weekType;
+    this.day = day;
+    this.subgroup = subgroup;
+    this.classroom = classroom;
+    this.id = id;
+  }
+
+  static createEmpty(): EmptyEntityOf<Lesson> {
+    return {
+      teacher: undefined,
+      subject: undefined,
+      lessonType: undefined,
+      lessonTime: undefined,
+      classroom: undefined,
+      day: undefined,
+      weekType: undefined,
+      subgroup: undefined,
     };
   }
 }

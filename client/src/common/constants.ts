@@ -10,6 +10,9 @@ export const ENTITY_TITLES: { [K in AllEntitiesNames]: string } = {
   group: 'Група',
   subgroup: 'Підгрупа',
   weekType: 'Тип тижня',
+  building: 'Корпус',
+  classroom: 'Аудиторія',
+  lesson: 'Заняття',
 };
 
 export const FIELD_TITLES: { [K in keyof AllFields]: string } = {
@@ -25,5 +28,7 @@ export const FIELD_TITLES: { [K in keyof AllFields]: string } = {
   timeEnd: 'Час закінчення',
   startYear: 'Рік початку',
   studentsNumber: 'Кількість студентів',
+  capacity: 'Місткість',
+  address: 'Адреса',
   ...ENTITY_TITLES,
 };

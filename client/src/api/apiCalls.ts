@@ -20,9 +20,9 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
       weekType: 'week-types',
       subgroup: 'subgroups',
       group: 'groups',
-      // building: 'buildings',
-      // classroom: 'classrooms',
-      // lesson: 'lessons',
+      building: 'buildings',
+      classroom: 'classrooms',
+      lesson: 'lessons',
     };
 
     return ENDPOINTS[name];

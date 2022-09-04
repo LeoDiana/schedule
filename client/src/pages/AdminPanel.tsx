@@ -24,6 +24,9 @@ function AdminPanel(): JSX.Element {
     group: [],
     subgroup: [],
     weekType: [],
+    building: [],
+    classroom: [],
+    lesson: [],
   });
   const [selectedEntityId, setSelectedEntityId] = useState<number>();
 
@@ -154,8 +157,13 @@ function AdminPanel(): JSX.Element {
                   (<tr key={item.id} className='h-10'>
                     {
                       Object.keys(allEntitiesRelated[selectedEntityType].fields).map((fieldName) =>
-                        <td
-                          key={fieldName}>{typeof item[fieldName as keyof typeof item] === 'object' ? (item[fieldName as keyof typeof item] as any).displayName : item[fieldName as keyof typeof item]}</td>,
+                      {
+                        const field = item[fieldName as keyof typeof item];
+                        return(
+                        <td key={fieldName}>
+                          {typeof field === 'object' ? (field as any).displayName : field}
+                        </td>)
+                      }
                       )
                     }
                     <td>
