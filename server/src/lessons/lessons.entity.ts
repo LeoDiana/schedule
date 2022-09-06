@@ -1,5 +1,4 @@
 import {
-  Column,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -35,9 +34,8 @@ export class Lesson {
   @JoinColumn()
   lessonTime: LessonTime;
 
-  @ManyToOne(() => Classroom, { eager: true })
+  @ManyToOne(() => Classroom, { eager: true, nullable: true })
   @JoinColumn()
-  @Column({ nullable: true })
   classroom: Classroom;
 
   @ManyToOne(() => Day, { eager: true })
