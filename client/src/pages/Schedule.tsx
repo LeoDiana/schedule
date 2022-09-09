@@ -9,7 +9,7 @@ interface LessonCardProps {
   second: string,
 }
 
-function LessonCard({title, first, second}: LessonCardProps): JSX.Element {
+export function LessonCard({title, first, second}: LessonCardProps): JSX.Element {
   return (
     <div className='col-start-4 h-28 flex flex-col justify-between row-start-4 bg-indigo-200 drop-shadow-md rounded-xl p-3 leading-tight border-2 border-indigo-300'>
       <p className='mb-2 font-medium'>{title}</p>
@@ -26,7 +26,7 @@ interface TimeCellsProps {
   time: string,
 }
 
-function TimeCell({number, time}: TimeCellsProps): JSX.Element {
+export function TimeCell({number, time}: TimeCellsProps): JSX.Element {
   return (
     <div className='text-center h-28 flex flex-col justify-center'>
       <p className='font-semibold'>{number}</p>
