@@ -27,7 +27,7 @@ root.render(
         {/*   /> */}
         {/* ))} */}
         <Route path="admin-panel" element={<AdminPanel/>}/>
-        <Route path="schedule" element={<Schedule/>}/>
+        {/* <Route path="schedule" element={<Schedule/>}/> */}
       </Routes>
     </BrowserRouter>
     {/* </Provider> */}

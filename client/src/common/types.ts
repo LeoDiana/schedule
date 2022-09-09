@@ -91,6 +91,7 @@ export type EmptyEntityOf<T extends AllEntities> = { [K in keyof Omit<DtoOfEntit
 type ThisTypeAndUndefined<T> = { [K in keyof T]: undefined | T[K] };
 export type CreationTypeOf<T extends AllEntities> = ThisTypeAndUndefined<Omit<DtoOfEntity<T>, 'id'>>;
 
+export type FilterType = 'subgroup' | 'teacher';
 
 // export type DtoOfEntityName<T extends AllEntitiesNames> = T extends 'academicStatus'
 //   ? AcademicStatusDTO

@@ -14,10 +14,10 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
 
   return (
     <div className='w-full flex flex-col'>
-      <label htmlFor={name} className='font-medium mb-0.5'>{FIELD_TITLES[name as keyof typeof FIELD_TITLES]}</label>
+      <label htmlFor={name} className='font-medium mb-0.5'>{FIELD_TITLES[name as keyof typeof FIELD_TITLES] || name}</label>
       <div className='w-full relative'>
         <input id={name} type='text' onChange={(event) => onChange(Number(event.target.value))}
-               value={value ? value.displayName : ''}
+               value={value ? typeof value === 'object' ? value.displayName || value : FIELD_TITLES[value as keyof typeof FIELD_TITLES] || value : ''}
                autoComplete='off'
                className='w-full rounded-md border-2 drop-shadow-sm text-lg pl-2 pr-9 py-1' />
         <ChevronDownIcon onClick={() => setIsOpen(s => !s)}
@@ -35,7 +35,7 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
                 }}
                 className='hover:bg-gray-100 px-2'
               >
-                {item.displayName}
+                {typeof item === 'object' ? item.displayName : FIELD_TITLES[item as keyof typeof FIELD_TITLES] || item}
               </div>,
             )}
           </div>

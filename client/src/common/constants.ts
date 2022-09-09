@@ -1,4 +1,4 @@
-import { AllEntitiesNames, AllFields } from './types';
+import { AllEntitiesNames, AllFields, FilterType } from './types';
 
 export const ENTITY_TITLES: { [K in AllEntitiesNames]: string } = {
   academicStatus: 'Академічний статус',
@@ -32,3 +32,5 @@ export const FIELD_TITLES: { [K in keyof AllFields]: string } = {
   address: 'Адреса',
   ...ENTITY_TITLES,
 };
+
+export const FILTERS: FilterType[] = ['subgroup', 'teacher'];

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { allEntitiesRelated } from '../entities/entitiesRelated';
 import { Day, Lesson, LessonTime } from '../entities/entitiesClasses';
+import { readLessonsWithFilter } from '../api/apiCalls';
 
 interface LessonCardProps {
   title: string,
@@ -34,7 +35,12 @@ function TimeCell({number, time}: TimeCellsProps): JSX.Element {
   )
 }
 
-function Schedule(): JSX.Element {
+interface Props {
+  filter: any,
+  filteredEntity: any,
+}
+
+function Schedule({filter, filteredEntity}: Props): JSX.Element {
   const [lessonTimes, setLessonTimes] = useState<LessonTime[]>();
   const [days, setDays] = useState<Day[]>();
   const [lessons, setLessons] = useState<Lesson[]>();
@@ -43,31 +49,20 @@ function Schedule(): JSX.Element {
     const fetchData = async () => {
       setLessonTimes(await allEntitiesRelated.lessonTime.api.readAll());
       setDays(await allEntitiesRelated.day.api.readAll());
-      setLessons(await allEntitiesRelated.lesson.api.readAll());
+      // setLessons(await allEntitiesRelated.lesson.api.readAll());
 
-      // const a = await allEntitiesRelated.lessonTime.api.readAll();
-      // const b = [0, ...a.map((time) => time.id)];
-      // console.log(b.join(' '));
-      // const c = await allEntitiesRelated.day.api.readAll();
-      // const d = [0, ...c.map((d) => d.id)];
-      // console.log(d.join(' '));
-      // const g
+      setLessons(await readLessonsWithFilter(filteredEntity.id, filter));
+
     };
 
     fetchData();
-  }, []);
+  }, [filter, filteredEntity]);
 
 
   return lessonTimes && days && lessons ? (
     <div className='m-5'>
+      <h3 className='text-3xl text-center pb-6 font-bold'>{filteredEntity.displayName}</h3>
       <div className='grid grid-cols-6 grid-rows-8 gap-2'>
-      {/* <div style={{ */}
-      {/*   display: 'grid', */}
-      {/*   gridTemplateColumns: '150px repeat(7, 200px)', */}
-      {/*   gridTemplateRows:' 40px repeat(7, 100px)', */}
-      {/*   gap: '7px', */}
-      {/* }}> */}
-      {/*   <div className='row-start-1 col-start-1 col-span-6 bg-white relative -z-10 h-10 border-b-2 '></div> */}
         {lessonTimes.map((time) => (
           <div key={time.number} style={{gridRowStart: time.id + 1, gridColumnStart: 1}}>
             <TimeCell number={time.number} time={`${time.timeStart} - ${time.timeEnd}`} />
@@ -79,8 +74,8 @@ function Schedule(): JSX.Element {
           </div>
         ))}
 
-        {lessons.map((lesson, index) => (
-          <div key={index}
+        {lessons.map((lesson) => (
+          <div key={lesson.id}
                style={{gridRowStart: lesson.lessonTime.id+1, gridColumnStart: lesson.day.id+1}}
                >
             <LessonCard
@@ -90,19 +85,6 @@ function Schedule(): JSX.Element {
             />
           </div>
         ))}
-        {/* <div className='col-start-4 row-start-3'> */}
-        {/*   <LessonCard title='Обчислювальна геометрія та компʼютер' first='ст. в. Римар П.В.' second='лекція MS Teams'/> */}
-        {/* </div> */}
-        {/* <div className='col-start-3 row-start-2'> */}
-        {/*   <LessonCard title='Обчислювальна геометрія та компʼютер' first='ст. в. Римар П.В.' second='лекція MS Teams'/> */}
-        {/* </div> */}
-        {/* <div className='col-start-3 row-start-3'> */}
-        {/*   <LessonCard title='Обчислювальна геометрія та компʼютер' first='ст. в. Римар П.В.' second='лекція MS Teams'/> */}
-        {/* </div> */}
-        {/* <div className='col-start-4 row-start-4'> */}
-        {/*   <LessonCard title='Обчислювальна геометрія та компʼютер' first='ст. в. Римар П.В.' second='лекція MS Teams'/> */}
-        {/* </div> */}
-
       </div>
     </div>
   ) : <div>Loading...</div>
