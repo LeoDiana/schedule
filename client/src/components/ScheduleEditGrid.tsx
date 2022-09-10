@@ -12,25 +12,29 @@ blah: string,
 function ScheduleEditGrid(): JSX.Element {
   const [lessonTimes, setLessonTimes] = useState<LessonTime[]>();
   const [days, setDays] = useState<Day[]>();
-  const [lessons, setLessons] = useState<any[]>();
-  const [draggedLesson, setDraggedLesson] = useState<any>();
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [draggedLesson, setDraggedLesson] = useState<Lesson>();
+
+  const filter = 'subgroup';
 
   useEffect(() => {
     const fetchData = async () => {
       setLessonTimes(await allEntitiesRelated.lessonTime.api.readAll());
       setDays(await allEntitiesRelated.day.api.readAll());
 
-      setLessons([{name: 'abc', x: 1, y: 1, id: 1}, {name: 'asd', x: 2, y:2, id: 2}, {name: 'pop', x: undefined, y:undefined, id: 3}])
+      // setLessons([{name: 'abc', x: 1, y: 1, id: 1}, {name: 'asd', x: 2, y:2, id: 2}, {name: 'pop', x: undefined, y:undefined, id: 3}])
 
-      // setLessons(await readLessonsWithFilter(filteredEntity.id, filter));
-
+      setLessons(await readLessonsWithFilter(1, filter));
     };
 
     fetchData();
   }, []);
 
+  function hasPositionInSchedule(lesson: Lesson): boolean{
+    return !!(lesson.lessonTime && lesson.day);
+  }
 
-  return lessonTimes && days ? (
+  return lessonTimes && days && lessons ? (
     <div className='flex'>
     <div className='m-5 flex-grow'>
       {/* <h3 className='text-3xl text-center pb-6 font-bold'>{filteredEntity.displayName}</h3> */}
@@ -48,23 +52,22 @@ function ScheduleEditGrid(): JSX.Element {
         {
           (()=>{
             const cells = [];
-            for(let i=0; i< days.length; i++){
-              for(let j=0;j<lessonTimes.length;j++){
+            // for(let i=0; i<days.length; i++){
+            for(const day of days){
+              for (const lessonTime of lessonTimes){
+              // for(let j=0;j<lessonTimes.length;j++){
                 cells.push(
-                  <div key={`${i}-${j}`} className='group'
-                       style={{ gridRowStart: j + 2, gridColumnStart: i + 2 }}
+                  <div key={`${day.id}-${lessonTime.id}`} className='group'
+                       style={{ gridRowStart: lessonTime.id + 1, gridColumnStart: day.id + 1 }}
                        onDragEnter={(e)=>{
-                         // console.log('enter');
                          e.preventDefault()}}
                        onDragOver={(e)=>{
-                         // console.log('over');
                          e.preventDefault()}}
                        onDrop={(e)=>{
-                         console.log(i, j);
                          if(draggedLesson) {
                            setLessons((lessons)=> {
-                             // @ts-ignore
-                             return [...lessons.filter(lesson => lesson.id !== draggedLesson.id), { ...draggedLesson, x: i, y: j }];
+                             return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
+                               { ...draggedLesson, lessonTime: lessonTime, day: day }] as Lesson[];
                            })
                          }
                        }}
@@ -80,9 +83,9 @@ function ScheduleEditGrid(): JSX.Element {
           })()
         }
         {
-          lessons?.filter((lesson) => lesson.x && lesson.y).map((lesson, index) => (
+          lessons?.filter(hasPositionInSchedule).map((lesson, index) => (
             <div key={index}
-                 style={{ gridRowStart: lesson.y + 2, gridColumnStart: lesson.x + 2 }}
+                 style={{ gridRowStart: lesson.lessonTime.id + 1, gridColumnStart: lesson.day.id + 1 }}
                  draggable
                  onDragStart={(e)=>{
                    console.log('start drag');
@@ -90,9 +93,10 @@ function ScheduleEditGrid(): JSX.Element {
                  }}
             >
               <LessonCard
-                title={lesson.name}
-                first={'lesson.teacher.displayName'}
-                second={'Teams'}
+                lesson={lesson}
+                filterType={filter}
+                // first={'lesson.teacher.displayName'}
+                // second={'Teams'}
               />
             </div>
           ))
@@ -113,7 +117,7 @@ function ScheduleEditGrid(): JSX.Element {
     </div>
       <div className='bg-pink-400 p-3'>
         {
-          lessons?.filter((lesson) => !lesson.x || !lesson.y).map((lesson, index) =>
+          lessons?.filter((lesson) => !hasPositionInSchedule(lesson)).map((lesson, index) =>
             <div
             key={index}
             onDragStart={(e)=>{
@@ -122,9 +126,8 @@ function ScheduleEditGrid(): JSX.Element {
             }}
               draggable>
               <LessonCard
-                title={lesson.name}
-                first={'lesson.teacher.displayName'}
-                second={'Teams'}
+                lesson={lesson}
+                filterType={filter}
               />
             </div>
 

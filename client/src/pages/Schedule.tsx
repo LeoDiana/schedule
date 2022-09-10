@@ -2,20 +2,28 @@ import React, { useEffect, useState } from 'react';
 import { allEntitiesRelated } from '../entities/entitiesRelated';
 import { Day, Lesson, LessonTime } from '../entities/entitiesClasses';
 import { readLessonsWithFilter } from '../api/apiCalls';
+import { FilterType } from '../common/types';
 
 interface LessonCardProps {
-  title: string,
-  first: string,
-  second: string,
+  lesson: Lesson,
+  filterType: FilterType,
 }
 
-export function LessonCard({title, first, second}: LessonCardProps): JSX.Element {
+export function LessonCard({lesson, filterType}: LessonCardProps): JSX.Element {
+  let first;
+  const second = `${lesson.lessonType.displayName} ${lesson.classroom ? lesson.classroom.displayName : 'MS Teams'}`;
+
+  switch (filterType) {
+    case 'subgroup': first = lesson.teacher.displayName; break;
+    case 'teacher': first = lesson.subgroup.displayName; break;
+  }
+
   return (
     <div className='col-start-4 h-28 flex flex-col justify-between row-start-4 bg-indigo-200 drop-shadow-md rounded-xl p-3 leading-tight border-2 border-indigo-300'>
-      <p className='mb-2 font-medium'>{title}</p>
+      <p className='mb-2 font-medium'>{lesson.subject.displayName}</p>
       <div>
-      <p className='text-sm leading-none'>{first}</p>
-      <p className='text-sm'>{second}</p>
+        <p className='text-sm leading-none'>{first}</p>
+        <p className='text-sm'>{second}</p>
       </div>
     </div>
   )
@@ -79,9 +87,8 @@ function Schedule({filter, filteredEntity}: Props): JSX.Element {
                style={{gridRowStart: lesson.lessonTime.id+1, gridColumnStart: lesson.day.id+1}}
                >
             <LessonCard
-              title={lesson.subject.displayName}
-              first={lesson.teacher.displayName}
-              second={`${lesson.lessonType.displayName} ${lesson.classroom ? lesson.classroom.displayName : 'MS Teams'} `}
+              lesson={lesson}
+              filterType={filter}
             />
           </div>
         ))}
