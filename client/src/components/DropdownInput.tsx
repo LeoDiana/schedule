@@ -13,6 +13,11 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
+    <>
+    <div className={`w-screen h-screen fixed z-30 top-0 right-0 ${isOpen ? 'visible' : 'invisible'}`} onClick={(e)=>{
+      setIsOpen(false);
+    }}>
+    </div>
     <div className='w-full flex flex-col'>
       <label htmlFor={name} className='font-medium mb-0.5'>{FIELD_TITLES[name as keyof typeof FIELD_TITLES] || name}</label>
       <div className='w-full relative'>
@@ -32,6 +37,7 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
                 key={JSON.stringify(item)}
                 onClick={() => {
                   onChange(item);
+                  setIsOpen(false);
                 }}
                 className='hover:bg-gray-100 px-2'
               >
@@ -43,6 +49,7 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
         }
       </div>
     </div>
+    </>
   );
 }
 
