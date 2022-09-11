@@ -1,52 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { FILTERS } from '../common/constants';
-import { allEntitiesRelated } from '../entities/entitiesRelated';
+import React from 'react';
 import Schedule from '../pages/Schedule';
-import DropdownInput from '../components/DropdownInput';
-import { FilterType } from '../common/types';
+import { Filters, useFilters } from './Filters';
 
-export const ScheduleFilter = () => {
-  const [typeFilter, setTypeFilter] = useState<FilterType>(FILTERS[0]);
-  const [selectedEntity, setSelectedEntity] = useState<any>();
-
-  const [entities, setEntities] = useState({} as { [k in FilterType]: any });
-
-  useEffect(() => {
-    const fetchedEntities = {} as { [k in FilterType]: any };
-    const fetchData = async () => {
-      fetchedEntities['subgroup'] = await allEntitiesRelated.subgroup.api.readAll();
-      fetchedEntities['teacher'] = await allEntitiesRelated.teacher.api.readAll();
-      setEntities(fetchedEntities);
-    };
-
-    fetchData();
-  }, []);
-
-  const handleTypeChange = (filter: FilterType) => {
-    setTypeFilter(filter);
-    setSelectedEntity(entities[filter][0]);
-  };
-
-  const handleEntityChange = (item: any) => {
-    setSelectedEntity(item);
-  };
+export function ScheduleFilter() {
+  const [types, selectedType, setType,
+         entities, selectedEntity, setEntity] = useFilters();
 
   return (
     <>
-      <div className='flex gap-2 p-4'>
-      <DropdownInput name='Сортувати по' value={typeFilter} onChange={handleTypeChange} items={FILTERS} />
-      {typeFilter && entities[typeFilter] ? (
-        <DropdownInput name={typeFilter} value={selectedEntity} onChange={handleEntityChange} items={entities[typeFilter]} />
-      ) : null}
-      </div>
-      {typeFilter && selectedEntity ? (
+      <Filters
+        types={types} selectedType={selectedType}
+        setType={setType} entities={entities}
+        selectedEntity={selectedEntity} setEntity={setEntity}
+      />
+      {selectedType && selectedEntity ? (
         <Schedule
           {...{
-            filter: typeFilter,
+            filter: selectedType,
             filteredEntity: selectedEntity as any,
           }}
         />
       ) : null}
     </>
   );
-};
+}
