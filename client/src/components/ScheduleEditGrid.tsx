@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { allEntitiesRelated } from '../entities/entitiesRelated';
 import { Day, Lesson, LessonTime } from '../entities/entitiesClasses';
-import { readLessonsWithFilter } from '../api/apiCalls';
 import { LessonCard, ScheduleGrid } from '../pages/Schedule';
 import { PlusIcon } from '@heroicons/react/24/outline';
+import { EditableLesson, FilterType } from '../common/types';
 
 interface Props {
   blah: string,
@@ -12,8 +12,10 @@ interface Props {
 function ScheduleEditGrid(): JSX.Element {
   const [lessonTimes, setLessonTimes] = useState<LessonTime[]>();
   const [days, setDays] = useState<Day[]>();
-  const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [draggedLesson, setDraggedLesson] = useState<Lesson>();
+  // const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [draggedLesson, setDraggedLesson] = useState<EditableLesson>();
+
+  const [allLessons, setAllLessons] = useState<EditableLesson[]>([]);
 
   const filter = 'subgroup';
 
@@ -22,17 +24,27 @@ function ScheduleEditGrid(): JSX.Element {
       setLessonTimes(await allEntitiesRelated.lessonTime.api.readAll());
       setDays(await allEntitiesRelated.day.api.readAll());
 
-      setLessons(await readLessonsWithFilter(1, filter));
+      setAllLessons(await allEntitiesRelated.lesson.api.readAll());
+      // setLessons(await readLessonsWithFilter(1, filter));
     };
 
     fetchData();
   }, []);
 
-  function hasPositionInSchedule(lesson: Lesson): boolean {
+  function hasPositionInSchedule(lesson: EditableLesson): boolean {
     return !!(lesson.lessonTime && lesson.day);
   }
 
-  return lessonTimes && days && lessons ? (
+  function filterLessonsBy(filter: FilterType, filteredEntity: {id: number}) {
+    return allLessons.filter((lesson) => lesson[filter]?.id === filteredEntity.id);
+  }
+
+  // function editLesson(lessons: Lesson[], newLesson: Lesson): Lesson[]{
+  //   return [...lessons.filter(lesson => lesson.id !== newLesson.id),
+  //     { ...newLesson }] as Lesson[];
+  // }
+
+  return lessonTimes && days && allLessons ? (
     <div className='flex'>
       <div className='m-5 flex-grow'>
         {/* <h3 className='text-3xl text-center pb-6 font-bold'>{filteredEntity.displayName}</h3> */}
@@ -54,7 +66,7 @@ function ScheduleEditGrid(): JSX.Element {
                            }}
                            onDrop={(e) => {
                              if (draggedLesson) {
-                               setLessons((lessons) => {
+                               setAllLessons((lessons) => {
                                  return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
                                    { ...draggedLesson, lessonTime: lessonTime, day: day }] as Lesson[];
                                });
@@ -73,17 +85,16 @@ function ScheduleEditGrid(): JSX.Element {
               })()
             }
             {
-              lessons?.filter(hasPositionInSchedule).map((lesson, index) => (
+              filterLessonsBy(filter, { id: 1 }).filter(hasPositionInSchedule).map((lesson, index) => (
                 <div key={index}
-                     style={{ gridRowStart: lesson.lessonTime.id + 1, gridColumnStart: lesson.day.id + 1 }}
+                     style={{ gridRowStart: lesson!.lessonTime!.id + 1, gridColumnStart: lesson!.day!.id + 1 }}
                      draggable
                      onDragStart={(e) => {
-                       console.log('start drag');
                        setDraggedLesson(lesson);
                      }}
                 >
                   <LessonCard
-                    lesson={lesson}
+                    lesson={lesson as Lesson}
                     filterType={filter}
                   />
                 </div>
@@ -101,7 +112,8 @@ function ScheduleEditGrid(): JSX.Element {
            }}
            onDrop={(e) => {
              if (draggedLesson) {
-               setLessons((lessons) => {
+               setAllLessons((lessons) => {
+                 // so it not Lesson anymore only data , without diaplayNMaae
                  return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
                    { ...draggedLesson, lessonTime: undefined, day: undefined }] as Lesson[];
                });
@@ -109,7 +121,7 @@ function ScheduleEditGrid(): JSX.Element {
            }}
       >
         {
-          lessons?.filter((lesson) => !hasPositionInSchedule(lesson)).map((lesson, index) =>
+          filterLessonsBy(filter, { id: 1 }).filter((lesson) => !hasPositionInSchedule(lesson)).map((lesson, index) =>
             <div
               draggable
               key={index}
@@ -117,7 +129,7 @@ function ScheduleEditGrid(): JSX.Element {
                 setDraggedLesson(lesson);
               }}>
               <LessonCard
-                lesson={lesson}
+                lesson={lesson as Lesson}
                 filterType={filter}
               />
             </div>,

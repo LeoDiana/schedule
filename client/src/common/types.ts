@@ -93,6 +93,8 @@ export type CreationTypeOf<T extends AllEntities> = ThisTypeAndUndefined<Omit<Dt
 
 export type FilterType = 'subgroup' | 'teacher';
 
+export type EditableLesson = Partial<LessonDTO> & {id: number};
+
 // export type DtoOfEntityName<T extends AllEntitiesNames> = T extends 'academicStatus'
 //   ? AcademicStatusDTO
 //   : never;
