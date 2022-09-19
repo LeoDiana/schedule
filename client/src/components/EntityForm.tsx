@@ -17,6 +17,7 @@ interface BaseFormProps<T extends AllEntities> {
   fields: EntityRelated<T>['fields'],
   allEntities: AllEntitiesItems,
   formType: FormType,
+  returns?: (obj: DtoOfEntity<T>) => void
 }
 
 interface UpdateFormProps<T extends AllEntities> extends BaseFormProps<T> {
@@ -41,12 +42,16 @@ function EntityForm<T extends FormType, E extends AllEntities>({
                                                                  name,
                                                                  allEntities,
                                                                  formType,
+                                                                 returns
                                                                }: EntityFormType<T, E>): JSX.Element {
   const [values, setValues] = useState<CreationTypeOf<E> | DtoOfEntity<E>>(entity);
   const [showNotification, setShowNotification] = useState(false);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     apiFunc(values as any);
+    if(returns) {
+      returns(values as any);
+    }
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 3*1000);
     event.preventDefault();
