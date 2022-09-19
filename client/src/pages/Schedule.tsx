@@ -7,9 +7,10 @@ import { FilterType } from '../common/types';
 interface LessonCardProps {
   lesson: Lesson,
   filterType: FilterType,
+  isSelected?: boolean
 }
 
-export function LessonCard({lesson, filterType}: LessonCardProps): JSX.Element {
+export function LessonCard({lesson, filterType, isSelected=false}: LessonCardProps): JSX.Element {
   let first;
   const second = `${lesson.lessonType.displayName} ${lesson.classroom ? lesson.classroom.displayName : 'MS Teams'}`;
 
@@ -19,7 +20,9 @@ export function LessonCard({lesson, filterType}: LessonCardProps): JSX.Element {
   }
 
   return (
-    <div className='col-start-4 h-28 flex flex-col justify-between row-start-4 bg-indigo-200 drop-shadow-md rounded-xl p-3 leading-tight border-2 border-indigo-300'>
+    <div className={[
+      'col-start-4 h-28 flex flex-col justify-between row-start-4 bg-indigo-200 drop-shadow-md rounded-xl p-3 leading-tight',
+      isSelected ? 'border-4 border-indigo-400 p-2.5' : 'border-2 border-indigo-300'].join(' ')}>
       <p className='mb-2 font-medium'>{lesson.subject.displayName}</p>
       <div>
         <p className='text-sm leading-none'>{first}</p>

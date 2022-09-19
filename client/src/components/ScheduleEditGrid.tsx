@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { allEntitiesRelated } from '../entities/entitiesRelated';
-import { Day, Lesson, LessonTime } from '../entities/entitiesClasses';
+import { Day, Lesson, LessonTime, Subgroup, Teacher } from '../entities/entitiesClasses';
 import { LessonCard, ScheduleGrid } from '../pages/Schedule';
 import { PlusIcon } from '@heroicons/react/24/outline';
-import { EditableLesson, FilterType } from '../common/types';
+import { AllEntitiesItems, EditableLesson, EntitiesNamesToTypes, FilterType } from '../common/types';
 import { Filters, useFilters } from './Filters';
+import EntityForm from './EntityForm';
+import { useModal } from '../common/hooks';
 
 function ScheduleEditGrid(): JSX.Element {
   const [lessonTimes, setLessonTimes] = useState<LessonTime[]>();
@@ -19,22 +21,52 @@ function ScheduleEditGrid(): JSX.Element {
   const [collisions, setCollisions] = useState({});
 
   const [types, selectedType, setType,
-    entities, selectedEntity, setEntity] = useFilters();
+    items, selectedItem, setEntity] = useFilters();
+
+  const [selectedLesson, setSelectedLesson] = useState<EditableLesson>();
+  const [isOpenEditFormForSelectedLesson, setIsOpenEditFormForSelectedLesson] = useState(false);
+  const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
+  const [entities, setEntities] = useState<AllEntitiesItems>({
+    academicStatus: [],
+    teacher: [],
+    lessonTime: [],
+    day: [],
+    lessonType: [],
+    subject: [],
+    group: [],
+    subgroup: [],
+    weekType: [],
+    building: [],
+    classroom: [],
+    lesson: [],
+  });
 
   useEffect(() => {
     const fetchData = async () => {
-      const lessonTimes = await allEntitiesRelated.lessonTime.api.readAll();
-      const days = await allEntitiesRelated.day.api.readAll();
+      let entity: keyof typeof allEntitiesRelated;
+      const fetched = {} as AllEntitiesItems;
+      for (entity in allEntitiesRelated) {
+        fetched[entity] = await allEntitiesRelated[entity].api.readAll();
+      }
+      setEntities(fetched);
+
+      // const lessonTimes = await allEntitiesRelated.lessonTime.api.readAll();
+      // const days = await allEntitiesRelated.day.api.readAll();
       const allLessons = await allEntitiesRelated.lesson.api.readAll();
+      //
+      // const teachers = await allEntitiesRelated.teacher.api.readAll();
+      // const subgroups = await allEntitiesRelated.subgroup.api.readAll();
 
-      const teachers = await allEntitiesRelated.teacher.api.readAll();
-      const subgroups = await allEntitiesRelated.subgroup.api.readAll();
-
-      setLessonTimes(lessonTimes);
-      setDays(days);
+      setLessonTimes(fetched.lessonTime as LessonTime[]);
+      setDays(fetched.day as Day[]);
       setAllLessons(allLessons);
 
-      checkingTablesRef.current = buildTablesForChecking(allLessons, teachers, subgroups, days, lessonTimes);
+      checkingTablesRef.current = buildTablesForChecking(
+        allLessons,
+        fetched.teacher as Teacher[],
+        fetched.subgroup as Subgroup[],
+        fetched.day as Day[],
+        fetched.lessonTime as LessonTime[]);
     };
 
     fetchData();
@@ -51,12 +83,12 @@ function ScheduleEditGrid(): JSX.Element {
   function buildTablesForChecking(allLessons: any[], teachers: any[], subgroups: any[], days: any[], lessonTimes: any[]) {
     const teachersSchedules: any = {};
     teachers.forEach((teacher) => teachersSchedules[teacher.id] = Array.from(
-      {length: lessonTimes.length},
-      () => Array.from({length: days.length}, () => [])));
+      {length: lessonTimes.length+1},
+      () => Array.from({length: days.length+1}, () => [])));
     const subgroupsSchedules: any = {};
     subgroups.forEach((subgroup) => subgroupsSchedules[subgroup.id] = Array.from(
-      {length: lessonTimes.length},
-      () => Array.from({length: days.length}, () => [])));
+      {length: lessonTimes.length+1},
+      () => Array.from({length: days.length+1}, () => [])));
 
     allLessons.map((lesson) => {
       teachersSchedules[lesson.teacher.id][lesson.lessonTime.id][lesson.day.id].push(lesson);
@@ -94,59 +126,78 @@ function ScheduleEditGrid(): JSX.Element {
 
   function changeTable(prevLesson: any, movedLesson: any){
     // clear previous collisions at this point
-    checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson:any) =>
-      setCollisions((state) => ({...state, [lesson.id]: ''}))
-    )
-    checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson:any) =>
-      setCollisions((state) => ({...state, [lesson.id]: ''}))
-    )
-    // remove lesson from where it was
-    checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id] =
-      checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].filter((lesson: any) => lesson.id !== prevLesson.id);
-    checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id] =
-      checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].filter((lesson: any) => lesson.id !== prevLesson.id);
-    // add collisions if they are still at prev point
-    if(checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].length > 1) {
-      checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson:any) =>
-        setCollisions((state) => ({...state, [lesson.id]: 'warning'}))
-      )
-    }
-    if(checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].length > 1) {
-      checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson:any) =>
-        setCollisions((state) => ({...state, [lesson.id]: 'warning'}))
-      )
+    if(prevLesson.lessonTime && prevLesson.day) {
+      checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
+        setCollisions((state) => ({ ...state, [lesson.id]: '' })),
+      );
+      checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
+        setCollisions((state) => ({ ...state, [lesson.id]: '' })),
+      );
+      // remove lesson from where it was
+      checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id] =
+        checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].filter((lesson: any) => lesson.id !== prevLesson.id);
+      checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id] =
+        checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].filter((lesson: any) => lesson.id !== prevLesson.id);
+      // add collisions if they are still at prev point
+      if(checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].length > 1) {
+        checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson:any) =>
+          setCollisions((state) => ({...state, [lesson.id]: 'warning'}))
+        )
+      }
+      if(checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].length > 1) {
+        checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson:any) =>
+          setCollisions((state) => ({...state, [lesson.id]: 'warning'}))
+        )
+      }
     }
 
-    // move to new collisions
-    const teachersLessonsAtThisPoint = checkingTables.teacher[movedLesson.teacher.id][movedLesson.lessonTime.id][movedLesson.day.id];
-    const subgroupsLessonsAtThisPoint = checkingTables.subgroup[movedLesson.subgroup.id][movedLesson.lessonTime.id][movedLesson.day.id];
-    // add new lesson
-    teachersLessonsAtThisPoint.push(movedLesson);
-    subgroupsLessonsAtThisPoint.push(movedLesson);
-    // add collisions
-    if(teachersLessonsAtThisPoint.length > 1){
-      teachersLessonsAtThisPoint.forEach((lesson:any) =>
-        setCollisions((state) => ({...state, [lesson.id]: 'warning'}))
-      )
-    }
-    if(subgroupsLessonsAtThisPoint.length > 1){
-      subgroupsLessonsAtThisPoint.forEach((lesson:any) =>
-        setCollisions((state) => ({...state, [lesson.id]: 'warning'}))
-      )
+    if(movedLesson.lessonTime && movedLesson.day) {
+      // move to new collisions
+      const teachersLessonsAtThisPoint = checkingTables.teacher[movedLesson.teacher.id][movedLesson.lessonTime.id][movedLesson.day.id];
+      const subgroupsLessonsAtThisPoint = checkingTables.subgroup[movedLesson.subgroup.id][movedLesson.lessonTime.id][movedLesson.day.id];
+      // add new lesson
+      teachersLessonsAtThisPoint.push(movedLesson);
+      subgroupsLessonsAtThisPoint.push(movedLesson);
+      // add collisions
+      if (teachersLessonsAtThisPoint.length > 1) {
+        teachersLessonsAtThisPoint.forEach((lesson: any) =>
+          setCollisions((state) => ({ ...state, [lesson.id]: 'warning' })),
+        );
+      }
+      if (subgroupsLessonsAtThisPoint.length > 1) {
+        subgroupsLessonsAtThisPoint.forEach((lesson: any) =>
+          setCollisions((state) => ({ ...state, [lesson.id]: 'warning' })),
+        );
+      }
     }
   }
 
   return lessonTimes && days && allLessons ? (
     <>
+      {selectedLesson && isEditFormOpen &&
+        <>
+          <div
+            onClick={closeEditForm}
+            className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
+          <EntityForm<'update', Lesson>
+            apiFunc={((...params: any[]) => allEntitiesRelated.lesson.api.update(params as any)) as any}
+            fields={allEntitiesRelated.lesson.fields}
+            name={'lesson'}
+            allEntities={entities}
+            entity={selectedLesson as any}
+            formType='update'
+          />
+        </>
+      }
       <div className='flex'>
         <div className='flex-grow'>
           <Filters
             types={types} selectedType={selectedType}
-            setType={setType} entities={entities}
-            selectedEntity={selectedEntity} setEntity={setEntity}
+            setType={setType} entities={items}
+            selectedEntity={selectedItem} setEntity={setEntity}
           />
           <div className='m-5'>
-            <h3 className='text-3xl text-center pb-6 font-bold'>{selectedEntity.displayName}</h3>
+            <h3 className='text-3xl text-center pb-6 font-bold'>{selectedItem.displayName}</h3>
             <ScheduleGrid lessonTimes={lessonTimes} days={days}>
               <>
                 {
@@ -188,18 +239,31 @@ function ScheduleEditGrid(): JSX.Element {
                   })()
                 }
                 {
-                  filterLessonsBy(selectedType, selectedEntity).filter(hasPositionInSchedule).map((lesson, index) => (
+                  filterLessonsBy(selectedType, selectedItem).filter(hasPositionInSchedule).map((lesson, index) => (
                     <div key={index}
                          style={{ gridRowStart: lesson!.lessonTime!.id + 1, gridColumnStart: lesson!.day!.id + 1 }}
                          draggable
                          onDragStart={(e) => {
                            setDraggedLesson(lesson);
                          }}
-                         className={collisions[lesson.id as keyof typeof collisions] === 'warning' ? 'border-l-red-600 border-l-4' : ''}
+                         className={
+                      [collisions[lesson.id as keyof typeof collisions] === 'warning' ? 'border-l-red-600 border-l-4' : '',
+                        // selectedLesson?.id === lesson.id ? 'border-green-600 border-4' : '',
+                      ].join(' ')
+                    }
+                     onClick={
+                        () => {
+                          if(lesson.id === selectedLesson?.id){
+                            openEditForm();
+                          }
+                          setSelectedLesson(lesson)
+                      }
+                    }
                     >
                       <LessonCard
                         lesson={lesson as Lesson}
                         filterType={selectedType}
+                        isSelected={selectedLesson?.id === lesson.id}
                       />
                     </div>
                   ))
@@ -217,28 +281,40 @@ function ScheduleEditGrid(): JSX.Element {
              }}
              onDrop={(e) => {
                if (draggedLesson) {
-                 setAllLessons((lessons) => {
-                   // so it not Lesson anymore only data , without diaplayNMaae
-                   return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
-                     { ...draggedLesson, lessonTime: undefined, day: undefined }] as Lesson[];
-                 });
+                 const newLesson = { ...draggedLesson, lessonTime: undefined, day: undefined };
+                 if(check(newLesson)){
+                   setAllLessons((lessons) => {
+                     return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
+                       newLesson] as Lesson[];
+                   });
+                   changeTable(draggedLesson, newLesson);
+                 }
                }
              }}
         >
           {
             (() => {
-              const lessonsNotOnSchedule = filterLessonsBy(selectedType, selectedEntity).filter((lesson) => !hasPositionInSchedule(lesson));
-              console.log(lessonsNotOnSchedule);
+              const lessonsNotOnSchedule = filterLessonsBy(selectedType, selectedItem).filter((lesson) => !hasPositionInSchedule(lesson));
               return (lessonsNotOnSchedule.length ? lessonsNotOnSchedule.map((lesson, index) =>
                 <div
                   draggable
                   key={index}
                   onDragStart={(e) => {
                     setDraggedLesson(lesson);
-                  }}>
+                  }}
+                  onClick={
+                    () => {
+                      if(lesson.id === selectedLesson?.id){
+                        openEditForm();
+                      }
+                      setSelectedLesson(lesson)
+                    }
+                  }
+                >
                   <LessonCard
                     lesson={lesson as Lesson}
                     filterType={selectedType}
+                    isSelected={selectedLesson?.id === lesson.id}
                   />
                 </div>,
               ) : <div>DROP LESSONS HERE</div>);
