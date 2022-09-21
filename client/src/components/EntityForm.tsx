@@ -47,21 +47,19 @@ function EntityForm<T extends FormType, E extends AllEntities>({
   const [values, setValues] = useState<CreationTypeOf<E> | DtoOfEntity<E>>(entity);
   const [showNotification, setShowNotification] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
-    apiFunc(values as any);
+  async function handleSubmit(): Promise<void> {
+    const result = await apiFunc(values as any);
     if(returns) {
-      returns(values as any);
+      returns(result as any);
     }
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 3*1000);
-    event.preventDefault();
   }
 
   return (
     <>
       {showNotification ? <SuccessfulNotification /> : null}
     <form
-      onSubmit={handleSubmit}
       className='fixed bg-white z-20 p-7 w-96 flex flex-col items-center gap-3 rounded-3xl drop-shadow-2xl left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2'>
       <h6 className='text-2xl font-semibold mb-3'>{ENTITY_TITLES[name]}</h6>
       {Object.keys(fields).map((fieldName) =>
@@ -95,8 +93,10 @@ function EntityForm<T extends FormType, E extends AllEntities>({
               />
               : null,
       )}
-      <button type='submit'
-              className='bg-blue-500 rounded-md py-1 mt-2 w-full drop-shadow-sm text-white font-bold text-lg'>
+      <button type='button'
+              className='bg-blue-500 rounded-md py-1 mt-2 w-full drop-shadow-sm text-white font-bold text-lg'
+              onClick={handleSubmit}
+      >
         {formType === 'create' ? 'Створити' : 'Зберегти зміни'}
       </button>
     </form>

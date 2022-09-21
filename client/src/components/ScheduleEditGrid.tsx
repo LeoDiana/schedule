@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { allEntitiesRelated } from '../entities/entitiesRelated';
 import { Day, Lesson, LessonTime, Subgroup, Teacher } from '../entities/entitiesClasses';
 import { LessonCard, ScheduleGrid } from '../pages/Schedule';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { AllEntitiesItems, EditableLesson, EntitiesNamesToTypes, FilterType } from '../common/types';
 import { Filters, useFilters } from './Filters';
 import EntityForm from './EntityForm';
@@ -26,6 +26,8 @@ function ScheduleEditGrid(): JSX.Element {
   const [selectedLesson, setSelectedLesson] = useState<EditableLesson>();
   const [isOpenEditFormForSelectedLesson, setIsOpenEditFormForSelectedLesson] = useState(false);
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
+  const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
+  const [positionInSchedule, setPosition] = useState({});
   const [entities, setEntities] = useState<AllEntitiesItems>({
     academicStatus: [],
     teacher: [],
@@ -90,7 +92,7 @@ function ScheduleEditGrid(): JSX.Element {
       {length: lessonTimes.length+1},
       () => Array.from({length: days.length+1}, () => [])));
 
-    allLessons.map((lesson) => {
+    allLessons.filter(lesson => lesson.lessonTime && lesson.day).map((lesson) => {
       teachersSchedules[lesson.teacher.id][lesson.lessonTime.id][lesson.day.id].push(lesson);
       subgroupsSchedules[lesson.subgroup.id][lesson.lessonTime.id][lesson.day.id].push(lesson);
     })
@@ -174,6 +176,28 @@ function ScheduleEditGrid(): JSX.Element {
 
   return lessonTimes && days && allLessons ? (
     <>
+      {isCreateFormOpen ?
+        <>
+          <div
+            onClick={closeCreateForm}
+            className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
+          <EntityForm<'create', Lesson>
+            apiFunc={((...params: any[]) => allEntitiesRelated.lesson.api.create(params as any))}
+            entity={{...allEntitiesRelated.lesson.createEmpty(), [selectedType]: selectedItem, ...positionInSchedule }}
+            fields={allEntitiesRelated.lesson.fields}
+            name={'lesson'}
+            allEntities={entities}
+            formType='create'
+            returns={(ent)=>{
+              setAllLessons((lessons) => {
+                return [...lessons, ent] as Lesson[];
+              });
+              console.log(ent);
+            }}
+          />
+        </>
+        : null
+      }
       {selectedLesson && isEditFormOpen &&
         <>
           <div
@@ -235,7 +259,12 @@ function ScheduleEditGrid(): JSX.Element {
                                }}
                           >
                             <div
-                              className='invisible h-full border-4 flex justify-center border-gray-400 border-dashed rounded-xl group-hover:visible'>
+                              className='invisible h-full border-4 flex justify-center border-gray-400 border-dashed rounded-xl group-hover:visible'
+                              onClick={() => {
+                                setPosition({lessonTime: lessonTime, day: day});
+                                openCreateForm();
+                              }}
+                            >
                               <PlusIcon className='w-12 stroke-2 text-gray-400' />
                             </div>
                           </div>,
@@ -299,6 +328,28 @@ function ScheduleEditGrid(): JSX.Element {
                }
              }}
         >
+          <button
+            className='p-2 rounded-lg border-2 border-rose-500 text-rose-500 font-semibold mb-2'
+            onClick={async () => {
+              if(selectedLesson) {
+                await allEntitiesRelated.lesson.api.delete(selectedLesson.id);
+                const filtered = allLessons.filter((item) => item.id !== selectedLesson.id);
+                setAllLessons((prevState) => ({ ...prevState, ...filtered }));
+                setSelectedLesson(undefined);
+              }
+            }}
+          >
+            <TrashIcon className='w-5 inline stroke-2' /> Delete selected
+          </button>
+          <button
+            className='p-2 rounded-lg border-2 border-blue-500 text-blue-500 font-semibold mb-2'
+            onClick={() => {
+              setPosition({});
+              openCreateForm();
+            }}
+          >
+            <PlusIcon className='w-5 inline stroke-2' /> Create new
+          </button>
           {
             (() => {
               const lessonsNotOnSchedule = filterLessonsBy(selectedType, selectedItem).filter((lesson) => !hasPositionInSchedule(lesson));
@@ -324,7 +375,7 @@ function ScheduleEditGrid(): JSX.Element {
                     isSelected={selectedLesson?.id === lesson.id}
                   />
                 </div>,
-              ) : <div>DROP LESSONS HERE</div>);
+              ) : <div className='pt-5 text-center text-gray-400'>DROP LESSONS HERE</div>);
             })()
 
           }

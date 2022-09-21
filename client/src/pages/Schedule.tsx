@@ -74,9 +74,9 @@ function Schedule({filter, filteredEntity}: Props): JSX.Element {
     <div className='m-5'>
       <h3 className='text-3xl text-center pb-6 font-bold'>{filteredEntity.displayName}</h3>
       <ScheduleGrid lessonTimes={lessonTimes} days={days}>
-        {lessons.map((lesson) => (
+        {lessons.filter(lesson => lesson.lessonTime && lesson.day).map((lesson) => (
           <div key={lesson.id}
-               style={{gridRowStart: lesson.lessonTime.id+1, gridColumnStart: lesson.day.id+1}}
+               style={{gridRowStart: lesson.lessonTime!.id+1, gridColumnStart: lesson.day!.id+1}}
           >
             <LessonCard
               lesson={lesson}

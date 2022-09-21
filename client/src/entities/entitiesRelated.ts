@@ -315,9 +315,9 @@ export class LessonRelated extends EntityRelated<Lesson> {
       teacher: new Teacher({...obj.teacher, academicStatus: new AcademicStatus(obj.teacher.academicStatus)}),
       subject: new Subject(obj.subject),
       lessonType: new LessonType(obj.lessonType),
-      lessonTime: new LessonTime(obj.lessonTime),
+      lessonTime: obj.lessonTime ? new LessonTime(obj.lessonTime) : undefined,
       classroom: obj.classroom ? new Classroom({...obj.classroom, building: new Building(obj.classroom.building)}) : undefined,
-      day: new Day(obj.day),
+      day: obj.day ? new Day(obj.day) : undefined,
       weekType: new WeekType(obj.weekType),
       subgroup: new Subgroup({...obj.subgroup, group: new Group(obj.subgroup.group)}),
     });

@@ -73,9 +73,9 @@ export interface LessonDTO {
   teacher: TeacherDTO;
   subject: SubjectDTO;
   lessonType: LessonTypeDTO;
-  lessonTime: LessonTimeDTO;
+  lessonTime?: LessonTimeDTO;
   classroom?: ClassroomDTO;
-  day: DayDTO;
+  day?: DayDTO;
   weekType: WeekTypeDTO;
   subgroup: SubgroupDTO;
 }

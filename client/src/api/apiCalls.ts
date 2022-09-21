@@ -37,17 +37,17 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
     this.generateObject = generateObject;
   }
 
-  async create(entity: Omit<DtoOfEntity<T>, 'id'>): Promise<void> {
+  async create(entity: Omit<DtoOfEntity<T>, 'id'>): Promise<any> {
     try {
-      await axios.post(this.endpoint, entity);
+      return await axios.post(this.endpoint, entity);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async update(entity: DtoOfEntity<T>): Promise<void> {
+  async update(entity: DtoOfEntity<T>): Promise<any> {
     try {
-      await axios.put(`${this.endpoint}/${entity.id}`, entity);
+      return await axios.put(`${this.endpoint}/${entity.id}`, entity);
     } catch (error) {
       console.log(error);
     }

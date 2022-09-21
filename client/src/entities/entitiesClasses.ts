@@ -295,14 +295,14 @@ export class Lesson implements ConstructorFor<LessonDTO>, Entity {
   teacher: Teacher;
   subject: Subject;
   lessonType: LessonType;
-  lessonTime: LessonTime;
+  lessonTime?: LessonTime;
   classroom?: any;
-  day: Day;
+  day?: Day;
   weekType: WeekType;
   subgroup: Subgroup;
 
   public get displayName(): string {
-    return `${this.day.displayName} ${this.lessonTime.displayName} ${this.weekType.displayName} ${this.subject.displayName} ${this.teacher.displayName} ${this.subgroup.displayName}`;
+    return `${this.day?.displayName} ${this.lessonTime?.displayName} ${this.weekType.displayName} ${this.subject.displayName} ${this.teacher.displayName} ${this.subgroup.displayName}`;
   }
 
   constructor(obj: ConstructorFor<LessonDTO>) {
