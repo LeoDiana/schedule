@@ -8,6 +8,9 @@ module.exports = {
       gridTemplateRows: {
         '9': 'repeat(9, minmax(0, 1fr)'
       },
+      zIndex: {
+        '2': '2'
+      }
     },
   },
   plugins: [],
