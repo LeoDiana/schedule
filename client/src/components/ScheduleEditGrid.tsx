@@ -260,7 +260,7 @@ function ScheduleEditGrid(): JSX.Element {
                          }}
                          className={
                            [
-                             // collisions[lesson.id as keyof typeof collisions] === 'warning' ? 'border-l-red-600 border-l-4' : '',
+                             collisions[lesson.id as keyof typeof collisions] === 'warning' ? 'border-l-red-600 border-l-4' : '',
                              'relative',
                              checkingTables[selectedType][selectedItem.id][lesson!.lessonTime!.id][lesson!.day!.id].length > 1 ? 'group' : '',
                              // selectedLesson?.id === lesson.id ? 'border-green-600 border-4' : '',
