@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { allEntitiesRelated } from '../entities/entitiesRelated';
 import { Day, Lesson, LessonTime, Subgroup, Teacher } from '../entities/entitiesClasses';
 import { LessonCard, ScheduleGrid } from '../pages/Schedule';
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { AllEntitiesItems, EditableLesson, FilterType } from '../common/types';
 import { Filters, useFilters } from './Filters';
 import EntityForm from './EntityForm';
@@ -63,12 +63,14 @@ function ScheduleEditGrid(): JSX.Element {
       allLessons.forEach(lesson => (emptyCollisions as any)[lesson.id] = []);
       setCollisions(emptyCollisions);
 
-      checkingTablesRef.current = buildTablesForChecking(
+      const chT = buildTablesForChecking(
         allLessons,
         fetched.teacher as Teacher[],
         fetched.subgroup as Subgroup[],
         fetched.day as Day[],
         fetched.lessonTime as LessonTime[]);
+      allLessons.forEach(lesson => changeTable2(lesson, lesson, chT));
+      checkingTablesRef.current = chT;
     };
 
     fetchData();
@@ -82,6 +84,59 @@ function ScheduleEditGrid(): JSX.Element {
     return allLessons.filter((lesson) => lesson[filter]?.id === filteredEntity.id);
   }
 
+  function changeTable2(prevLesson: any, movedLesson: any = undefined, checkingTables: any) {
+    // clear previous collisions at this point
+    if (prevLesson.lessonTime && prevLesson.day) {
+      checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
+        setCollisions((state) => ({ ...state, [lesson.id]: [] })),
+      );
+      checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
+        setCollisions((state) => ({ ...state, [lesson.id]: [] })),
+      );
+      // remove lesson from where it was
+      checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id] =
+        checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].filter((lesson: any) => lesson.id !== prevLesson.id);
+      checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id] =
+        checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].filter((lesson: any) => lesson.id !== prevLesson.id);
+      // add collisions if they are still at prev point
+      if (checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].length > 1) {
+        checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
+          setCollisions((state) => ({ ...state, [lesson.id]: [...(state as any)[lesson.id], lesson] })),
+        );
+      }
+      if (checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].length > 1) {
+        checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
+          setCollisions((state) => ({ ...state, [lesson.id]: [...(state as any)[lesson.id], lesson] })),
+        );
+      }
+    }
+
+    if (movedLesson && movedLesson.lessonTime && movedLesson.day) {
+      console.log(movedLesson);
+      // move to new collisions
+      const teachersLessonsAtThisPoint = checkingTables.teacher[movedLesson.teacher.id][movedLesson.lessonTime.id][movedLesson.day.id];
+      const subgroupsLessonsAtThisPoint = checkingTables.subgroup[movedLesson.subgroup.id][movedLesson.lessonTime.id][movedLesson.day.id];
+      // add new lesson
+      teachersLessonsAtThisPoint.push(movedLesson);
+      subgroupsLessonsAtThisPoint.push(movedLesson);
+      // add collisions
+      if (teachersLessonsAtThisPoint.length > 1) {
+        const newCollisions = {};
+        teachersLessonsAtThisPoint.forEach((lesson: any) =>
+          (newCollisions as any)[lesson.id] = teachersLessonsAtThisPoint
+        );
+        setCollisions((state) => ({...state, ...newCollisions}));
+      }
+      if (subgroupsLessonsAtThisPoint.length > 1) {
+        const newCollisions = {};
+        subgroupsLessonsAtThisPoint.forEach((lesson: any) =>
+          (newCollisions as any)[lesson.id] = subgroupsLessonsAtThisPoint
+        );
+        setCollisions((state) => ({...state, ...newCollisions}));
+      }
+    }
+  }
+
   function buildTablesForChecking(allLessons: any[], teachers: any[], subgroups: any[], days: any[], lessonTimes: any[]) {
     const teachersSchedules: any = {};
     teachers.forEach((teacher) => teachersSchedules[teacher.id] = Array.from(
@@ -92,7 +147,7 @@ function ScheduleEditGrid(): JSX.Element {
       { length: lessonTimes.length + 1 },
       () => Array.from({ length: days.length + 1 }, () => [])));
 
-    allLessons.filter(lesson => lesson.lessonTime && lesson.day).map((lesson) => {
+    allLessons.filter(lesson => lesson.lessonTime && lesson.day).forEach((lesson) => {
       teachersSchedules[lesson.teacher.id][lesson.lessonTime.id][lesson.day.id].push(lesson);
       subgroupsSchedules[lesson.subgroup.id][lesson.lessonTime.id][lesson.day.id].push(lesson);
     });
@@ -132,6 +187,7 @@ function ScheduleEditGrid(): JSX.Element {
     }
 
     if (movedLesson && movedLesson.lessonTime && movedLesson.day) {
+      console.log(movedLesson);
       // move to new collisions
       const teachersLessonsAtThisPoint = checkingTables.teacher[movedLesson.teacher.id][movedLesson.lessonTime.id][movedLesson.day.id];
       const subgroupsLessonsAtThisPoint = checkingTables.subgroup[movedLesson.subgroup.id][movedLesson.lessonTime.id][movedLesson.day.id];
@@ -344,13 +400,21 @@ function ScheduleEditGrid(): JSX.Element {
             <TrashIcon className='w-5 inline stroke-2' /> Delete selected
           </button>
           <button
-            className='p-2 rounded-lg border-2 border-blue-500 text-blue-500 font-semibold mb-2'
+            className='p-2 rounded-lg border-2 border-green-500 text-green-500 font-semibold mb-2'
             onClick={() => {
               setPosition({});
               openCreateForm();
             }}
           >
             <PlusIcon className='w-5 inline stroke-2' /> Create new
+          </button>
+          <button
+            className='p-2 rounded-lg border-2 border-blue-500 text-blue-500 font-semibold mb-2'
+            onClick={() => {
+              allLessons.forEach(l => allEntitiesRelated.lesson.api.update(l as any));
+            }}
+          >
+            <ArrowDownTrayIcon className='w-5 inline stroke-2' /> Save all changes
           </button>
           {
             (() => {
