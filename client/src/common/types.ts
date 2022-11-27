@@ -1,100 +1,100 @@
 import {
-  AcademicStatus,
-  Building,
-  Classroom,
-  Day,
-  Group,
-  Lesson,
+  AcademicStatus, Building, Classroom,
+  Day, Group, Lesson,
   LessonTime,
   LessonType,
   Subgroup,
   Subject,
   Teacher,
   WeekType,
-} from './entitiesInterfaces';
+} from '../entities/entitiesClasses';
+import {
+  AcademicStatusDTO, BuildingDTO, ClassroomDTO,
+  DayDTO, GroupDTO, LessonDTO,
+  LessonTimeDTO,
+  LessonTypeDTO, SubgroupDTO,
+  SubjectDTO,
+  TeacherDTO, WeekTypeDTO,
+} from '../entities/entitiesDTO';
 
-export type FormTypes = 'create' | 'update';
-export type FilterTypes = 'subgroup' | 'teacher';
+export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
-export interface AllEntitiesOfType<T> {
-  academicStatus: T;
-  teacher: T;
-  subject: T;
-  lessonType: T;
-  lessonTime: T;
-  day: T;
-  weekType: T;
-  building: T;
-  classroom: T;
-  subgroup: T;
-  group: T;
-  lesson: T;
-}
+export type EntitiesNamesToTypes = {
+  academicStatus: AcademicStatus;
+  teacher: Teacher;
+  lessonTime: LessonTime;
+  day: Day;
+  subject: Subject;
+  lessonType: LessonType;
+  weekType: WeekType;
+  group: Group;
+  subgroup: Subgroup;
+  building: Building;
+  classroom: Classroom;
+  lesson: Lesson;
+};
 
-export type AllEntities = keyof AllEntitiesOfType<any>;
+export type AllEntities = EntitiesNamesToTypes[keyof EntitiesNamesToTypes];
+export type AllEntitiesNames = keyof EntitiesNamesToTypes;
 
-type EntityInfoFieldTypes = 'text' | 'number' | 'entity';
-
-export type FieldsOfType<T extends AllEntities> = T extends 'academicStatus'
-  ? AcademicStatus
-  : T extends 'teacher'
-  ? Teacher
-  : T extends 'subject'
-  ? Subject
-  : T extends 'lessonType'
-  ? LessonType
-  : T extends 'lessonTime'
-  ? LessonTime
-  : T extends 'day'
-  ? Day
-  : T extends 'weekType'
-  ? WeekType
-  : T extends 'building'
-  ? Building
-  : T extends 'classroom'
-  ? Classroom
-  : T extends 'subgroup'
-  ? Subgroup
-  : T extends 'group'
-  ? Group
-  : T extends 'lesson'
-  ? Lesson
+export type DtoOfEntity<T extends AllEntities> =
+    T extends AcademicStatus ? AcademicStatusDTO
+  : T extends Teacher ? TeacherDTO
+  : T extends LessonTime ? LessonTimeDTO
+  : T extends Subject ? SubjectDTO
+  : T extends LessonType ? LessonTypeDTO
+  : T extends Group ? GroupDTO
+  : T extends Subgroup ? SubgroupDTO
+  : T extends Building ? BuildingDTO
+  : T extends Classroom ? ClassroomDTO
+  : T extends Lesson ? LessonDTO
+  : T extends Day ? DayDTO
+  : T extends WeekType ? WeekTypeDTO
   : never;
 
-export type SimpleFieldsOfType<T extends AllEntities> = {
-  [k in keyof FieldsOfType<T>]: string | number;
+type DtoFieldsToCorrespondingClasses<T extends DtoOfEntity<AllEntities>> = {
+  [K in keyof T]: K extends AllEntitiesNames ? EntitiesNamesToTypes[K] : T[K];
 };
+export type ConstructorFor<T extends DtoOfEntity<AllEntities>> = DtoFieldsToCorrespondingClasses<T>;
 
-export interface EntityInfoFieldCommon {
-  label: string;
-  type: EntityInfoFieldTypes;
-}
+type UnionToIntersection<U> =
+  (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
+export type AllFields = UnionToIntersection<AllEntities>;
 
-export interface EntityInfoFieldSimple extends EntityInfoFieldCommon {
-  type: 'number' | 'text';
-}
+export type FieldType = 'string' | 'number' | 'entity';
 
-export interface EntityInfoFieldComplex extends EntityInfoFieldCommon {
-  type: 'entity';
-  getEntitiesForList: () => Promise<any>;
-  makeShortShownName: (obj: any) => string;
-}
+// type DtoFieldsToIdType<T extends DtoOfEntity<AllEntities>> = {
+//   [K in keyof T]: K extends AllEntitiesNames ? number : T[K];
+// };
+//
+// // it's like DTO, but without id and all fields of DTO type transformed into just id of that object
+// export type ValuesTypeInCreateForm<T extends AllEntities> = Omit<DtoFieldsToIdType<DtoOfEntity<T>>, 'id'>;
+//
+// type KeysOfType<T, U> = {
+//   [P in keyof T]: T[P] extends U ? P : never;
+// }[keyof T];
+//
+// type PickByType<T, U> = Pick<T, KeysOfType<T, U>>;
+//
+// export type EntityFieldsOf<T extends AllEntities> = PickByType<T, DtoOfEntity<AllEntities>>;
+// // export type EntityFieldsOf<T extends AllEntities> = keyof PickByType<T, DtoOfEntity<AllEntities>>;
+// // export type ArraysOfEntityFieldsOf<T extends AllEntities> = {[K in keyof EntityFieldsOf<T>]: Array<any>};
+// export type ArraysOfEntityFieldsOf<T extends AllEntities> = {[K in keyof EntityFieldsOf<T>]: Array<T[K]>};
 
-export type EntityInfoFields<T extends AllEntities> = {
-  [K in keyof FieldsOfType<T>]: EntityInfoFieldSimple | EntityInfoFieldComplex;
-};
+export type AllEntitiesItems = { [K in AllEntitiesNames]: Array<AllEntities> };
 
-export interface ApiEndpoints {
-  readAll: () => Promise<any[]>;
-  create: (obj: any) => Promise<string>;
-  update: (obj: any) => Promise<string>;
-  delete: (id: number) => Promise<string>;
-}
 
-export interface FormScheme<T extends AllEntities> {
-  name: AllEntities;
-  title: string;
-  type: FormTypes;
-  fields: EntityInfoFields<T>;
-  apiCall: (entity: FieldsOfType<T>) => Promise<string>; // create or update
-}
+// export type FieldsOf<T extends AllEntities> = { [K in keyof Omit<DtoOfEntity<T>, 'id'>]: K extends AllEntitiesNames ? 'entity' : DtoOfEntity<T>[K] extends string ? 'string' : DtoOfEntity<T>[K] extends number ? 'number' : never };
+export type FieldsOf<T extends AllEntities> = { [K in keyof Omit<DtoOfEntity<T>, 'id'>]: FieldType};
+
+export type EmptyEntityOf<T extends AllEntities> = { [K in keyof Omit<DtoOfEntity<T>, 'id'>]: undefined };
+type ThisTypeAndUndefined<T> = { [K in keyof T]: undefined | T[K] };
+export type CreationTypeOf<T extends AllEntities> = ThisTypeAndUndefined<Omit<DtoOfEntity<T>, 'id'>>;
+
+export type FilterType = 'subgroup' | 'teacher';
+
+export type EditableLesson = Partial<LessonDTO> & {id: number};
+
+// export type DtoOfEntityName<T extends AllEntitiesNames> = T extends 'academicStatus'
+//   ? AcademicStatusDTO
+//   : never;

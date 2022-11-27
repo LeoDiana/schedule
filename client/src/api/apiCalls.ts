@@ -1,49 +1,81 @@
 import { instance as axios } from './axiosConfig';
-import { ENDPOINTS, ERROR_MESSAGE, SUCCESS_MESSAGE } from '../common/constants';
+import { AllEntities, AllEntitiesNames, DtoOfEntity } from '../common/types';
+import { allEntitiesRelated } from '../entities/entitiesRelated';
 
-export const readEntitiesApi = async (endpoint: string): Promise<any[]> => {
-  try {
-    const response = await axios.get(endpoint);
-    return response.data;
-  } catch (error) {
-    return [];
-  }
+const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
+  academicStatus: 'academic-statuses',
+  teacher: 'teachers',
+  lessonTime: 'lesson-times',
+  day: 'days',
+  lessonType: 'lesson-types',
+  subject: 'subjects',
+  weekType: 'week-types',
+  subgroup: 'subgroups',
+  group: 'groups',
+  building: 'buildings',
+  classroom: 'classrooms',
+  lesson: 'lessons',
 };
 
-export const createEntityApi = async (entity: any, endpoint: string): Promise<string> => {
-  try {
-    const response = await axios.post(endpoint, entity);
-    return SUCCESS_MESSAGE;
-  } catch (error) {
-    console.log(error);
-    return ERROR_MESSAGE;
-  }
+export type ApiMethods<T extends AllEntities> = {
+  create: (obj: Omit<DtoOfEntity<T>, 'id'>) => Promise<void>;
+  update: (obj: DtoOfEntity<T>) => Promise<void>;
+  delete: (id: number) => void;
+  readAll: () => Promise<T[]>;
 };
 
-export const updateEntityApi = async (entity: any, endpoint: string): Promise<string> => {
-  try {
-    const response = await axios.put(`${endpoint}/${entity.id}`, entity);
-    return SUCCESS_MESSAGE;
-  } catch (error) {
-    console.log(error);
-    return ERROR_MESSAGE;
+export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
+  private convertEntityNameToEndpoint(name: AllEntitiesNames) {
+    return ENDPOINTS[name];
   }
-};
 
-export const deleteEntityApi = async (id: number, endpoint: string): Promise<string> => {
-  try {
-    const response = await axios.delete(`${endpoint}/${id}`);
-    return SUCCESS_MESSAGE;
-  } catch (error) {
-    console.log(error);
-    return ERROR_MESSAGE;
+  endpoint: string;
+  generateObject: (obj: DtoOfEntity<T>) => T;
+
+  constructor(name: AllEntitiesNames, generateObject: (obj: DtoOfEntity<T>) => T) {
+    this.endpoint = this.convertEntityNameToEndpoint(name);
+    this.generateObject = generateObject;
   }
-};
+
+  async create(entity: Omit<DtoOfEntity<T>, 'id'>): Promise<any> {
+    try {
+      return await axios.post(this.endpoint, entity);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async update(entity: DtoOfEntity<T>): Promise<any> {
+    try {
+      return await axios.put(`${this.endpoint}/${entity.id}`, entity);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async delete(id: number): Promise<void> {
+    try {
+      await axios.delete(`${this.endpoint}/${id}`);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async readAll(): Promise<T[]> {
+    try {
+      const response = await axios.get(this.endpoint);
+      return (response.data as DtoOfEntity<T>[]).map(this.generateObject);
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  }
+}
 
 export const readLessonsWithFilter = async (id: number, filter: string): Promise<any[]> => {
   try {
     const response = await axios.get(`${ENDPOINTS.lesson}/${filter}/${id}`);
-    return response.data;
+    return (response.data).map(allEntitiesRelated.lesson.create);
   } catch (error) {
     console.log(error);
     return [];

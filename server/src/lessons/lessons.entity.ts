@@ -1,7 +1,6 @@
 import {
   Entity,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -35,7 +34,7 @@ export class Lesson {
   @JoinColumn()
   lessonTime: LessonTime;
 
-  @ManyToOne(() => Classroom, { eager: true })
+  @ManyToOne(() => Classroom, { eager: true, nullable: true })
   @JoinColumn()
   classroom: Classroom;
 
