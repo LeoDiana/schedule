@@ -18,8 +18,8 @@ const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
 };
 
 export type ApiMethods<T extends AllEntities> = {
-  create: (obj: Omit<DtoOfEntity<T>, 'id'>) => Promise<void>;
-  update: (obj: DtoOfEntity<T>) => Promise<void>;
+  create: (obj: Omit<DtoOfEntity<T>, 'id'>) => Promise<any>;
+  update: (obj: DtoOfEntity<T>) => Promise<any>;
   delete: (id: number) => void;
   readAll: () => Promise<T[]>;
 };

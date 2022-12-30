@@ -89,7 +89,7 @@ function AdminPanel(): JSX.Element {
             className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
           {/* in Func need to wrap function to save it`s context */}
           <EntityForm<'create', EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any))}
+            apiFunc={((params: any) => allEntitiesRelated[selectedEntityType].api.create(params as any))}
             entity={allEntitiesRelated[selectedEntityType].createEmpty()}
             fields={allEntitiesRelated[selectedEntityType].fields}
             name={selectedEntityType}
@@ -110,7 +110,7 @@ function AdminPanel(): JSX.Element {
             className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
           {/* in Func need to wrap function to save it`s context */}
           <EntityForm<'update', EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.update(params as any)) as any}
+            apiFunc={((params: any) => allEntitiesRelated[selectedEntityType].api.update(params as any)) as any}
             fields={allEntitiesRelated[selectedEntityType].fields}
             name={selectedEntityType}
             allEntities={entities}
