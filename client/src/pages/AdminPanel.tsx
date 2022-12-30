@@ -9,6 +9,7 @@ import {
 } from '../common/types';
 import { useModal } from '../common/hooks';
 import EntityForm from '../components/EntityForm';
+import Modal from '../components/Modal';
 
 function AdminPanel(): JSX.Element {
   const [selectedEntityType, setSelectedEntityType] = useState<AllEntitiesNames>('academicStatus');
@@ -82,12 +83,8 @@ function AdminPanel(): JSX.Element {
 
   return (
     <>
-      {isCreateFormOpen ?
-        <>
-          <div
-            onClick={closeCreateForm}
-            className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
-          {/* in Func need to wrap function to save it`s context */}
+      {isCreateFormOpen &&
+        <Modal close={closeCreateForm}>
           <EntityForm<'create', EntitiesNamesToTypes[typeof selectedEntityType]>
             apiFunc={((params: any) => allEntitiesRelated[selectedEntityType].api.create(params as any))}
             entity={allEntitiesRelated[selectedEntityType].createEmpty()}
@@ -96,19 +93,14 @@ function AdminPanel(): JSX.Element {
             allEntities={entities}
             formType='create'
           />
-        </>
-        : null
+        </Modal>
       }
 
-      {isEditFormOpen && selectedEntityId ?
-        <>
-          <div
-            onClick={() => {
-              setSelectedEntityId(undefined);
-              closeEditForm();
-            }}
-            className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
-          {/* in Func need to wrap function to save it`s context */}
+      {isEditFormOpen && selectedEntityId &&
+        <Modal close={() => {
+          setSelectedEntityId(undefined);
+          closeEditForm();
+        }}>
           <EntityForm<'update', EntitiesNamesToTypes[typeof selectedEntityType]>
             apiFunc={((params: any) => allEntitiesRelated[selectedEntityType].api.update(params as any)) as any}
             fields={allEntitiesRelated[selectedEntityType].fields}
@@ -117,8 +109,7 @@ function AdminPanel(): JSX.Element {
             entity={entities[selectedEntityType].find((item) => item.id === selectedEntityId) as any}
             formType='update'
           />
-        </>
-        : null
+        </Modal>
       }
 
       <div className='m-5 flex gap-4'>
