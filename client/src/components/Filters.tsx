@@ -1,5 +1,5 @@
 import { FilterType } from '../common/types';
-import DropdownInput from './DropdownInput';
+import DropdownInput from './inputs/DropdownInput';
 import React, { useEffect, useState } from 'react';
 import { FILTERS } from '../common/constants';
 import { allEntitiesRelated } from '../entities/entitiesRelated';

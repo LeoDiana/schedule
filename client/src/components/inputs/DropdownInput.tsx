@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FIELD_TITLES } from '../common/constants';
+import { FIELD_TITLES } from '../../common/constants';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 interface Props {
@@ -14,7 +14,7 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
 
   return (
     <>
-    <div className={`w-screen h-screen fixed z-30 top-0 right-0 ${isOpen ? 'visible' : 'invisible'}`} onClick={(e)=>{
+    <div className={`w-screen h-screen fixed z-30 top-0 right-0 ${isOpen ? 'visible' : 'invisible'}`} onClick={()=>{
       setIsOpen(false);
     }}>
     </div>
@@ -29,7 +29,7 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
                          className='w-6 absolute right-2 top-1/2 -translate-y-1/2 stroke-2 text-gray-500' />
       </div>
       <div className='relative'>
-        {isOpen ?
+        {isOpen &&
           <div
             className='w-full bg-white drop-shadow-sm rounded-md py-1 border-2 text-lg gap-2 absolute z-30 top-0 mt-1'>
             {items.map((item: any) =>
@@ -42,10 +42,9 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
                 className='hover:bg-gray-100 px-2'
               >
                 {typeof item === 'object' ? item.displayName : FIELD_TITLES[item as keyof typeof FIELD_TITLES] || item}
-              </div>,
+              </div>
             )}
           </div>
-          : null
         }
       </div>
     </div>
