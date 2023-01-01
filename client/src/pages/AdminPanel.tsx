@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { allEntitiesRelated } from '../entities/entitiesRelated';
+import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
 import { ENTITY_TITLES, FIELD_TITLES } from '../common/constants';
 import {
   AllEntitiesItems,
@@ -10,12 +10,18 @@ import {
 import { useModal } from '../common/hooks';
 import EntityForm from '../components/EntityForm';
 import Modal from '../components/Modal';
+import { fetchEntities, selectAllEntities } from '../features/entities/entitiesSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 function AdminPanel(): JSX.Element {
+  const dispatch = useDispatch();
+  const entities = useSelector(selectAllEntities);
+  // console.log(entities2);
+
   const [selectedEntityType, setSelectedEntityType] = useState<AllEntitiesNames>('academicStatus');
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
-  const [entities, setEntities] = useState<AllEntitiesItems>({
+  const [entities2, setEntities] = useState<AllEntitiesItems>({
     academicStatus: [],
     teacher: [],
     lessonTime: [],
@@ -33,12 +39,13 @@ function AdminPanel(): JSX.Element {
 
   useEffect(() => {
     const fetchData = async () => {
-      let entity: keyof typeof allEntitiesRelated;
-      const fetched = {} as AllEntitiesItems;
-      for (entity in allEntitiesRelated) {
-        fetched[entity] = await allEntitiesRelated[entity].api.readAll();
-      }
-      setEntities(fetched);
+      dispatch(fetchEntities());
+      // let entity: keyof typeof allEntitiesRelated;
+      // const fetched = {} as AllEntitiesItems;
+      // for (entity in allEntitiesRelated) {
+      //   fetched[entity] = await allEntitiesRelated[entity].api.readAll();
+      // }
+      // setEntities(fetched);
     };
 
     fetchData();
@@ -152,7 +159,7 @@ function AdminPanel(): JSX.Element {
                         const field = item[fieldName as keyof typeof item];
                         return(
                         <td key={fieldName}>
-                          {typeof field === 'object' ? (field as any).displayName : field}
+                          {typeof field === 'object' ? getDisplayName(fieldName as AllEntitiesNames, field) : field}
                         </td>)
                       }
                       )

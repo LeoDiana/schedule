@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { allEntitiesRelated } from '../entities/entitiesRelated';
-import { Day, Lesson, LessonTime } from '../entities/entitiesClasses';
+import { getDisplayName } from '../entities/entitiesRelated';
+import { Lesson } from '../entities/entitiesClasses';
 import { readLessonsWithFilter } from '../api/apiCalls';
 import { FilterType } from '../common/types';
+import { useSelector } from 'react-redux';
+import { selectDays, selectLessonTimes } from '../features/entities/entitiesSlice';
+import { DayDTO, LessonTimeDTO } from '../entities/entitiesDTO';
 
 interface LessonCardProps {
   lesson: Lesson,
@@ -12,11 +15,11 @@ interface LessonCardProps {
 
 export function LessonCard({lesson, filterType, isSelected=false}: LessonCardProps): JSX.Element {
   let first;
-  const second = `${lesson.lessonType.displayName} ${lesson.classroom ? lesson.classroom.displayName : 'MS Teams'}`;
+  const second = `${getDisplayName('lessonType', lesson.lessonType)} ${lesson.classroom ? getDisplayName('classroom', lesson.classroom) : 'MS Teams'}`;
 
   switch (filterType) {
-    case 'subgroup': first = lesson.teacher.displayName; break;
-    case 'teacher': first = lesson.subgroup.displayName; break;
+    case 'subgroup': first = getDisplayName('teacher', lesson.teacher); break;
+    case 'teacher': first = getDisplayName('subgroup', lesson.subgroup); break;
   }
 
   return (
@@ -24,7 +27,7 @@ export function LessonCard({lesson, filterType, isSelected=false}: LessonCardPro
       'col-start-4 h-28 flex flex-col justify-between row-start-4 bg-indigo-200 drop-shadow-md rounded-xl p-3 leading-tight min-w-60',
       isSelected ? 'border-4 border-indigo-400 p-2.5' : 'border-2 border-indigo-300'].join(' ')}
     style={{minWidth:'175px'}}>
-      <p className='mb-2 font-medium'>{lesson.subject.displayName}</p>
+      <p className='mb-2 font-medium'>{getDisplayName('subject', lesson.subject)}</p>
       <div>
         <p className='text-sm leading-none'>{first}</p>
         <p className='text-sm'>{second}</p>
@@ -53,14 +56,16 @@ interface Props {
 }
 
 function Schedule({filter, filteredEntity}: Props): JSX.Element {
-  const [lessonTimes, setLessonTimes] = useState<LessonTime[]>();
-  const [days, setDays] = useState<Day[]>();
+  // const [lessonTimes, setLessonTimes] = useState<LessonTime[]>();
+  const lessonTimes = useSelector(selectLessonTimes);
+  const days = useSelector(selectDays);
+  // const [days, setDays] = useState<Day[]>();
   const [lessons, setLessons] = useState<Lesson[]>();
 
   useEffect(() => {
     const fetchData = async () => {
-      setLessonTimes(await allEntitiesRelated.lessonTime.api.readAll());
-      setDays(await allEntitiesRelated.day.api.readAll());
+      // setLessonTimes(await allEntitiesRelated.lessonTime.api.readAll());
+      // setDays(await allEntitiesRelated.day.api.readAll());
       // setLessons(await allEntitiesRelated.lesson.api.readAll());
 
       setLessons(await readLessonsWithFilter(filteredEntity.id, filter));
@@ -73,7 +78,7 @@ function Schedule({filter, filteredEntity}: Props): JSX.Element {
 
   return lessonTimes && days && lessons ? (
     <div className='m-5'>
-      <h3 className='text-3xl text-center pb-6 font-bold'>{filteredEntity.displayName}</h3>
+      <h3 className='text-3xl text-center pb-6 font-bold'>{getDisplayName(filter, filteredEntity)}</h3>
       <ScheduleGrid lessonTimes={lessonTimes} days={days}>
         {lessons.filter(lesson => lesson.lessonTime && lesson.day).map((lesson) => (
           <div key={lesson.id}
@@ -91,8 +96,8 @@ function Schedule({filter, filteredEntity}: Props): JSX.Element {
 }
 
 interface ScheduleGridProps {
-  lessonTimes: LessonTime[],
-  days: Day[],
+  lessonTimes: LessonTimeDTO[],
+  days: DayDTO[],
   children: JSX.Element | JSX.Element[],
 }
 

@@ -47,7 +47,7 @@ function ScheduleEditGrid(): JSX.Element {
   useEffect(() => {
     const fetchData = async () => {
       let entity: keyof typeof allEntitiesRelated;
-      const fetched = {} as AllEntitiesItems;
+      const fetched = {} as any;
       for (entity in allEntitiesRelated) {
         fetched[entity] = await allEntitiesRelated[entity].api.readAll();
       }

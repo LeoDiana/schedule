@@ -352,6 +352,30 @@ export class LessonRelated extends EntityRelated<Lesson> {
 // }
 
 
+export const getDisplayName = (entityName: AllEntitiesNames, obj: any): string => {
+  try {
+    switch (entityName) {
+      case 'academicStatus': return `${obj.shortName}.`;
+      case 'teacher': return `${obj.surname} ${obj.firstName[0]}.${obj.patronymic[0]}.`;
+      case 'lessonTime': return `${obj.number} ${obj.timeStart}-${obj.timeEnd}`;
+      case 'day': return obj.name;
+      case 'subject': return obj.shortName;
+      case 'lessonType': return obj.shortName;
+      case 'weekType': return obj.name;
+      case 'group': return obj.name;
+      case 'subgroup': return `${getDisplayName('group', obj.group)} ${obj.name ? obj.name : ''}`;
+      case 'building': return obj.name;
+      case 'classroom': return `${obj.number} ${getDisplayName('building', obj.building)}`;
+      case 'lesson': return `${getDisplayName('day', obj.day)} ${getDisplayName('lessonTime', obj.lessonTime)} ${getDisplayName('weekType', obj.weekType)} ${getDisplayName('subject', obj.subject)} ${getDisplayName('teacher', obj.teacher)} ${getDisplayName('subgroup', obj.subgroup)}`
+      default: return '';
+    }
+  } catch (err) {
+    console.log('Current object does not have proper fields');
+    return '';
+  }
+}
+
+
 export const allEntitiesRelated: { [K in AllEntitiesNames]: EntityRelated<EntitiesNamesToTypes[K]> } = {
   academicStatus: new AcademicStatusRelated(),
   teacher: new TeacherRelated(),

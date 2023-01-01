@@ -3,14 +3,16 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AdminPanel from "./pages/AdminPanel";
 import ScheduleEditGrid from './components/ScheduleEditGrid';
+import { Provider } from 'react-redux';
+import store from './app/store';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
-    {/* <Provider store={store}> */}
+    <Provider store={store}>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App/>}/>
@@ -18,7 +20,7 @@ root.render(
         <Route path="edit-schedule" element={<ScheduleEditGrid/>}/>
       </Routes>
     </BrowserRouter>
-    {/* </Provider> */}
+    </Provider>
   </React.StrictMode>,
 );
 
