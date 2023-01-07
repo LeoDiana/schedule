@@ -3,49 +3,33 @@ import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
 import { ENTITY_TITLES, FIELD_TITLES } from '../common/constants';
 import {
-  AllEntitiesItems,
   AllEntitiesNames,
   EntitiesNamesToTypes,
 } from '../common/types';
 import { useModal } from '../common/hooks';
 import EntityForm from '../components/EntityForm';
 import Modal from '../components/Modal';
-import { fetchEntities, selectAllEntities } from '../features/entities/entitiesSlice';
+import {
+  createEntity,
+  deleteEntity,
+  fetchEntities,
+  selectAllEntities,
+  updateEntity,
+} from '../features/entities/entitiesSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 function AdminPanel(): JSX.Element {
   const dispatch = useDispatch();
   const entities = useSelector(selectAllEntities);
-  // console.log(entities2);
 
   const [selectedEntityType, setSelectedEntityType] = useState<AllEntitiesNames>('academicStatus');
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
-  const [entities2, setEntities] = useState<AllEntitiesItems>({
-    academicStatus: [],
-    teacher: [],
-    lessonTime: [],
-    day: [],
-    lessonType: [],
-    subject: [],
-    group: [],
-    subgroup: [],
-    weekType: [],
-    building: [],
-    classroom: [],
-    lesson: [],
-  });
   const [selectedEntityId, setSelectedEntityId] = useState<number>();
 
   useEffect(() => {
     const fetchData = async () => {
       dispatch(fetchEntities());
-      // let entity: keyof typeof allEntitiesRelated;
-      // const fetched = {} as AllEntitiesItems;
-      // for (entity in allEntitiesRelated) {
-      //   fetched[entity] = await allEntitiesRelated[entity].api.readAll();
-      // }
-      // setEntities(fetched);
     };
 
     fetchData();
@@ -59,30 +43,8 @@ function AdminPanel(): JSX.Element {
   }
 
   function handleDelete(id: number) {
-    (async () => {
-      await allEntitiesRelated[selectedEntityType].api.delete(id);
-      const filtered = entities[selectedEntityType].filter((item) => item.id !== id);
-      setEntities((ents) => ({ ...ents, [selectedEntityType]: filtered }));
-    })();
+    dispatch(deleteEntity({ entityName: selectedEntityType, id }));
   }
-
-  // function selectEntityFieldsItems(entity: AllEntitiesNames) {
-  //   // const selectedEntities = {} as any;
-  //   // const selectedEntities = {} as ArraysOfEntityFieldsOf<EntitiesNamesToTypes[typeof entity]>;
-  //   const selectedEntities = {} as {[K in keyof EntityFieldsOf<EntitiesNamesToTypes[typeof entity]>]: Array<any>};
-  //   // const selectedEntities = {} as ArraysOfEntityFieldsOf<Teacher>;
-  //   // const selectedEntities = {} as { academicStatus: AcademicStatus[] };
-  //
-  //   const entityFields = allEntitiesRelated[entity].fields;
-  //   for(const fieldName in entityFields){
-  //     if(entityFields[fieldName as keyof typeof entityFields] === 'entity'){
-  //       const fn = fieldName as AllEntitiesNames;
-  //       selectedEntities[fieldName as keyof typeof selectedEntities] = entities[fieldName as keyof typeof entities] as Array<EntitiesNamesToTypes[typeof fn]>;
-  //     }
-  //   }
-  //
-  //   return selectedEntities;
-  // }
 
   function fieldsCount(ent: AllEntitiesNames) {
     return Object.keys(allEntitiesRelated[ent].fields).length + 2;
@@ -93,7 +55,7 @@ function AdminPanel(): JSX.Element {
       {isCreateFormOpen &&
         <Modal close={closeCreateForm}>
           <EntityForm<'create', EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiFunc={((params: any) => allEntitiesRelated[selectedEntityType].api.create(params as any))}
+            apiFunc={createEntity}
             entity={allEntitiesRelated[selectedEntityType].createEmpty()}
             fields={allEntitiesRelated[selectedEntityType].fields}
             name={selectedEntityType}
@@ -109,7 +71,7 @@ function AdminPanel(): JSX.Element {
           closeEditForm();
         }}>
           <EntityForm<'update', EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiFunc={((params: any) => allEntitiesRelated[selectedEntityType].api.update(params as any)) as any}
+            apiFunc={updateEntity}
             fields={allEntitiesRelated[selectedEntityType].fields}
             name={selectedEntityType}
             allEntities={entities}

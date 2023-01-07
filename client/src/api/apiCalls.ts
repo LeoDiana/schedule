@@ -67,7 +67,7 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
       return response.data;
     } catch (error) {
       console.log(error);
-      return [] as any;
+      return [];
     }
   }
 }

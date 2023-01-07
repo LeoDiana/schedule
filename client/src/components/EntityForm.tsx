@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ENTITY_TITLES } from '../common/constants';
-import { ApiMethods } from '../api/apiCalls';
 import {
   AllEntities,
   AllEntitiesItems,
@@ -11,22 +10,23 @@ import { EntityRelated } from '../entities/entitiesRelated';
 import NumberInput from './inputs/NumberInput';
 import TextInput from './inputs/TextInput';
 import DropdownInput from './inputs/DropdownInput';
+import { useDispatch } from 'react-redux';
+import { CreateEntityApi, UpdateEntityApi } from '../features/entities/entitiesSlice';
 
 interface BaseFormProps<T extends AllEntities> {
   name: AllEntitiesNames
   fields: EntityRelated<T>['fields'],
   allEntities: AllEntitiesItems,
   formType: FormType,
-  returns?: (obj: DtoOfEntity<T>) => void
 }
 
 interface UpdateFormProps<T extends AllEntities> extends BaseFormProps<T> {
-  apiFunc: ApiMethods<T>['update'],
+  apiFunc: UpdateEntityApi,
   entity: DtoOfEntity<T>,
 }
 
 interface CreateFormProps<T extends AllEntities> extends BaseFormProps<T> {
-  apiFunc: ApiMethods<T>['create'],
+  apiFunc: CreateEntityApi,
   entity: EmptyEntityOf<T>,
 }
 
@@ -42,16 +42,14 @@ function EntityForm<T extends FormType, E extends AllEntities>({
                                                                  name,
                                                                  allEntities,
                                                                  formType,
-                                                                 returns,
                                                                }: EntityFormType<T, E>): JSX.Element {
+  const dispatch = useDispatch();
+
   const [values, setValues] = useState<CreationTypeOf<E> | DtoOfEntity<E>>(entity);
   const [showNotification, setShowNotification] = useState(false);
 
   async function handleSubmit(): Promise<void> {
-    const result = await apiFunc(values as any);
-    if (returns) {
-      returns(result as any);
-    }
+    dispatch(apiFunc({entityName: name, entity: values as any}))
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 3 * 1000);
   }
@@ -93,7 +91,7 @@ function EntityForm<T extends FormType, E extends AllEntities>({
 
   return (
     <>
-      {showNotification ? <SuccessfulNotification /> : null}
+      {showNotification ?? <SuccessfulNotification />}
       <form
         className='fixed bg-white z-20 p-7 w-96 flex flex-col items-center gap-3 rounded-3xl drop-shadow-2xl left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2'>
         <h6 className='text-2xl font-semibold mb-3'>{ENTITY_TITLES[name]}</h6>

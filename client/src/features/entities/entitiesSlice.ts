@@ -1,7 +1,22 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allEntitiesRelated } from '../../entities/entitiesRelated';
-import { AllEntitiesItems } from '../../common/types';
+import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes } from '../../common/types';
 import { DayDTO, LessonTimeDTO } from '../../entities/entitiesDTO';
+
+interface CreateProps {
+  entityName: AllEntitiesNames,
+  entity: object
+}
+
+interface UpdateProps {
+  entityName: AllEntitiesNames,
+  entity: { id: number }
+}
+
+interface DeleteProps {
+  entityName: AllEntitiesNames,
+  id: number
+}
 
 interface InitialState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed',
@@ -34,11 +49,18 @@ export const entitiesSlice = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder.addCase(fetchEntities.fulfilled, (state, action) => {
-      // console.log('action.payload');
-      // console.log(action.payload);
       state.entities = action.payload;
-    })
-  }
+    }).addCase(deleteEntity.fulfilled, (state, action: PayloadAction<DeleteProps>) => {
+      const { entityName, id } = action.payload;
+      state.entities[entityName] = state.entities[entityName].filter((item) => item.id !== id);
+    }).addCase(createEntity.fulfilled, (state, action: PayloadAction<CreateProps>) => {
+      const { entityName, entity } = action.payload;
+      state.entities[entityName].push(entity as EntitiesNamesToTypes[typeof entityName]);
+    }).addCase(updateEntity.fulfilled, (state, action: PayloadAction<UpdateProps>) => {
+      const { entityName, entity } = action.payload;
+      state.entities[entityName] = state.entities[entityName].map((ent) => ent.id !== entity.id ? ent : entity as EntitiesNamesToTypes[typeof entityName]);
+    });
+  },
 });
 
 export const fetchEntities = createAsyncThunk('entities/fetchEntities', async () => {
@@ -46,26 +68,35 @@ export const fetchEntities = createAsyncThunk('entities/fetchEntities', async ()
   const result: any = {};
   Object.keys(allEntitiesRelated).forEach((key, i) => result[key] = allFetched[i]);
   return result as AllEntitiesItems;
-})
+});
 
-// // the outside "thunk creator" function
-// const fetchUserById = userId => {
-//   // the inside "thunk function"
-//   return async (dispatch, getState) => {
-//     try {
-//       // make an async call in the thunk
-//       const user = await userAPI.fetchById(userId)
-//       // dispatch an action when we get the response back
-//       dispatch(userLoaded(user))
-//     } catch (err) {
-//       // If something went wrong, handle it here
-//     }
-//   }
-// }
+export type DeleteEntityApi = AsyncThunk<DeleteProps, DeleteProps, {}>;
+export const deleteEntity = createAsyncThunk<DeleteProps, DeleteProps>(
+  'entities/deleteEntity',
+  async ({ entityName, id }) => {
+    await allEntitiesRelated[entityName].api.delete(id);
+    return { entityName, id };
+  });
 
-//export const { increment, decrement, incrementByAmount } = counterSlice.actions
-export const selectAllEntities = (state: {entities: InitialState}) => state.entities.entities;
-export const selectDays = (state: {entities: InitialState}) => state.entities.entities.day as DayDTO[];
-export const selectLessonTimes = (state: {entities: InitialState}) => state.entities.entities.lessonTime as LessonTimeDTO[];
+export type CreateEntityApi = AsyncThunk<CreateProps, CreateProps, {}>;
+export const createEntity = createAsyncThunk<CreateProps, CreateProps>(
+  'entities/createEntity',
+  async ({ entityName, entity }) => {
+    const result = await allEntitiesRelated[entityName].api.create(entity as any);
+    return { entityName, entity: result.data };
+  });
+
+export type UpdateEntityApi = AsyncThunk<UpdateProps, UpdateProps, {}>;
+export const updateEntity = createAsyncThunk<UpdateProps, UpdateProps>(
+  'entities/editEntity',
+  async ({ entityName, entity }) => {
+    const result = await allEntitiesRelated[entityName].api.update(entity as any);
+    return { entityName, entity: result.data };
+  });
+
+
+export const selectAllEntities = (state: { entities: InitialState }) => state.entities.entities;
+export const selectDays = (state: { entities: InitialState }) => state.entities.entities.day as DayDTO[];
+export const selectLessonTimes = (state: { entities: InitialState }) => state.entities.entities.lessonTime as LessonTimeDTO[];
 
 export default entitiesSlice.reducer;
