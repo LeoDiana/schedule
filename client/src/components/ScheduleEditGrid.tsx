@@ -226,11 +226,11 @@ function ScheduleEditGrid(): JSX.Element {
             name='lesson'
             allEntities={entities}
             formType='create'
-            returns={(ent) =>
-              setAllLessons((lessons) => {
-                return [...lessons, ent] as Lesson[];
-              })
-            }
+            // returns={(ent) =>
+            //   setAllLessons((lessons) => {
+            //     return [...lessons, ent] as Lesson[];
+            //   })
+            // }
           />
         </>
         : null
@@ -247,13 +247,13 @@ function ScheduleEditGrid(): JSX.Element {
             allEntities={entities}
             entity={selectedLesson as any}
             formType='update'
-            returns={(ent) => {
-              setAllLessons((lessons) => {
-                return [...lessons.filter(lesson => lesson.id !== ent.id),
-                  ent] as Lesson[];
-              });
-              console.log(ent);
-            }}
+            // returns={(ent) => {
+            //   setAllLessons((lessons) => {
+            //     return [...lessons.filter(lesson => lesson.id !== ent.id),
+            //       ent] as Lesson[];
+            //   });
+            //   console.log(ent);
+            // }}
           />
         </>
       }

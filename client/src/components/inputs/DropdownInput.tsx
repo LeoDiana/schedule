@@ -1,12 +1,26 @@
 import React, { useState } from 'react';
 import { FIELD_TITLES } from '../../common/constants';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { getDisplayName } from '../../entities/entitiesRelated';
+import { AllEntitiesNames } from '../../common/types';
 
 interface Props {
   name: string,
   value: any,
   onChange: (value: any) => void,
   items: Array<any>;
+}
+
+function getInputDisplayValue(entityName: AllEntitiesNames, item: any): string {
+  if(!item){
+    return '';
+  }
+
+  if(typeof item === 'object'){
+    return getDisplayName(entityName, item);
+  }
+
+  return FIELD_TITLES[item as keyof typeof FIELD_TITLES] || item
 }
 
 function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
@@ -21,8 +35,9 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
     <div className='w-full flex flex-col'>
       <label htmlFor={name} className='font-medium mb-0.5'>{FIELD_TITLES[name as keyof typeof FIELD_TITLES] || name}</label>
       <div className='w-full relative'>
-        <input id={name} type='text' onChange={(event) => onChange(Number(event.target.value))}
-               value={value ? typeof value === 'object' ? value.displayName || value : FIELD_TITLES[value as keyof typeof FIELD_TITLES] || value : ''}
+        <input id={name} type='text'
+               onChange={(event) => onChange(Number(event.target.value))}
+               value={getInputDisplayValue(name as AllEntitiesNames, value)}
                autoComplete='off'
                className='w-full rounded-md border-2 drop-shadow-sm text-lg pl-2 pr-9 py-1' />
         <ChevronDownIcon onClick={() => setIsOpen(s => !s)}
@@ -41,7 +56,7 @@ function DropdownInput({ name, value, onChange, items }: Props): JSX.Element {
                 }}
                 className='hover:bg-gray-100 px-2'
               >
-                {typeof item === 'object' ? item.displayName : FIELD_TITLES[item as keyof typeof FIELD_TITLES] || item}
+                {getInputDisplayValue(name as AllEntitiesNames, item)}
               </div>
             )}
           </div>

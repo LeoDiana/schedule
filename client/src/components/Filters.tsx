@@ -5,8 +5,8 @@ import { FILTERS } from '../common/constants';
 import { allEntitiesRelated } from '../entities/entitiesRelated';
 
 
-type UseFilterReturn = [FilterType[], FilterType, (type: FilterType)=>void,
-                        any[], any, (item: any)=> void];
+type UseFilterReturn = [FilterType[], FilterType, (type: FilterType) => void,
+  any[], any, (item: any) => void];
 
 export function useFilters(): UseFilterReturn {
   const [typeFilter, setTypeFilter] = useState<FilterType>(FILTERS[0]);
@@ -48,14 +48,24 @@ export interface FiltersProps {
   setEntity: (item: any) => void,
 }
 
-export function Filters({types, selectedType, setType,
-                   entities, selectedEntity, setEntity}: FiltersProps) {
+export function Filters({
+                          types, selectedType, setType,
+                          entities, selectedEntity, setEntity,
+                        }: FiltersProps) {
+  console.log({
+    types, selectedType, setType,
+    entities, selectedEntity, setEntity,
+  });
   return (
     <div className='flex gap-2 p-4'>
       <DropdownInput name='Сортувати по' value={selectedType} onChange={setType} items={types} />
-      {selectedType && entities ? (
-        <DropdownInput name={selectedType} value={selectedEntity} onChange={setEntity} items={entities} />
-      ) : null}
+      {selectedType && entities && (
+        <DropdownInput
+          name={selectedType}
+          value={selectedEntity}
+          onChange={setEntity}
+          items={entities} />
+      )}
     </div>
   );
 }
