@@ -56,20 +56,15 @@ interface Props {
 }
 
 function Schedule({filter, filteredEntity}: Props): JSX.Element {
-  // const [lessonTimes, setLessonTimes] = useState<LessonTime[]>();
   const lessonTimes = useSelector(selectLessonTimes);
   const days = useSelector(selectDays);
-  // const [days, setDays] = useState<Day[]>();
   const [lessons, setLessons] = useState<Lesson[]>();
 
   useEffect(() => {
     const fetchData = async () => {
-      // setLessonTimes(await allEntitiesRelated.lessonTime.api.readAll());
-      // setDays(await allEntitiesRelated.day.api.readAll());
       // setLessons(await allEntitiesRelated.lesson.api.readAll());
 
       setLessons(await readLessonsWithFilter(filteredEntity.id, filter));
-
     };
 
     fetchData();

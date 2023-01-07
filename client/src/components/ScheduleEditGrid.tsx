@@ -1,16 +1,28 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { allEntitiesRelated } from '../entities/entitiesRelated';
+import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
 import { Day, Lesson, LessonTime, Subgroup, Teacher } from '../entities/entitiesClasses';
 import { LessonCard, ScheduleGrid } from '../pages/Schedule';
 import { ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { AllEntitiesItems, EditableLesson, FilterType } from '../common/types';
+import { EditableLesson, FilterType } from '../common/types';
 import { Filters, useFilters } from './Filters';
 import EntityForm from './EntityForm';
 import { useModal } from '../common/hooks';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  createEntity,
+  selectAllEntities,
+  selectDays,
+  selectLessonTimes,
+  updateEntity,
+} from '../features/entities/entitiesSlice';
+import Modal from './Modal';
 
 function ScheduleEditGrid(): JSX.Element {
-  const [lessonTimes, setLessonTimes] = useState<LessonTime[]>();
-  const [days, setDays] = useState<Day[]>();
+  const dispatch = useDispatch();
+  const entities = useSelector(selectAllEntities);
+  const lessonTimes = useSelector(selectLessonTimes);
+  const days = useSelector(selectDays);
+
   const [draggedLesson, setDraggedLesson] = useState<EditableLesson>();
 
   const [allLessons, setAllLessons] = useState<EditableLesson[]>([]);
@@ -27,36 +39,13 @@ function ScheduleEditGrid(): JSX.Element {
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
   const [positionInSchedule, setPosition] = useState({});
-  const [entities, setEntities] = useState<AllEntitiesItems>({
-    academicStatus: [],
-    teacher: [],
-    lessonTime: [],
-    day: [],
-    lessonType: [],
-    subject: [],
-    group: [],
-    subgroup: [],
-    weekType: [],
-    building: [],
-    classroom: [],
-    lesson: [],
-  });
   const [conflictedModal, setConflictedModal] = useState<any>();
 
 
   useEffect(() => {
     const fetchData = async () => {
-      let entity: keyof typeof allEntitiesRelated;
-      const fetched = {} as any;
-      for (entity in allEntitiesRelated) {
-        fetched[entity] = await allEntitiesRelated[entity].api.readAll();
-      }
-      setEntities(fetched);
+      const allLessons = entities.lesson;
 
-      const allLessons = await allEntitiesRelated.lesson.api.readAll();
-
-      setLessonTimes(fetched.lessonTime as LessonTime[]);
-      setDays(fetched.day as Day[]);
       setAllLessons(allLessons);
 
       const emptyCollisions = {};
@@ -65,10 +54,10 @@ function ScheduleEditGrid(): JSX.Element {
 
       const chT = buildTablesForChecking(
         allLessons,
-        fetched.teacher as Teacher[],
-        fetched.subgroup as Subgroup[],
-        fetched.day as Day[],
-        fetched.lessonTime as LessonTime[]);
+        entities.teacher as Teacher[],
+        entities.subgroup as Subgroup[],
+        entities.day as Day[],
+        entities.lessonTime as LessonTime[]);
       allLessons.forEach(lesson => changeTable2(lesson, lesson, chT));
       checkingTablesRef.current = chT;
     };
@@ -214,48 +203,29 @@ function ScheduleEditGrid(): JSX.Element {
 
   return lessonTimes && days && allLessons ? (
     <>
-      {isCreateFormOpen ?
-        <>
-          <div
-            onClick={closeCreateForm}
-            className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
+      {isCreateFormOpen &&
+        <Modal close={closeCreateForm}>
           <EntityForm<'create', Lesson>
-            apiFunc={((...params: any[]) => allEntitiesRelated.lesson.api.create(params as any))}
+            apiFunc={createEntity}
             entity={{ ...allEntitiesRelated.lesson.createEmpty(), [selectedType]: selectedItem, ...positionInSchedule }}
             fields={allEntitiesRelated.lesson.fields}
             name='lesson'
             allEntities={entities}
             formType='create'
-            // returns={(ent) =>
-            //   setAllLessons((lessons) => {
-            //     return [...lessons, ent] as Lesson[];
-            //   })
-            // }
           />
-        </>
-        : null
+        </Modal>
       }
       {selectedLesson && isEditFormOpen &&
-        <>
-          <div
-            onClick={closeEditForm}
-            className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
+        <Modal close={closeEditForm}>
           <EntityForm<'update', Lesson>
-            apiFunc={((...params: any[]) => allEntitiesRelated.lesson.api.update(params as any)) as any}
+            apiFunc={updateEntity}
             fields={allEntitiesRelated.lesson.fields}
             name='lesson'
             allEntities={entities}
             entity={selectedLesson as any}
             formType='update'
-            // returns={(ent) => {
-            //   setAllLessons((lessons) => {
-            //     return [...lessons.filter(lesson => lesson.id !== ent.id),
-            //       ent] as Lesson[];
-            //   });
-            //   console.log(ent);
-            // }}
           />
-        </>
+        </Modal>
       }
       <div className='flex'>
         <div className='flex-grow'>
@@ -265,7 +235,7 @@ function ScheduleEditGrid(): JSX.Element {
             selectedEntity={selectedItem} setEntity={setEntity}
           />
           <div className='m-5'>
-            <h3 className='text-3xl text-center pb-6 font-bold'>{selectedItem.displayName}</h3>
+            <h3 className='text-3xl text-center pb-6 font-bold'>{getDisplayName(selectedType, selectedItem)}</h3>
             <ScheduleGrid lessonTimes={lessonTimes} days={days}>
               <>
                 {

@@ -1,7 +1,7 @@
 import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allEntitiesRelated } from '../../entities/entitiesRelated';
 import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes } from '../../common/types';
-import { DayDTO, LessonTimeDTO } from '../../entities/entitiesDTO';
+import { Day, Lesson, LessonTime } from '../../entities/entitiesClasses';
 
 interface CreateProps {
   entityName: AllEntitiesNames,
@@ -70,7 +70,7 @@ export const fetchEntities = createAsyncThunk('entities/fetchEntities', async ()
   return result as AllEntitiesItems;
 });
 
-export type DeleteEntityApi = AsyncThunk<DeleteProps, DeleteProps, {}>;
+export type DeleteEntityApi = AsyncThunk<DeleteProps, DeleteProps, any>;
 export const deleteEntity = createAsyncThunk<DeleteProps, DeleteProps>(
   'entities/deleteEntity',
   async ({ entityName, id }) => {
@@ -78,7 +78,7 @@ export const deleteEntity = createAsyncThunk<DeleteProps, DeleteProps>(
     return { entityName, id };
   });
 
-export type CreateEntityApi = AsyncThunk<CreateProps, CreateProps, {}>;
+export type CreateEntityApi = AsyncThunk<CreateProps, CreateProps, any>;
 export const createEntity = createAsyncThunk<CreateProps, CreateProps>(
   'entities/createEntity',
   async ({ entityName, entity }) => {
@@ -86,7 +86,7 @@ export const createEntity = createAsyncThunk<CreateProps, CreateProps>(
     return { entityName, entity: result.data };
   });
 
-export type UpdateEntityApi = AsyncThunk<UpdateProps, UpdateProps, {}>;
+export type UpdateEntityApi = AsyncThunk<UpdateProps, UpdateProps, any>;
 export const updateEntity = createAsyncThunk<UpdateProps, UpdateProps>(
   'entities/editEntity',
   async ({ entityName, entity }) => {
@@ -96,7 +96,8 @@ export const updateEntity = createAsyncThunk<UpdateProps, UpdateProps>(
 
 
 export const selectAllEntities = (state: { entities: InitialState }) => state.entities.entities;
-export const selectDays = (state: { entities: InitialState }) => state.entities.entities.day as DayDTO[];
-export const selectLessonTimes = (state: { entities: InitialState }) => state.entities.entities.lessonTime as LessonTimeDTO[];
+export const selectDays = (state: { entities: InitialState }) => state.entities.entities.day.map((day => allEntitiesRelated.day.create(day as any))) as Day[];
+export const selectLessonTimes = (state: { entities: InitialState }) => state.entities.entities.lessonTime.map(lt => allEntitiesRelated.lessonTime.create(lt as any)) as LessonTime[];
+export const selectLessons = (state: { entities: InitialState }) => state.entities.entities.lesson.map(lesson => allEntitiesRelated.lesson.create(lesson as any)) as Lesson[];
 
 export default entitiesSlice.reducer;

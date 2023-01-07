@@ -8,6 +8,9 @@ import AdminPanel from "./pages/AdminPanel";
 import ScheduleEditGrid from './components/ScheduleEditGrid';
 import { Provider } from 'react-redux';
 import store from './app/store';
+import { fetchEntities } from './features/entities/entitiesSlice';
+
+store.dispatch(fetchEntities());
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(

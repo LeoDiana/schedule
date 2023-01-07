@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
 import { ENTITY_TITLES, FIELD_TITLES } from '../common/constants';
@@ -12,7 +12,6 @@ import Modal from '../components/Modal';
 import {
   createEntity,
   deleteEntity,
-  fetchEntities,
   selectAllEntities,
   updateEntity,
 } from '../features/entities/entitiesSlice';
@@ -26,15 +25,6 @@ function AdminPanel(): JSX.Element {
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
   const [selectedEntityId, setSelectedEntityId] = useState<number>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      dispatch(fetchEntities());
-    };
-
-    fetchData();
-  }, []);
-
 
   function onEntityTypeClick(entity: AllEntitiesNames) {
     return () => {
@@ -116,15 +106,13 @@ function AdminPanel(): JSX.Element {
                 entities[selectedEntityType].map((item) =>
                   (<tr key={item.id} className='h-10'>
                     {
-                      Object.keys(allEntitiesRelated[selectedEntityType].fields).map((fieldName) =>
-                      {
+                      Object.keys(allEntitiesRelated[selectedEntityType].fields).map((fieldName) => {
                         const field = item[fieldName as keyof typeof item];
                         return(
                         <td key={fieldName}>
                           {typeof field === 'object' ? getDisplayName(fieldName as AllEntitiesNames, field) : field}
                         </td>)
-                      }
-                      )
+                      })
                     }
                     <td>
                       <button
