@@ -5,17 +5,14 @@ import { LessonCard, ScheduleGrid } from '../pages/Schedule';
 import { ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { EditableLesson, FilterType } from '../common/types';
 import { Filters, useFilters } from './Filters';
-import EntityForm from './EntityForm';
+import { CreateModal, EditModal } from './EntityForm';
 import { useModal } from '../common/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  createEntity,
   selectAllEntities,
   selectDays,
   selectLessonTimes,
-  updateEntity,
 } from '../features/entities/entitiesSlice';
-import Modal from './Modal';
 
 function ScheduleEditGrid(): JSX.Element {
   const dispatch = useDispatch();
@@ -112,16 +109,16 @@ function ScheduleEditGrid(): JSX.Element {
       if (teachersLessonsAtThisPoint.length > 1) {
         const newCollisions = {};
         teachersLessonsAtThisPoint.forEach((lesson: any) =>
-          (newCollisions as any)[lesson.id] = teachersLessonsAtThisPoint
+          (newCollisions as any)[lesson.id] = teachersLessonsAtThisPoint,
         );
-        setCollisions((state) => ({...state, ...newCollisions}));
+        setCollisions((state) => ({ ...state, ...newCollisions }));
       }
       if (subgroupsLessonsAtThisPoint.length > 1) {
         const newCollisions = {};
         subgroupsLessonsAtThisPoint.forEach((lesson: any) =>
-          (newCollisions as any)[lesson.id] = subgroupsLessonsAtThisPoint
+          (newCollisions as any)[lesson.id] = subgroupsLessonsAtThisPoint,
         );
-        setCollisions((state) => ({...state, ...newCollisions}));
+        setCollisions((state) => ({ ...state, ...newCollisions }));
       }
     }
   }
@@ -187,16 +184,16 @@ function ScheduleEditGrid(): JSX.Element {
       if (teachersLessonsAtThisPoint.length > 1) {
         const newCollisions = {};
         teachersLessonsAtThisPoint.forEach((lesson: any) =>
-            (newCollisions as any)[lesson.id] = teachersLessonsAtThisPoint
+          (newCollisions as any)[lesson.id] = teachersLessonsAtThisPoint,
         );
-        setCollisions((state) => ({...state, ...newCollisions}));
+        setCollisions((state) => ({ ...state, ...newCollisions }));
       }
       if (subgroupsLessonsAtThisPoint.length > 1) {
         const newCollisions = {};
         subgroupsLessonsAtThisPoint.forEach((lesson: any) =>
-          (newCollisions as any)[lesson.id] = subgroupsLessonsAtThisPoint
+          (newCollisions as any)[lesson.id] = subgroupsLessonsAtThisPoint,
         );
-        setCollisions((state) => ({...state, ...newCollisions}));
+        setCollisions((state) => ({ ...state, ...newCollisions }));
       }
     }
   }
@@ -204,28 +201,20 @@ function ScheduleEditGrid(): JSX.Element {
   return lessonTimes && days && allLessons ? (
     <>
       {isCreateFormOpen &&
-        <Modal close={closeCreateForm}>
-          <EntityForm<'create', Lesson>
-            apiFunc={createEntity}
-            entity={{ ...allEntitiesRelated.lesson.createEmpty(), [selectedType]: selectedItem, ...positionInSchedule }}
-            fields={allEntitiesRelated.lesson.fields}
-            name='lesson'
-            allEntities={entities}
-            formType='create'
-          />
-        </Modal>
+        <CreateModal
+          onClose={closeCreateForm}
+          entityType='lesson'
+          entity={{
+            ...allEntitiesRelated.lesson.createEmpty(),
+            [selectedType]: selectedItem, ...positionInSchedule,
+          }} />
       }
       {selectedLesson && isEditFormOpen &&
-        <Modal close={closeEditForm}>
-          <EntityForm<'update', Lesson>
-            apiFunc={updateEntity}
-            fields={allEntitiesRelated.lesson.fields}
-            name='lesson'
-            allEntities={entities}
-            entity={selectedLesson as any}
-            formType='update'
-          />
-        </Modal>
+        <EditModal
+          onClose={closeEditForm}
+          entityType='lesson'
+          entity={selectedLesson}
+        />
       }
       <div className='flex'>
         <div className='flex-grow'>
@@ -318,7 +307,7 @@ function ScheduleEditGrid(): JSX.Element {
                         filterType={selectedType}
                         isSelected={selectedLesson?.id === lesson.id}
                       />
-                      { conflictedModal && conflictedModal.id === lesson.id &&
+                      {conflictedModal && conflictedModal.id === lesson.id &&
                         <div className='flex gap-2 absolute z-2 -top-32 opacity-75'>
                           {
                             (collisions as any)[lesson.id].map((l: any, i: number) => (

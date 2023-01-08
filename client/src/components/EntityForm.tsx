@@ -2,21 +2,26 @@ import React, { useState } from 'react';
 import { ENTITY_TITLES } from '../common/constants';
 import {
   AllEntities,
-  AllEntitiesItems,
   AllEntitiesNames, CreationTypeOf,
-  DtoOfEntity, EmptyEntityOf,
+  DtoOfEntity, EmptyEntityOf, EntitiesNamesToTypes,
 } from '../common/types';
-import { EntityRelated } from '../entities/entitiesRelated';
+import { allEntitiesRelated, EntityRelated } from '../entities/entitiesRelated';
 import NumberInput from './inputs/NumberInput';
 import TextInput from './inputs/TextInput';
 import DropdownInput from './inputs/DropdownInput';
-import { useDispatch } from 'react-redux';
-import { CreateEntityApi, UpdateEntityApi } from '../features/entities/entitiesSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  createEntity,
+  CreateEntityApi,
+  selectAllEntities,
+  updateEntity,
+  UpdateEntityApi,
+} from '../features/entities/entitiesSlice';
+import Modal from './Modal';
 
 interface BaseFormProps<T extends AllEntities> {
   name: AllEntitiesNames
   fields: EntityRelated<T>['fields'],
-  allEntities: AllEntitiesItems,
   formType: FormType,
 }
 
@@ -40,16 +45,16 @@ function EntityForm<T extends FormType, E extends AllEntities>({
                                                                  apiFunc,
                                                                  entity,
                                                                  name,
-                                                                 allEntities,
                                                                  formType,
                                                                }: EntityFormType<T, E>): JSX.Element {
   const dispatch = useDispatch();
+  const allEntities = useSelector(selectAllEntities);
 
   const [values, setValues] = useState<CreationTypeOf<E> | DtoOfEntity<E>>(entity);
   const [showNotification, setShowNotification] = useState(false);
 
   async function handleSubmit(): Promise<void> {
-    dispatch(apiFunc({entityName: name, entity: values as any}))
+    dispatch(apiFunc({ entityName: name, entity: values as any }));
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 3 * 1000);
   }
@@ -116,4 +121,39 @@ function SuccessfulNotification(): JSX.Element {
   );
 }
 
+interface FormModalProps {
+  onClose: () => void,
+  entityType: AllEntitiesNames,
+  entity: any
+}
+
+export function CreateModal({ onClose, entityType, entity }: FormModalProps) {
+  return (
+    <Modal close={onClose}>
+      <EntityForm<'create', EntitiesNamesToTypes[typeof entityType]>
+        apiFunc={createEntity}
+        entity={entity}
+        fields={allEntitiesRelated[entityType].fields}
+        name={entityType}
+        formType='create'
+      />
+    </Modal>
+  );
+}
+
+export function EditModal({onClose, entityType, entity}: FormModalProps) {
+  return (
+    <Modal close={onClose}>
+      <EntityForm<'update', EntitiesNamesToTypes[typeof entityType]>
+        apiFunc={updateEntity}
+        fields={allEntitiesRelated[entityType].fields}
+        name={entityType}
+        entity={entity}
+        formType='update'
+      />
+    </Modal>
+  );
+}
+
 export default EntityForm;
+

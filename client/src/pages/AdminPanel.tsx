@@ -4,16 +4,12 @@ import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated'
 import { ENTITY_TITLES, FIELD_TITLES } from '../common/constants';
 import {
   AllEntitiesNames,
-  EntitiesNamesToTypes,
 } from '../common/types';
 import { useModal } from '../common/hooks';
-import EntityForm from '../components/EntityForm';
-import Modal from '../components/Modal';
+import { CreateModal, EditModal } from '../components/EntityForm';
 import {
-  createEntity,
   deleteEntity,
   selectAllEntities,
-  updateEntity,
 } from '../features/entities/entitiesSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -43,32 +39,19 @@ function AdminPanel(): JSX.Element {
   return (
     <>
       {isCreateFormOpen &&
-        <Modal close={closeCreateForm}>
-          <EntityForm<'create', EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiFunc={createEntity}
-            entity={allEntitiesRelated[selectedEntityType].createEmpty()}
-            fields={allEntitiesRelated[selectedEntityType].fields}
-            name={selectedEntityType}
-            allEntities={entities}
-            formType='create'
-          />
-        </Modal>
+        <CreateModal onClose={closeCreateForm}
+                     entityType={selectedEntityType}
+                     entity={allEntitiesRelated[selectedEntityType].createEmpty()} />
       }
 
       {isEditFormOpen && selectedEntityId &&
-        <Modal close={() => {
-          setSelectedEntityId(undefined);
-          closeEditForm();
-        }}>
-          <EntityForm<'update', EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiFunc={updateEntity}
-            fields={allEntitiesRelated[selectedEntityType].fields}
-            name={selectedEntityType}
-            allEntities={entities}
-            entity={entities[selectedEntityType].find((item) => item.id === selectedEntityId) as any}
-            formType='update'
-          />
-        </Modal>
+        <EditModal
+          onClose={() => {
+            setSelectedEntityId(undefined);
+            closeEditForm();
+          }}
+          entityType={selectedEntityType}
+          entity={entities[selectedEntityType].find((item) => item.id === selectedEntityId) as any} />
       }
 
       <div className='m-5 flex gap-4'>
@@ -108,10 +91,10 @@ function AdminPanel(): JSX.Element {
                     {
                       Object.keys(allEntitiesRelated[selectedEntityType].fields).map((fieldName) => {
                         const field = item[fieldName as keyof typeof item];
-                        return(
-                        <td key={fieldName}>
-                          {typeof field === 'object' ? getDisplayName(fieldName as AllEntitiesNames, field) : field}
-                        </td>)
+                        return (
+                          <td key={fieldName}>
+                            {typeof field === 'object' ? getDisplayName(fieldName as AllEntitiesNames, field) : field}
+                          </td>);
                       })
                     }
                     <td>
@@ -129,10 +112,10 @@ function AdminPanel(): JSX.Element {
                     </td>
                   </tr>),
                 ) : <tr className='text-lg mt-4 font-bold'>
-                      <td colSpan={fieldsCount(selectedEntityType)}>
-                        Тут ще нічого немає
-                      </td>
-                    </tr>
+                  <td colSpan={fieldsCount(selectedEntityType)}>
+                    Тут ще нічого немає
+                  </td>
+                </tr>
             }
             </tbody>
           </table>
