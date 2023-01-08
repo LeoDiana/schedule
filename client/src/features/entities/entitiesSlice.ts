@@ -1,7 +1,7 @@
 import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allEntitiesRelated } from '../../entities/entitiesRelated';
 import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes } from '../../common/types';
-import { Day, Lesson, LessonTime } from '../../entities/entitiesClasses';
+import { Day, Lesson, LessonTime, Subgroup, Teacher } from '../../entities/entitiesClasses';
 
 interface CreateProps {
   entityName: AllEntitiesNames,
@@ -98,6 +98,8 @@ export const updateEntity = createAsyncThunk<UpdateProps, UpdateProps>(
 export const selectAllEntities = (state: { entities: InitialState }) => state.entities.entities;
 export const selectDays = (state: { entities: InitialState }) => state.entities.entities.day.map((day => allEntitiesRelated.day.create(day as any))) as Day[];
 export const selectLessonTimes = (state: { entities: InitialState }) => state.entities.entities.lessonTime.map(lt => allEntitiesRelated.lessonTime.create(lt as any)) as LessonTime[];
+export const selectSubgroup = (state: { entities: InitialState }) => state.entities.entities.subgroup.map(subgroup => allEntitiesRelated.subgroup.create(subgroup as any)) as Subgroup[];
+export const selectTeacher = (state: { entities: InitialState }) => state.entities.entities.teacher.map(teacher => allEntitiesRelated.teacher.create(teacher as any)) as Teacher[];
 export const selectLessons = (state: { entities: InitialState }) => state.entities.entities.lesson.map(lesson => allEntitiesRelated.lesson.create(lesson as any)) as Lesson[];
 
 export default entitiesSlice.reducer;

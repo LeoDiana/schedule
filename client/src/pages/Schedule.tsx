@@ -61,13 +61,10 @@ function Schedule({filter, filteredEntity}: Props): JSX.Element {
   const [lessons, setLessons] = useState<Lesson[]>();
 
   useEffect(() => {
-    const fetchData = async () => {
-      // setLessons(await allEntitiesRelated.lesson.api.readAll());
-
+    (async () => {
       setLessons(await readLessonsWithFilter(filteredEntity.id, filter));
-    };
+    })();
 
-    fetchData();
   }, [filter, filteredEntity]);
 
 

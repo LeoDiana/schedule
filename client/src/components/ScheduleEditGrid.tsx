@@ -9,9 +9,10 @@ import { CreateModal, EditModal } from './EntityForm';
 import { useModal } from '../common/hooks';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  deleteEntity,
   selectAllEntities,
   selectDays,
-  selectLessonTimes,
+  selectLessonTimes, updateEntity,
 } from '../features/entities/entitiesSlice';
 
 function ScheduleEditGrid(): JSX.Element {
@@ -233,35 +234,25 @@ function ScheduleEditGrid(): JSX.Element {
                     for (const day of days) {
                       for (const lessonTime of lessonTimes) {
                         cells.push(
-                          <div key={`${day.id}-${lessonTime.id}`} className='group'
-                               style={{ gridRowStart: lessonTime.id + 1, gridColumnStart: day.id + 1 }}
-                               onDragEnter={(e) => {
-                                 e.preventDefault();
-                               }}
-                               onDragOver={(e) => {
-                                 e.preventDefault();
-                               }}
-                               onDrop={() => {
-                                 if (draggedLesson) {
-                                   const newLesson = { ...draggedLesson, lessonTime: lessonTime, day: day };
-                                   setAllLessons((lessons) => {
-                                     return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
-                                       newLesson] as Lesson[];
-                                   });
-                                   changeTable(draggedLesson, newLesson);
-                                 }
-                               }}
-                          >
-                            <div
-                              className='invisible h-full border-4 flex justify-center border-gray-400 border-dashed rounded-xl group-hover:visible'
-                              onClick={() => {
-                                setPosition({ lessonTime: lessonTime, day: day });
-                                openCreateForm();
-                              }}
-                            >
-                              <PlusIcon className='w-12 stroke-2 text-gray-400' />
-                            </div>
-                          </div>,
+                          <EmptyCell
+                            key={`${day.id}-${lessonTime.id}`}
+                            day={day}
+                            lessonTime={lessonTime}
+                            onDrop={() => {
+                              if (draggedLesson) {
+                                const newLesson = { ...draggedLesson, lessonTime: lessonTime, day: day };
+                                setAllLessons((lessons) => {
+                                  return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
+                                    newLesson] as Lesson[];
+                                });
+                                changeTable(draggedLesson, newLesson);
+                              }
+                            }}
+                            onClick={() => {
+                              setPosition({ lessonTime: lessonTime, day: day });
+                              openCreateForm();
+                            }}
+                          />
                         );
                       }
                     }
@@ -348,7 +339,7 @@ function ScheduleEditGrid(): JSX.Element {
             className='p-2 rounded-lg border-2 border-rose-500 text-rose-500 font-semibold mb-2'
             onClick={async () => {
               if (selectedLesson) {
-                await allEntitiesRelated.lesson.api.delete(selectedLesson.id);
+                dispatch(deleteEntity({ entityName: 'lesson', id: selectedLesson.id }));
                 const filtered = allLessons.filter((item) => item.id !== selectedLesson.id);
                 changeTable(selectedLesson);
                 setAllLessons(filtered);
@@ -370,7 +361,7 @@ function ScheduleEditGrid(): JSX.Element {
           <button
             className='p-2 rounded-lg border-2 border-blue-500 text-blue-500 font-semibold mb-2'
             onClick={() => {
-              allLessons.forEach(l => allEntitiesRelated.lesson.api.update(l as any));
+              allLessons.forEach(lesson => dispatch(updateEntity({entityName: 'lesson', entity: lesson})));
             }}
           >
             <ArrowDownTrayIcon className='w-5 inline stroke-2' /> Save all changes
@@ -402,12 +393,40 @@ function ScheduleEditGrid(): JSX.Element {
                 </div>,
               ) : <div className='pt-5 text-center text-gray-400'>DROP LESSONS HERE</div>);
             })()
-
           }
         </div>
       </div>
     </>
   ) : <div>Loading...</div>;
+}
+
+interface EmptyCellProps {
+  lessonTime: LessonTime,
+  day: Day,
+  onDrop: () => void,
+  onClick: () => void,
+}
+
+function EmptyCell ({lessonTime, day, onDrop, onClick}: EmptyCellProps) {
+  return (
+    <div className='group'
+         style={{ gridRowStart: lessonTime.id + 1, gridColumnStart: day.id + 1 }}
+         onDragEnter={(e) => {
+           e.preventDefault();
+         }}
+         onDragOver={(e) => {
+           e.preventDefault();
+         }}
+         onDrop={onDrop}
+    >
+      <div
+        className='invisible h-full border-4 flex justify-center border-gray-400 border-dashed rounded-xl group-hover:visible'
+        onClick={onClick}
+      >
+        <PlusIcon className='w-12 stroke-2 text-gray-400' />
+      </div>
+    </div>
+  );
 }
 
 export default ScheduleEditGrid;
