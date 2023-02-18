@@ -53,24 +53,26 @@ export function TimeCell({number, time}: TimeCellsProps): JSX.Element {
 interface Props {
   filter: any,
   filteredEntity: any,
+  weekType: any,
 }
 
-function Schedule({filter, filteredEntity}: Props): JSX.Element {
+function Schedule({filter, filteredEntity, weekType}: Props): JSX.Element {
   const lessonTimes = useSelector(selectLessonTimes);
   const days = useSelector(selectDays);
   const [lessons, setLessons] = useState<Lesson[]>();
 
   useEffect(() => {
     (async () => {
-      setLessons(await readLessonsWithFilter(filteredEntity.id, filter));
+      const ls = await readLessonsWithFilter(filteredEntity.id, filter);
+      setLessons(ls.filter((l: { weekType: any; }) => l.weekType.id === weekType.id));
     })();
 
-  }, [filter, filteredEntity]);
+  }, [filter, filteredEntity, weekType]);
 
 
   return lessonTimes && days && lessons ? (
     <div className='m-5'>
-      <h3 className='text-3xl text-center pb-6 font-bold'>{getDisplayName(filter, filteredEntity)}</h3>
+      <h3 className='text-3xl text-center pb-6 font-bold'>{getDisplayName(filter, filteredEntity)} {getDisplayName('weekType', weekType)}</h3>
       <ScheduleGrid lessonTimes={lessonTimes} days={days}>
         {lessons.filter(lesson => lesson.lessonTime && lesson.day).map((lesson) => (
           <div key={lesson.id}

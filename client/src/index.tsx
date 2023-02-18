@@ -16,13 +16,7 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App/>}/>
-        <Route path="admin-panel" element={<AdminPanel/>}/>
-        <Route path="edit-schedule" element={<ScheduleEditGrid/>}/>
-      </Routes>
-    </BrowserRouter>
+      <App />
     </Provider>
   </React.StrictMode>,
 );

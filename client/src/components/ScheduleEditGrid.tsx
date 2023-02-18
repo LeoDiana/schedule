@@ -17,7 +17,7 @@ import {
 
 function ScheduleEditGrid(): JSX.Element {
   const dispatch = useDispatch();
-  const entities = useSelector(selectAllEntities);
+  const allEntities = useSelector(selectAllEntities);
   const lessonTimes = useSelector(selectLessonTimes);
   const days = useSelector(selectDays);
 
@@ -31,7 +31,9 @@ function ScheduleEditGrid(): JSX.Element {
   const [collisions, setCollisions] = useState({});
 
   const [types, selectedType, setType,
-    items, selectedItem, setEntity] = useFilters();
+    entities, selectedEntity, setEntity,
+    weekTypes, selectedWeekType, setWeekType
+  ] = useFilters();
 
   const [selectedLesson, setSelectedLesson] = useState<EditableLesson>();
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
@@ -42,9 +44,9 @@ function ScheduleEditGrid(): JSX.Element {
 
   useEffect(() => {
     const fetchData = async () => {
-      const allLessons = entities.lesson;
+      const allLessons = allEntities.lesson;
 
-      setAllLessons(allLessons);
+      await setAllLessons(allLessons);
 
       const emptyCollisions = {};
       allLessons.forEach(lesson => (emptyCollisions as any)[lesson.id] = []);
@@ -52,10 +54,10 @@ function ScheduleEditGrid(): JSX.Element {
 
       const chT = buildTablesForChecking(
         allLessons,
-        entities.teacher as Teacher[],
-        entities.subgroup as Subgroup[],
-        entities.day as Day[],
-        entities.lessonTime as LessonTime[]);
+        allEntities.teacher as Teacher[],
+        allEntities.subgroup as Subgroup[],
+        allEntities.day as Day[],
+        allEntities.lessonTime as LessonTime[]);
       allLessons.forEach(lesson => changeTable2(lesson, lesson, chT));
       checkingTablesRef.current = chT;
     };
@@ -99,7 +101,7 @@ function ScheduleEditGrid(): JSX.Element {
     }
 
     if (movedLesson && movedLesson.lessonTime && movedLesson.day) {
-      console.log(movedLesson);
+      // console.log(movedLesson);
       // move to new collisions
       const teachersLessonsAtThisPoint = checkingTables.teacher[movedLesson.teacher.id][movedLesson.lessonTime.id][movedLesson.day.id];
       const subgroupsLessonsAtThisPoint = checkingTables.subgroup[movedLesson.subgroup.id][movedLesson.lessonTime.id][movedLesson.day.id];
@@ -174,7 +176,7 @@ function ScheduleEditGrid(): JSX.Element {
     }
 
     if (movedLesson && movedLesson.lessonTime && movedLesson.day) {
-      console.log(movedLesson);
+      // console.log(movedLesson);
       // move to new collisions
       const teachersLessonsAtThisPoint = checkingTables.teacher[movedLesson.teacher.id][movedLesson.lessonTime.id][movedLesson.day.id];
       const subgroupsLessonsAtThisPoint = checkingTables.subgroup[movedLesson.subgroup.id][movedLesson.lessonTime.id][movedLesson.day.id];
@@ -199,7 +201,11 @@ function ScheduleEditGrid(): JSX.Element {
     }
   }
 
-  return lessonTimes && days && allLessons ? (
+  function getFilteredLessons () {
+    return filterLessonsBy(selectedType, selectedEntity).filter((l: any) => l.weekType.id === selectedWeekType.id).filter(hasPositionInSchedule);
+  }
+
+  return lessonTimes && days && allLessons && Object.keys(collisions).length ? (
     <>
       {isCreateFormOpen &&
         <CreateModal
@@ -207,7 +213,7 @@ function ScheduleEditGrid(): JSX.Element {
           entityType='lesson'
           entity={{
             ...allEntitiesRelated.lesson.createEmpty(),
-            [selectedType]: selectedItem, ...positionInSchedule,
+            [selectedType]: selectedEntity, ...positionInSchedule,
           }} />
       }
       {selectedLesson && isEditFormOpen &&
@@ -221,11 +227,11 @@ function ScheduleEditGrid(): JSX.Element {
         <div className='flex-grow'>
           <Filters
             types={types} selectedType={selectedType}
-            setType={setType} entities={items}
-            selectedEntity={selectedItem} setEntity={setEntity}
-          />
+            setType={setType} entities={entities}
+            selectedEntity={selectedEntity} setEntity={setEntity}
+            selectedWeekType={selectedWeekType} setWeekType={setWeekType} weekTypes={weekTypes}/>
           <div className='m-5'>
-            <h3 className='text-3xl text-center pb-6 font-bold'>{getDisplayName(selectedType, selectedItem)}</h3>
+            <h3 className='text-3xl text-center pb-6 font-bold'>{getDisplayName(selectedType, selectedEntity)}</h3>
             <ScheduleGrid lessonTimes={lessonTimes} days={days}>
               <>
                 {
@@ -260,7 +266,7 @@ function ScheduleEditGrid(): JSX.Element {
                   })()
                 }
                 {
-                  filterLessonsBy(selectedType, selectedItem).filter(hasPositionInSchedule).map((lesson, index) => (
+                  getFilteredLessons().map((lesson, index) => (
                     <div key={index}
                          style={{ gridRowStart: lesson!.lessonTime!.id + 1, gridColumnStart: lesson!.day!.id + 1 }}
                          draggable
@@ -284,13 +290,13 @@ function ScheduleEditGrid(): JSX.Element {
                              onMouseLeave={() => setConflictedModal(undefined)}
                         ></div>
                       }
-                      {checkingTables[selectedType][selectedItem.id][lesson!.lessonTime!.id][lesson!.day!.id].length > 1 &&
+                      {checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length > 1 &&
                         <div
                           className='bg-rose-700 rounded-full w-6 h-6 absolute z-2 -right-2 -top-2  text-white font-bold text-xs pl-2 pt-1'
                           onMouseOver={() => setConflictedModal(lesson)}
                           onMouseLeave={() => setConflictedModal(undefined)}
                         >
-                          {checkingTables[selectedType][selectedItem.id][lesson!.lessonTime!.id][lesson!.day!.id].length}
+                          {checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length}
                         </div>
                       }
                       <LessonCard
@@ -368,7 +374,7 @@ function ScheduleEditGrid(): JSX.Element {
           </button>
           {
             (() => {
-              const lessonsNotOnSchedule = filterLessonsBy(selectedType, selectedItem).filter((lesson) => !hasPositionInSchedule(lesson));
+              const lessonsNotOnSchedule = filterLessonsBy(selectedType, selectedEntity).filter((lesson) => !hasPositionInSchedule(lesson));
               return (lessonsNotOnSchedule.length ? lessonsNotOnSchedule.map((lesson, index) =>
                 <div
                   draggable
