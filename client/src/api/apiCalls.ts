@@ -18,10 +18,10 @@ const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
 };
 
 export type ApiMethods<T extends AllEntities> = {
-  create: (obj: Omit<DtoOfEntity<T>, 'id'>) => Promise<void>;
-  update: (obj: DtoOfEntity<T>) => Promise<void>;
+  create: (obj: Omit<DtoOfEntity<T>, 'id'>) => Promise<any>;
+  update: (obj: DtoOfEntity<T>) => Promise<any>;
   delete: (id: number) => void;
-  readAll: () => Promise<T[]>;
+  readAll: () => Promise<DtoOfEntity<T>[]>;
 };
 
 export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
@@ -61,10 +61,10 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
     }
   }
 
-  async readAll(): Promise<T[]> {
+  async readAll(): Promise<DtoOfEntity<T>[]> {
     try {
       const response = await axios.get(this.endpoint);
-      return (response.data as DtoOfEntity<T>[]).map(this.generateObject);
+      return response.data;
     } catch (error) {
       console.log(error);
       return [];

@@ -1,48 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { allEntitiesRelated } from '../entities/entitiesRelated';
+import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
 import { ENTITY_TITLES, FIELD_TITLES } from '../common/constants';
 import {
-  AllEntitiesItems,
   AllEntitiesNames,
-  EntitiesNamesToTypes,
 } from '../common/types';
 import { useModal } from '../common/hooks';
-import EntityForm from '../components/EntityForm';
+import { CreateModal, EditModal } from '../components/EntityForm';
+import {
+  deleteEntity,
+  selectAllEntities,
+} from '../features/entities/entitiesSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 function AdminPanel(): JSX.Element {
+  const dispatch = useDispatch();
+  const entities = useSelector(selectAllEntities);
+
   const [selectedEntityType, setSelectedEntityType] = useState<AllEntitiesNames>('academicStatus');
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
-  const [entities, setEntities] = useState<AllEntitiesItems>({
-    academicStatus: [],
-    teacher: [],
-    lessonTime: [],
-    day: [],
-    lessonType: [],
-    subject: [],
-    group: [],
-    subgroup: [],
-    weekType: [],
-    building: [],
-    classroom: [],
-    lesson: [],
-  });
   const [selectedEntityId, setSelectedEntityId] = useState<number>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      let entity: keyof typeof allEntitiesRelated;
-      const fetched = {} as AllEntitiesItems;
-      for (entity in allEntitiesRelated) {
-        fetched[entity] = await allEntitiesRelated[entity].api.readAll();
-      }
-      setEntities(fetched);
-    };
-
-    fetchData();
-  }, []);
-
 
   function onEntityTypeClick(entity: AllEntitiesNames) {
     return () => {
@@ -51,30 +29,8 @@ function AdminPanel(): JSX.Element {
   }
 
   function handleDelete(id: number) {
-    (async () => {
-      await allEntitiesRelated[selectedEntityType].api.delete(id);
-      const filtered = entities[selectedEntityType].filter((item) => item.id !== id);
-      setEntities((ents) => ({ ...ents, [selectedEntityType]: filtered }));
-    })();
+    dispatch(deleteEntity({ entityName: selectedEntityType, id }));
   }
-
-  // function selectEntityFieldsItems(entity: AllEntitiesNames) {
-  //   // const selectedEntities = {} as any;
-  //   // const selectedEntities = {} as ArraysOfEntityFieldsOf<EntitiesNamesToTypes[typeof entity]>;
-  //   const selectedEntities = {} as {[K in keyof EntityFieldsOf<EntitiesNamesToTypes[typeof entity]>]: Array<any>};
-  //   // const selectedEntities = {} as ArraysOfEntityFieldsOf<Teacher>;
-  //   // const selectedEntities = {} as { academicStatus: AcademicStatus[] };
-  //
-  //   const entityFields = allEntitiesRelated[entity].fields;
-  //   for(const fieldName in entityFields){
-  //     if(entityFields[fieldName as keyof typeof entityFields] === 'entity'){
-  //       const fn = fieldName as AllEntitiesNames;
-  //       selectedEntities[fieldName as keyof typeof selectedEntities] = entities[fieldName as keyof typeof entities] as Array<EntitiesNamesToTypes[typeof fn]>;
-  //     }
-  //   }
-  //
-  //   return selectedEntities;
-  // }
 
   function fieldsCount(ent: AllEntitiesNames) {
     return Object.keys(allEntitiesRelated[ent].fields).length + 2;
@@ -82,43 +38,20 @@ function AdminPanel(): JSX.Element {
 
   return (
     <>
-      {isCreateFormOpen ?
-        <>
-          <div
-            onClick={closeCreateForm}
-            className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
-          {/* in Func need to wrap function to save it`s context */}
-          <EntityForm<'create', EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.create(params as any))}
-            entity={allEntitiesRelated[selectedEntityType].createEmpty()}
-            fields={allEntitiesRelated[selectedEntityType].fields}
-            name={selectedEntityType}
-            allEntities={entities}
-            formType='create'
-          />
-        </>
-        : null
+      {isCreateFormOpen &&
+        <CreateModal onClose={closeCreateForm}
+                     entityType={selectedEntityType}
+                     entity={allEntitiesRelated[selectedEntityType].createEmpty()} />
       }
 
-      {isEditFormOpen && selectedEntityId ?
-        <>
-          <div
-            onClick={() => {
-              setSelectedEntityId(undefined);
-              closeEditForm();
-            }}
-            className='fixed w-screen h-screen top-0 z-10 backdrop-blur bg-black/50'></div>
-          {/* in Func need to wrap function to save it`s context */}
-          <EntityForm<'update', EntitiesNamesToTypes[typeof selectedEntityType]>
-            apiFunc={((...params: any[]) => allEntitiesRelated[selectedEntityType].api.update(params as any)) as any}
-            fields={allEntitiesRelated[selectedEntityType].fields}
-            name={selectedEntityType}
-            allEntities={entities}
-            entity={entities[selectedEntityType].find((item) => item.id === selectedEntityId) as any}
-            formType='update'
-          />
-        </>
-        : null
+      {isEditFormOpen && selectedEntityId &&
+        <EditModal
+          onClose={() => {
+            setSelectedEntityId(undefined);
+            closeEditForm();
+          }}
+          entityType={selectedEntityType}
+          entity={entities[selectedEntityType].find((item) => item.id === selectedEntityId) as any} />
       }
 
       <div className='m-5 flex gap-4'>
@@ -156,15 +89,13 @@ function AdminPanel(): JSX.Element {
                 entities[selectedEntityType].map((item) =>
                   (<tr key={item.id} className='h-10'>
                     {
-                      Object.keys(allEntitiesRelated[selectedEntityType].fields).map((fieldName) =>
-                      {
+                      Object.keys(allEntitiesRelated[selectedEntityType].fields).map((fieldName) => {
                         const field = item[fieldName as keyof typeof item];
-                        return(
-                        <td key={fieldName}>
-                          {typeof field === 'object' ? (field as any).displayName : field}
-                        </td>)
-                      }
-                      )
+                        return (
+                          <td key={fieldName}>
+                            {typeof field === 'object' ? getDisplayName(fieldName as AllEntitiesNames, field) : field}
+                          </td>);
+                      })
                     }
                     <td>
                       <button
@@ -181,10 +112,10 @@ function AdminPanel(): JSX.Element {
                     </td>
                   </tr>),
                 ) : <tr className='text-lg mt-4 font-bold'>
-                      <td colSpan={fieldsCount(selectedEntityType)}>
-                        Тут ще нічого немає
-                      </td>
-                    </tr>
+                  <td colSpan={fieldsCount(selectedEntityType)}>
+                    Тут ще нічого немає
+                  </td>
+                </tr>
             }
             </tbody>
           </table>
