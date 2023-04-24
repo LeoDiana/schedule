@@ -32,7 +32,7 @@ function ScheduleEditGrid(): JSX.Element {
 
   const [types, selectedType, setType,
     entities, selectedEntity, setEntity,
-    weekTypes, selectedWeekType, setWeekType
+    weekTypes, selectedWeekType, setWeekType,
   ] = useFilters();
 
   const [selectedLesson, setSelectedLesson] = useState<EditableLesson>();
@@ -101,7 +101,6 @@ function ScheduleEditGrid(): JSX.Element {
     }
 
     if (movedLesson && movedLesson.lessonTime && movedLesson.day) {
-      // console.log(movedLesson);
       // move to new collisions
       const teachersLessonsAtThisPoint = checkingTables.teacher[movedLesson.teacher.id][movedLesson.lessonTime.id][movedLesson.day.id];
       const subgroupsLessonsAtThisPoint = checkingTables.subgroup[movedLesson.subgroup.id][movedLesson.lessonTime.id][movedLesson.day.id];
@@ -201,8 +200,72 @@ function ScheduleEditGrid(): JSX.Element {
     }
   }
 
-  function getFilteredLessons () {
+  function getFilteredLessons() {
     return filterLessonsBy(selectedType, selectedEntity).filter((l: any) => l.weekType.id === selectedWeekType.id).filter(hasPositionInSchedule);
+  }
+
+  function addEmptyCells() {
+    const cells = [];
+    for (const day of days) {
+      for (const lessonTime of lessonTimes) {
+        cells.push(
+          <EmptyCell
+            key={`${day.id}-${lessonTime.id}`}
+            day={day}
+            lessonTime={lessonTime}
+            onDrop={() => {
+              if (draggedLesson) {
+                const newLesson = { ...draggedLesson, lessonTime: lessonTime, day: day };
+                setAllLessons((lessons) => {
+                  return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
+                    newLesson] as Lesson[];
+                });
+                changeTable(draggedLesson, newLesson);
+              }
+            }}
+            onClick={() => {
+              setPosition({ lessonTime: lessonTime, day: day });
+              openCreateForm();
+            }}
+          />,
+        );
+      }
+    }
+    return cells;
+  }
+
+  function addCollisionLine(lesson: any) {
+    return ((collisions[lesson.id as keyof typeof collisions] as any).length > 0 &&
+      <div className='bg-rose-700 h-full w-2.5 absolute z-2 rounded-l-md'
+           onMouseOver={() => setConflictedModal(lesson)}
+           onMouseLeave={() => setConflictedModal(undefined)}
+      ></div>);
+  }
+
+  function addCollisionCircle(lesson: any) {
+    return (checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length > 1 &&
+      <div
+        className='bg-rose-700 rounded-full w-6 h-6 absolute z-2 -right-2 -top-2  text-white font-bold text-xs pl-2 pt-1'
+        onMouseOver={() => setConflictedModal(lesson)}
+        onMouseLeave={() => setConflictedModal(undefined)}
+      >
+        {checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length}
+      </div>);
+  }
+
+  function addConflictedModal(lesson: any) {
+    return (conflictedModal && conflictedModal.id === lesson.id &&
+      <div className='flex gap-2 absolute z-2 -top-32 opacity-75'>
+        {
+          (collisions as any)[lesson.id].map((l: any, i: number) => (
+            <LessonCard
+              key={i}
+              lesson={l as Lesson}
+              filterType={selectedType}
+            />
+          ))
+        }
+      </div>);
   }
 
   return lessonTimes && days && allLessons && Object.keys(collisions).length ? (
@@ -229,42 +292,12 @@ function ScheduleEditGrid(): JSX.Element {
             types={types} selectedType={selectedType}
             setType={setType} entities={entities}
             selectedEntity={selectedEntity} setEntity={setEntity}
-            selectedWeekType={selectedWeekType} setWeekType={setWeekType} weekTypes={weekTypes}/>
+            selectedWeekType={selectedWeekType} setWeekType={setWeekType} weekTypes={weekTypes} />
           <div className='m-5'>
             <h3 className='text-3xl text-center pb-6 font-bold'>{getDisplayName(selectedType, selectedEntity)}</h3>
             <ScheduleGrid lessonTimes={lessonTimes} days={days}>
               <>
-                {
-                  (() => {
-                    const cells = [];
-                    for (const day of days) {
-                      for (const lessonTime of lessonTimes) {
-                        cells.push(
-                          <EmptyCell
-                            key={`${day.id}-${lessonTime.id}`}
-                            day={day}
-                            lessonTime={lessonTime}
-                            onDrop={() => {
-                              if (draggedLesson) {
-                                const newLesson = { ...draggedLesson, lessonTime: lessonTime, day: day };
-                                setAllLessons((lessons) => {
-                                  return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
-                                    newLesson] as Lesson[];
-                                });
-                                changeTable(draggedLesson, newLesson);
-                              }
-                            }}
-                            onClick={() => {
-                              setPosition({ lessonTime: lessonTime, day: day });
-                              openCreateForm();
-                            }}
-                          />
-                        );
-                      }
-                    }
-                    return cells;
-                  })()
-                }
+                {addEmptyCells()}
                 {
                   getFilteredLessons().map((lesson, index) => (
                     <div key={index}
@@ -283,39 +316,14 @@ function ScheduleEditGrid(): JSX.Element {
                            }
                          }
                     >
-                      {
-                        (collisions[lesson.id as keyof typeof collisions] as any).length > 0 &&
-                        <div className='bg-rose-700 h-full w-2.5 absolute z-2 rounded-l-md'
-                             onMouseOver={() => setConflictedModal(lesson)}
-                             onMouseLeave={() => setConflictedModal(undefined)}
-                        ></div>
-                      }
-                      {checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length > 1 &&
-                        <div
-                          className='bg-rose-700 rounded-full w-6 h-6 absolute z-2 -right-2 -top-2  text-white font-bold text-xs pl-2 pt-1'
-                          onMouseOver={() => setConflictedModal(lesson)}
-                          onMouseLeave={() => setConflictedModal(undefined)}
-                        >
-                          {checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length}
-                        </div>
-                      }
+                      {addCollisionLine(lesson)}
+                      {addCollisionCircle(lesson)}
                       <LessonCard
                         lesson={lesson as Lesson}
                         filterType={selectedType}
                         isSelected={selectedLesson?.id === lesson.id}
                       />
-                      {conflictedModal && conflictedModal.id === lesson.id &&
-                        <div className='flex gap-2 absolute z-2 -top-32 opacity-75'>
-                          {
-                            (collisions as any)[lesson.id].map((l: any, i: number) => (
-                              <LessonCard
-                                key={i}
-                                lesson={l as Lesson}
-                                filterType={selectedType}
-                              />
-                            ))
-                          }
-                        </div>}
+                      {addConflictedModal(lesson)}
                     </div>
                   ))
                 }
@@ -367,7 +375,7 @@ function ScheduleEditGrid(): JSX.Element {
           <button
             className='p-2 rounded-lg border-2 border-blue-500 text-blue-500 font-semibold mb-2'
             onClick={() => {
-              allLessons.forEach(lesson => dispatch(updateEntity({entityName: 'lesson', entity: lesson})));
+              allLessons.forEach(lesson => dispatch(updateEntity({ entityName: 'lesson', entity: lesson })));
             }}
           >
             <ArrowDownTrayIcon className='w-5 inline stroke-2' /> Save all changes
@@ -413,7 +421,7 @@ interface EmptyCellProps {
   onClick: () => void,
 }
 
-function EmptyCell ({lessonTime, day, onDrop, onClick}: EmptyCellProps) {
+function EmptyCell({ lessonTime, day, onDrop, onClick }: EmptyCellProps) {
   return (
     <div className='group'
          style={{ gridRowStart: lessonTime.id + 1, gridColumnStart: day.id + 1 }}
