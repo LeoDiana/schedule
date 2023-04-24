@@ -267,7 +267,11 @@ function ScheduleEditGrid(): JSX.Element {
       </div>);
   }
 
-  return lessonTimes && days && allLessons && Object.keys(collisions).length ? (
+  if (!(lessonTimes && days && allLessons && Object.keys(collisions).length)) {
+    return <div>Loading...</div>;
+  }
+
+  return (
     <>
       {isCreateFormOpen &&
         <CreateModal
@@ -410,7 +414,7 @@ function ScheduleEditGrid(): JSX.Element {
         </div>
       </div>
     </>
-  ) : <div>Loading...</div>;
+  );
 }
 
 export default ScheduleEditGrid;
