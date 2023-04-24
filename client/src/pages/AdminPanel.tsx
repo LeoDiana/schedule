@@ -65,7 +65,7 @@ function AdminPanel(): JSX.Element {
             )}
           </div>
         </div>
-        <div className='w-full p-4 rounded-md bg-white drop-shadow-md mb-2'>
+        <div className='w-full p-4 rounded-md bg-white drop-shadow-md'>
           <div className='flex justify-between'>
             <h6 className='text-xl font-bold'>{ENTITY_TITLES[selectedEntityType as AllEntitiesNames]}</h6>
             <button onClick={openCreateForm}
