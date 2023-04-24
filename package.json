@@ -1,0 +1,22 @@
+{
+  "name": "schedule",
+  "version": "1.0.0",
+  "description": "App for better visualization of schedule in educational establishments with ability to save it in Google Calendar",
+  "main": "index.js",
+  "scripts": {
+    "client": "npm start --prefix client",
+    "server": "npm start --prefix server",
+    "start": "npm run server & npm run client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeoDiana/schedule.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LeoDiana/schedule/issues"
+  },
+  "homepage": "https://github.com/LeoDiana/schedule#readme"
+}
