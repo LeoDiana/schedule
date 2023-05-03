@@ -10,7 +10,7 @@ import {
 } from '../entities/entitiesClasses';
 import {
   AcademicStatusDTO, BuildingDTO, ClassroomDTO,
-  DayDTO, GroupDTO, LessonDTO,
+  DayDTO, GroupDTO, ID, LessonDTO,
   LessonTimeDTO,
   LessonTypeDTO, SubgroupDTO,
   SubjectDTO,
@@ -93,7 +93,7 @@ export type CreationTypeOf<T extends AllEntities> = ThisTypeAndUndefined<Omit<Dt
 
 export type FilterType = 'subgroup' | 'teacher';
 
-export type EditableLesson = Partial<LessonDTO> & {id: number};
+export type EditableLesson = Partial<LessonDTO> & {id: ID};
 
 // export type DtoOfEntityName<T extends AllEntitiesNames> = T extends 'academicStatus'
 //   ? AcademicStatusDTO

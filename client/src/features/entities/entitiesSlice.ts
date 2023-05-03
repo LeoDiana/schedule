@@ -2,6 +2,7 @@ import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@redux
 import { allEntitiesRelated } from '../../entities/entitiesRelated';
 import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes } from '../../common/types';
 import { Day, Lesson, LessonTime, Subgroup, Teacher, WeekType } from '../../entities/entitiesClasses';
+import { ID } from '../../entities/entitiesDTO';
 
 interface CreateProps {
   entityName: AllEntitiesNames,
@@ -10,12 +11,12 @@ interface CreateProps {
 
 interface UpdateProps {
   entityName: AllEntitiesNames,
-  entity: { id: number }
+  entity: { id: ID }
 }
 
 interface DeleteProps {
   entityName: AllEntitiesNames,
-  id: number
+  id: ID
 }
 
 interface InitialState {

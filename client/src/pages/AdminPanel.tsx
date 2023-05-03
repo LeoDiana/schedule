@@ -12,6 +12,7 @@ import {
   selectAllEntities,
 } from '../features/entities/entitiesSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { ID } from '../entities/entitiesDTO';
 
 function AdminPanel(): JSX.Element {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ function AdminPanel(): JSX.Element {
   const [selectedEntityType, setSelectedEntityType] = useState<AllEntitiesNames>('academicStatus');
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
-  const [selectedEntityId, setSelectedEntityId] = useState<number>();
+  const [selectedEntityId, setSelectedEntityId] = useState<ID>();
 
   function onEntityTypeClick(entity: AllEntitiesNames) {
     return () => {
@@ -28,7 +29,7 @@ function AdminPanel(): JSX.Element {
     };
   }
 
-  function handleDelete(id: number) {
+  function handleDelete(id: ID) {
     dispatch(deleteEntity({ entityName: selectedEntityType, id }));
   }
 

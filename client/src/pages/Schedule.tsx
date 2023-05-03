@@ -64,7 +64,7 @@ function Schedule({filter, filteredEntity, weekType}: Props): JSX.Element {
   useEffect(() => {
     (async () => {
       const ls = await readLessonsWithFilter(filteredEntity.id, filter);
-      setLessons(ls.filter((l: { weekType: any; }) => l.weekType.id === weekType.id));
+      setLessons(ls.filter((l) => l.weekType.id === weekType.id));
     })();
 
   }, [filter, filteredEntity, weekType]);
@@ -99,12 +99,12 @@ export function ScheduleGrid({lessonTimes, days, children}: ScheduleGridProps) {
    return(
      <div className='grid grid-cols-6 grid-rows-8 gap-2'>
       {lessonTimes.map((time) => (
-        <div key={time.number} style={{gridRowStart: time.id + 1, gridColumnStart: 1}}>
+        <div key={time.number} style={{gridRowStart: Number(time.id) + 1, gridColumnStart: 1}}>
           <TimeCell number={time.number} time={`${time.timeStart} - ${time.timeEnd}`} />
         </div>
       ))}
       {days.map((day) => (
-        <div key={day.name} style={{gridRowStart: 1, gridColumnStart: day.id + 1}}>
+        <div key={day.name} style={{gridRowStart: 1, gridColumnStart: Number(day.id) + 1}}>
           <p className='font-semibold text-center'>{day.name}</p>
         </div>
       ))}
