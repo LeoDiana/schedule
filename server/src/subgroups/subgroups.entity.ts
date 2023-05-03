@@ -18,7 +18,10 @@ export class Subgroup {
   @Column()
   studentsNumber: number;
 
-  @ManyToOne(() => Group, { eager: true })
-  @JoinColumn()
-  group: Group;
+  @Column()
+  startYear: number;
+
+  // @ManyToOne(() => Group, { eager: true })
+  // @JoinColumn()
+  // group: Group;
 }

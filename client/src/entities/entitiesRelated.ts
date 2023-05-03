@@ -1,7 +1,9 @@
 import {
-  AcademicStatus, Building, Classroom,
+  AcademicStatus,
+  Building,
+  Classroom,
   Day,
-  Group, Lesson,
+  Lesson,
   LessonTime,
   LessonType,
   Subgroup,
@@ -11,13 +13,17 @@ import {
 } from './entitiesClasses';
 import { ApiMethods, EntityApi } from '../api/apiCalls';
 import {
-  AcademicStatusDTO, BuildingDTO, ClassroomDTO,
-  DayDTO, GroupDTO, LessonDTO,
+  AcademicStatusDTO,
+  BuildingDTO,
+  ClassroomDTO,
+  DayDTO,
+  LessonDTO,
   LessonTimeDTO,
   LessonTypeDTO,
   SubgroupDTO,
   SubjectDTO,
-  TeacherDTO, WeekTypeDTO,
+  TeacherDTO,
+  WeekTypeDTO,
 } from './entitiesDTO';
 import {
   AllEntities,
@@ -96,9 +102,9 @@ export class LessonTimeRelated extends EntityRelated<LessonTime> {
     super();
     this.api = new EntityApi<LessonTime>('lessonTime', this.create);
     this.fields = {
-      number: "string",
-      timeStart: "string",
-      timeEnd: "string",
+      number: 'string',
+      timeStart: 'string',
+      timeEnd: 'string',
     };
   }
 
@@ -119,7 +125,7 @@ export class DayRelated extends EntityRelated<Day> {
     super();
     this.api = new EntityApi<Day>('day', this.create);
     this.fields = {
-      name: "string",
+      name: 'string',
     };
   }
 
@@ -198,31 +204,31 @@ export class WeekTypeRelated extends EntityRelated<WeekType> {
   }
 }
 
-export class GroupRelated extends EntityRelated<Group> {
-  api: ApiMethods<Group>;
-  fields: { [K in keyof Omit<GroupDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : GroupDTO[K] extends string ? 'string' : GroupDTO[K] extends number ? 'number' : never };
-
-  constructor() {
-    super();
-    this.api = new EntityApi<Group>('group', this.create);
-    this.fields = {
-      name: 'string',
-      startYear: 'number',
-    };
-  }
-
-  create(obj: GroupDTO): Group {
-    return new Group(obj);
-  }
-
-  createEmpty() {
-    return Group.createEmpty();
-  }
-}
+// export class GroupRelated extends EntityRelated<Group> {
+//   api: ApiMethods<Group>;
+//   fields: { [K in keyof Omit<GroupDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : GroupDTO[K] extends string ? 'string' : GroupDTO[K] extends number ? 'number' : never };
+//
+//   constructor() {
+//     super();
+//     this.api = new EntityApi<Group>('group', this.create);
+//     this.fields = {
+//       name: 'string',
+//       startYear: 'number',
+//     };
+//   }
+//
+//   create(obj: GroupDTO): Group {
+//     return new Group(obj);
+//   }
+//
+//   createEmpty() {
+//     return Group.createEmpty();
+//   }
+// }
 
 export class SubgroupRelated extends EntityRelated<Subgroup> {
   api: ApiMethods<Subgroup>;
-  fields: { [K in keyof Required<Omit<SubgroupDTO, 'id'>>]: FieldType};
+  fields: { [K in keyof Required<Omit<SubgroupDTO, 'id'>>]: FieldType };
 
   constructor() {
     super();
@@ -230,12 +236,12 @@ export class SubgroupRelated extends EntityRelated<Subgroup> {
     this.fields = {
       name: 'string',
       studentsNumber: 'number',
-      group: 'entity',
+      startYear: 'number'
     };
   }
 
   create(obj: SubgroupDTO): Subgroup {
-    return new Subgroup({ ...obj, group: new Group(obj.group) });
+    return new Subgroup(obj);
   }
 
   createEmpty() {
@@ -252,7 +258,7 @@ export class BuildingRelated extends EntityRelated<Building> {
     this.api = new EntityApi<Building>('building', this.create);
     this.fields = {
       name: 'string',
-      address: 'string'
+      address: 'string',
     };
   }
 
@@ -298,28 +304,31 @@ export class LessonRelated extends EntityRelated<Lesson> {
     super();
     this.api = new EntityApi<Lesson>('lesson', this.create);
     this.fields = {
-      teacher: "entity",
-      subject: "entity",
-      lessonType: "entity",
-      lessonTime: "entity",
-      classroom: "entity",
-      day: "entity",
-      weekType: "entity",
-      subgroup: "entity"
+      teacher: 'entity',
+      subject: 'entity',
+      lessonType: 'entity',
+      lessonTime: 'entity',
+      classroom: 'entity',
+      day: 'entity',
+      weekType: 'entity',
+      subgroup: 'entity',
     };
   }
 
   create(obj: LessonDTO): Lesson {
     return new Lesson({
       ...obj,
-      teacher: new Teacher({...obj.teacher, academicStatus: new AcademicStatus(obj.teacher.academicStatus)}),
+      teacher: new Teacher({ ...obj.teacher, academicStatus: new AcademicStatus(obj.teacher.academicStatus) }),
       subject: new Subject(obj.subject),
       lessonType: new LessonType(obj.lessonType),
       lessonTime: obj.lessonTime ? new LessonTime(obj.lessonTime) : undefined,
-      classroom: obj.classroom ? new Classroom({...obj.classroom, building: new Building(obj.classroom.building)}) : undefined,
+      classroom: obj.classroom ? new Classroom({
+        ...obj.classroom,
+        building: new Building(obj.classroom.building),
+      }) : undefined,
       day: obj.day ? new Day(obj.day) : undefined,
       weekType: new WeekType(obj.weekType),
-      subgroup: new Subgroup({...obj.subgroup, group: new Group(obj.subgroup.group)}),
+      subgroup: new Subgroup(obj.subgroup),
     });
   }
 
@@ -328,52 +337,40 @@ export class LessonRelated extends EntityRelated<Lesson> {
   }
 }
 
-//
-// export class OoORelated extends EntityRelated<OoO> {
-//   api: ApiMethods<OoO>;
-//   fields: { [K in keyof Omit<OoODTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : OoODTO[K] extends string ? 'string' : OoODTO[K] extends number ? 'number' : never };
-//
-//   constructor() {
-//     super();
-//     this.api = new EntityApi<OoO>('ooO', this.create);
-//     this.fields = {
-//       name: 'string',
-//       shortName: 'string',
-//     };
-//   }
-//
-//   create(obj: OoODTO): OoO {
-//     return new OoO(obj);
-//   }
-//
-//   createEmpty() {
-//     return OoO.createEmpty();
-//   }
-// }
-
-
 export const getDisplayName = (entityName: AllEntitiesNames, obj: any): string => {
   try {
     switch (entityName) {
-      case 'academicStatus': return `${obj.shortName}.`;
-      case 'teacher': return `${obj.surname} ${obj.firstName[0]}.${obj.patronymic[0]}.`;
-      case 'lessonTime': return `${obj.number} ${obj.timeStart}-${obj.timeEnd}`;
-      case 'day': return obj.name;
-      case 'subject': return obj.shortName;
-      case 'lessonType': return obj.shortName;
-      case 'weekType': return obj.name;
-      case 'group': return obj.name;
-      case 'subgroup': return `${getDisplayName('group', obj.group)} ${obj.name ? obj.name : ''}`;
-      case 'building': return obj.name;
-      case 'classroom': return `${obj.number} ${getDisplayName('building', obj.building)}`;
-      case 'lesson': return `${getDisplayName('day', obj.day)} ${getDisplayName('lessonTime', obj.lessonTime)} ${getDisplayName('weekType', obj.weekType)} ${getDisplayName('subject', obj.subject)} ${getDisplayName('teacher', obj.teacher)} ${getDisplayName('subgroup', obj.subgroup)}`
-      default: return '';
+      case 'academicStatus':
+        return `${obj.shortName}.`;
+      case 'teacher':
+        return `${obj.surname} ${obj.firstName[0]}.${obj.patronymic[0]}.`;
+      case 'lessonTime':
+        return `${obj.number} ${obj.timeStart}-${obj.timeEnd}`;
+      case 'day':
+        return obj.name;
+      case 'subject':
+        return obj.shortName;
+      case 'lessonType':
+        return obj.shortName;
+      case 'weekType':
+        return obj.name;
+      // case 'group': return obj.name;
+      case 'subgroup':
+        return obj.name;
+      case 'building':
+        return obj.name;
+      case 'classroom':
+        return `${obj.number} ${getDisplayName('building', obj.building)}`;
+      case 'lesson':
+        return `${getDisplayName('day', obj.day)} ${getDisplayName('lessonTime', obj.lessonTime)} ${getDisplayName('weekType', obj.weekType)} ${getDisplayName('subject', obj.subject)} ${getDisplayName('teacher', obj.teacher)} ${getDisplayName('subgroup', obj.subgroup)}`;
+      default:
+        return '';
     }
   } catch (err) {
     console.log('Current object does not have proper fields');
     return '';
   }
-}
+};
 
 
 export const allEntitiesRelated: { [K in AllEntitiesNames]: EntityRelated<EntitiesNamesToTypes[K]> } = {
@@ -384,7 +381,6 @@ export const allEntitiesRelated: { [K in AllEntitiesNames]: EntityRelated<Entiti
   subject: new SubjectRelated(),
   lessonType: new LessonTypeRelated(),
   weekType: new WeekTypeRelated(),
-  group: new GroupRelated(),
   subgroup: new SubgroupRelated(),
   building: new BuildingRelated(),
   classroom: new ClassroomRelated(),

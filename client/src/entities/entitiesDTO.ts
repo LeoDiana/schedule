@@ -43,16 +43,10 @@ export interface WeekTypeDTO {
   name: string;
 }
 
-export interface GroupDTO {
+export interface SubgroupDTO {
   id: ID;
   name: string;
   startYear: number;
-}
-
-export interface SubgroupDTO {
-  id: ID;
-  name?: string;
-  group: GroupDTO;
   studentsNumber: number;
 }
 

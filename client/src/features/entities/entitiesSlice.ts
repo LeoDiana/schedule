@@ -35,7 +35,6 @@ const initialState: InitialState = {
     day: [],
     lessonType: [],
     subject: [],
-    group: [],
     subgroup: [],
     weekType: [],
     building: [],

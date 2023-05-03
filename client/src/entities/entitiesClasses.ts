@@ -1,7 +1,7 @@
 import { ConstructorFor, EmptyEntityOf } from '../common/types';
 import {
   AcademicStatusDTO, BuildingDTO, ClassroomDTO,
-  DayDTO, GroupDTO, ID, LessonDTO,
+  DayDTO, ID, LessonDTO,
   LessonTimeDTO,
   LessonTypeDTO,
   SubgroupDTO,
@@ -185,46 +185,21 @@ export class WeekType implements ConstructorFor<WeekTypeDTO>, Entity {
   }
 }
 
-export class Group implements ConstructorFor<GroupDTO>, Entity {
+export class Subgroup implements ConstructorFor<SubgroupDTO>, Entity {
   id: ID;
   name: string;
   startYear: number;
+  studentsNumber: number;
 
   public get displayName(): string {
     return this.name;
   }
 
-  constructor(obj: ConstructorFor<GroupDTO>) {
-    const { name, startYear, id } = obj;
-    this.name = name;
-    this.startYear = startYear;
-    this.id = id;
-  }
-
-  static createEmpty(): EmptyEntityOf<Group> {
-    return {
-      name: undefined,
-      startYear: undefined,
-    };
-  }
-}
-
-
-export class Subgroup implements ConstructorFor<SubgroupDTO>, Entity {
-  id: ID;
-  name?: string;
-  group: Group;
-  studentsNumber: number;
-
-  public get displayName(): string {
-    return `${this.group.displayName} ${this.name ? this.name : ''}`;
-  }
-
   constructor(obj: ConstructorFor<SubgroupDTO>) {
-    const { name, group, studentsNumber, id } = obj;
-    this.name = name || undefined;
+    const { name, startYear, studentsNumber, id } = obj;
+    this.name = name;
     this.studentsNumber = studentsNumber;
-    this.group = group;
+    this.startYear = startYear;
     this.id = id;
   }
 
@@ -232,7 +207,7 @@ export class Subgroup implements ConstructorFor<SubgroupDTO>, Entity {
     return {
       name: undefined,
       studentsNumber: undefined,
-      group: undefined,
+      startYear: undefined,
     };
   }
 }

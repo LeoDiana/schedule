@@ -12,7 +12,6 @@ const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
   subject: 'subjects',
   weekType: 'week-types',
   subgroup: 'subgroups',
-  group: 'groups',
   building: 'buildings',
   classroom: 'classrooms',
   lesson: 'lessons',
