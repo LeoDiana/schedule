@@ -10,6 +10,8 @@ type TableNames = 'groups' | 'teachers' | 'classrooms';
 
 export type ScheduleTables = Map<TableNames, ScheduleTable>;
 
+export type CollisionMark = 'conflict' | 'ok';
+
 export type Collision = {
   filter: {
     tableName: TableNames,
@@ -19,7 +21,7 @@ export type Collision = {
     lessonTime: ID
   }
   collidedObjects: Required<LessonDTO>[],
-  markedAs: 'conflict' | 'ok';
+  markedAs: CollisionMark;
 }
 export type Collisions = Collision[];
 

@@ -24,6 +24,7 @@ import {
 } from '../common/scheduleLogic';
 import { ID, LessonDTO } from '../entities/entitiesDTO';
 import Modal from './Modal';
+import { MARKED_AS } from '../common/constants';
 
 function hasPositionInSchedule(lesson: EditableLesson): boolean {
   return !!(lesson.lessonTime && lesson.day);
@@ -38,9 +39,6 @@ function ScheduleEditGrid(): JSX.Element {
   const [draggedLesson, setDraggedLesson] = useState<EditableLesson>();
 
   const [allLessons, setAllLessons] = useState<EditableLesson[]>([]);
-
-  // const checkingTablesRef = useRef<any>();
-  // const checkingTables = checkingTablesRef.current;
 
   const [scheduleTables, setScheduleTables] = useState<ScheduleTables>();
   const [collisions, setCollisions] = useState<Collisions>();
@@ -122,12 +120,10 @@ function ScheduleEditGrid(): JSX.Element {
     }
 
     const conflictedLessons = getCollisions(scheduleTables, selectedType, selectedEntity.id, selectedWeekType.id, lesson.day.id, lesson.lessonTime.id);
-    // setConflictedModal(conflictedLessons);
     return (conflictedLessons.length > 1 &&
       <div className='bg-rose-700 h-full w-2.5 absolute z-2 rounded-l-md'
            onClick={(e) => {
              e.stopPropagation();
-             console.log('66');
              openConflictedModal();
              setConflictedModalData(conflictedLessons);
            }}
@@ -147,20 +143,6 @@ function ScheduleEditGrid(): JSX.Element {
   //     </div>);
   // }
 
-  // function addConflictedModal(lesson: any) {
-  //   return (conflictedModal && conflictedModal.id === lesson.id &&
-  //     <div className='flex gap-2 absolute z-2 -top-32 opacity-75'>
-  //       {
-  //         (collisions as any)[lesson.id].map((l: any, i: number) => (
-  //           <LessonCard
-  //             key={i}
-  //             lesson={l as Lesson}
-  //             filterType={selectedType}
-  //           />
-  //         ))
-  //       }
-  //     </div>);
-  // }
 
   function collisionDescription(collision: Collision) {
     const markedAs = collision.markedAs;
@@ -182,7 +164,7 @@ function ScheduleEditGrid(): JSX.Element {
     }
 
     return (<div>
-      * {markedAs} at <span className='text-blue-600 hover:text-pink-600 cursor-pointer' onClick={handleClick}>{tableName} {weekType} {day} {lessonTime}</span>
+      • <span className={markedAs === 'conflict' ? 'text-red-600' : 'text-green-600'}>{MARKED_AS[collision.markedAs]}</span> в <span className='text-blue-600 hover:text-pink-600 cursor-pointer' onClick={handleClick}>{tableName} {weekType} {day} {lessonTime}</span>
     </div>);
   }
 
@@ -255,7 +237,6 @@ function ScheduleEditGrid(): JSX.Element {
                          }
                     >
                       {addCollisionLine(lesson)}
-                      {/* {addConflictedModal(lesson)} */}
                       {/* {addCollisionCircle(lesson)} */}
                       <LessonCard
                         lesson={lesson as Lesson}
@@ -349,7 +330,7 @@ function ScheduleEditGrid(): JSX.Element {
         </div>
       </div>
       <div className='m-8 p-2 border-4 border-blue-300 rounded-xl'>
-        <p className='text-md'>Collisions: </p>
+        <p className='text-md'>Колізії: </p>
         {collisions && collisions.map((collision, index) => (
           <div key={index}>
             {collisionDescription(collision)}
