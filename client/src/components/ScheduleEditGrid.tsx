@@ -153,7 +153,7 @@ function ScheduleEditGrid(): JSX.Element {
 
     const type = tableNameToFilterType(collision.filter.tableName);
 
-    const item = allEntities[type].find(i => i.id === collision.filter.item);
+    const item = allEntities[type].find(i => i.id === collision.filter.item) as {name: string};
     const week = weekTypes.find(w => w.id === collision.filter.weekType);
 
     function handleClick() {
@@ -164,7 +164,7 @@ function ScheduleEditGrid(): JSX.Element {
     }
 
     return (<div>
-      • <span className={markedAs === 'conflict' ? 'text-red-600' : 'text-green-600'}>{MARKED_AS[collision.markedAs]}</span> в <span className='text-blue-600 hover:text-pink-600 cursor-pointer' onClick={handleClick}>{tableName} {weekType} {day} {lessonTime}</span>
+      • <span className={markedAs === 'conflict' ? 'text-red-600' : 'text-green-600'}>{MARKED_AS[collision.markedAs]}</span> в <span className='text-blue-600 hover:text-pink-600 cursor-pointer' onClick={handleClick}>{item.name} {weekType} {day} {lessonTime}</span>
     </div>);
   }
 
