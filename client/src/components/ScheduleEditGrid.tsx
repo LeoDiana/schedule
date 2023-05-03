@@ -15,6 +15,18 @@ import {
   selectLessonTimes, updateEntity,
 } from '../features/entities/entitiesSlice';
 import EmptyCell from './EmptyCell';
+import {
+  buildCollisions,
+  buildScheduleTables, Collision,
+  Collisions,
+  hasCollisions,
+  ScheduleTables, tableNameToFilterType,
+} from '../common/scheduleLogic';
+import { ID, LessonDTO } from '../entities/entitiesDTO';
+
+function hasPositionInSchedule(lesson: EditableLesson): boolean {
+  return !!(lesson.lessonTime && lesson.day);
+}
 
 function ScheduleEditGrid(): JSX.Element {
   const dispatch = useDispatch();
@@ -26,10 +38,11 @@ function ScheduleEditGrid(): JSX.Element {
 
   const [allLessons, setAllLessons] = useState<EditableLesson[]>([]);
 
-  const checkingTablesRef = useRef<any>();
-  const checkingTables = checkingTablesRef.current;
+  // const checkingTablesRef = useRef<any>();
+  // const checkingTables = checkingTablesRef.current;
 
-  const [collisions, setCollisions] = useState({});
+  const [scheduleTables, setScheduleTables] = useState<ScheduleTables>();
+  const [collisions, setCollisions] = useState<Collisions>();
 
   const [types, selectedType, setType,
     entities, selectedEntity, setEntity,
@@ -40,163 +53,30 @@ function ScheduleEditGrid(): JSX.Element {
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
   const [positionInSchedule, setPosition] = useState({});
-  const [conflictedModal, setConflictedModal] = useState<any>();
 
 
   useEffect(() => {
-    (async () => {
-      const allLessons = allEntities.lesson;
+    const allLessons = allEntities.lesson as LessonDTO[];
+    const lessonsInSchedule = allLessons.filter(hasPositionInSchedule) as Required<LessonDTO>[];
 
-      await setAllLessons(allLessons);
+    const tables = buildScheduleTables(lessonsInSchedule, weekTypes, days, lessonTimes);
 
-      const emptyCollisions = {};
-      allLessons.forEach(lesson => (emptyCollisions as any)[lesson.id] = []);
-      setCollisions(emptyCollisions);
-
-      const chT = buildTablesForChecking(
-        allLessons,
-        allEntities.teacher as Teacher[],
-        allEntities.subgroup as Subgroup[],
-        allEntities.day as Day[],
-        allEntities.lessonTime as LessonTime[]);
-      allLessons.forEach(lesson => changeTable2(lesson, lesson, chT));
-      checkingTablesRef.current = chT;
-    })();
+    setAllLessons(allLessons);
+    setScheduleTables(tables);
+    setCollisions(buildCollisions(tables));
   }, []);
 
-  function hasPositionInSchedule(lesson: EditableLesson): boolean {
-    return !!(lesson.lessonTime && lesson.day);
-  }
+  useEffect(() => {
+    const lessonsInSchedule = allLessons.filter(hasPositionInSchedule) as Required<LessonDTO>[];
+    const tables = buildScheduleTables(lessonsInSchedule, weekTypes, days, lessonTimes);
 
-  function filterLessonsBy(filter: FilterType, filteredEntity: { id: number }) {
+    setScheduleTables(tables);
+    setCollisions(buildCollisions(tables));
+  }, [allLessons]);
+
+
+  function filterLessonsBy(filter: FilterType, filteredEntity: { id: ID }) {
     return allLessons.filter((lesson) => lesson[filter]?.id === filteredEntity.id);
-  }
-
-  function changeTable2(prevLesson: any, movedLesson: any = undefined, checkingTables: any) {
-    // clear previous collisions at this point
-    if (prevLesson.lessonTime && prevLesson.day) {
-      checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
-        setCollisions((state) => ({ ...state, [lesson.id]: [] })),
-      );
-      checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
-        setCollisions((state) => ({ ...state, [lesson.id]: [] })),
-      );
-      // remove lesson from where it was
-      checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id] =
-        checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].filter((lesson: any) => lesson.id !== prevLesson.id);
-      checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id] =
-        checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].filter((lesson: any) => lesson.id !== prevLesson.id);
-      // add collisions if they are still at prev point
-      if (checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].length > 1) {
-        checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
-          setCollisions((state) => ({ ...state, [lesson.id]: [...(state as any)[lesson.id], lesson] })),
-        );
-      }
-      if (checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].length > 1) {
-        checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
-          setCollisions((state) => ({ ...state, [lesson.id]: [...(state as any)[lesson.id], lesson] })),
-        );
-      }
-    }
-
-    if (movedLesson && movedLesson.lessonTime && movedLesson.day) {
-      // move to new collisions
-      const teachersLessonsAtThisPoint = checkingTables.teacher[movedLesson.teacher.id][movedLesson.lessonTime.id][movedLesson.day.id];
-      const subgroupsLessonsAtThisPoint = checkingTables.subgroup[movedLesson.subgroup.id][movedLesson.lessonTime.id][movedLesson.day.id];
-      // add new lesson
-      teachersLessonsAtThisPoint.push(movedLesson);
-      subgroupsLessonsAtThisPoint.push(movedLesson);
-      // add collisions
-      if (teachersLessonsAtThisPoint.length > 1) {
-        const newCollisions = {};
-        teachersLessonsAtThisPoint.forEach((lesson: any) =>
-          (newCollisions as any)[lesson.id] = teachersLessonsAtThisPoint,
-        );
-        setCollisions((state) => ({ ...state, ...newCollisions }));
-      }
-      if (subgroupsLessonsAtThisPoint.length > 1) {
-        const newCollisions = {};
-        subgroupsLessonsAtThisPoint.forEach((lesson: any) =>
-          (newCollisions as any)[lesson.id] = subgroupsLessonsAtThisPoint,
-        );
-        setCollisions((state) => ({ ...state, ...newCollisions }));
-      }
-    }
-  }
-
-  function buildTablesForChecking(allLessons: any[], teachers: any[], subgroups: any[], days: any[], lessonTimes: any[]) {
-    const teachersSchedules: any = {};
-    teachers.forEach((teacher) => teachersSchedules[teacher.id] = Array.from(
-      { length: lessonTimes.length + 1 },
-      () => Array.from({ length: days.length + 1 }, () => [])));
-    const subgroupsSchedules: any = {};
-    subgroups.forEach((subgroup) => subgroupsSchedules[subgroup.id] = Array.from(
-      { length: lessonTimes.length + 1 },
-      () => Array.from({ length: days.length + 1 }, () => [])));
-
-    allLessons.filter(lesson => lesson.lessonTime && lesson.day).forEach((lesson) => {
-      teachersSchedules[lesson.teacher.id][lesson.lessonTime.id][lesson.day.id].push(lesson);
-      subgroupsSchedules[lesson.subgroup.id][lesson.lessonTime.id][lesson.day.id].push(lesson);
-    });
-
-    return {
-      subgroup: subgroupsSchedules,
-      teacher: teachersSchedules,
-    };
-  }
-
-  // if no moved lesson - just delete prev from table
-  function changeTable(prevLesson: any, movedLesson: any = undefined) {
-    // clear previous collisions at this point
-    if (prevLesson.lessonTime && prevLesson.day) {
-      checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
-        setCollisions((state) => ({ ...state, [lesson.id]: [] })),
-      );
-      checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
-        setCollisions((state) => ({ ...state, [lesson.id]: [] })),
-      );
-      // remove lesson from where it was
-      checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id] =
-        checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].filter((lesson: any) => lesson.id !== prevLesson.id);
-      checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id] =
-        checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].filter((lesson: any) => lesson.id !== prevLesson.id);
-      // add collisions if they are still at prev point
-      if (checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].length > 1) {
-        checkingTables.teacher[prevLesson.teacher.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
-          setCollisions((state) => ({ ...state, [lesson.id]: [...(state as any)[lesson.id], lesson] })),
-        );
-      }
-      if (checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].length > 1) {
-        checkingTables.subgroup[prevLesson.subgroup.id][prevLesson.lessonTime.id][prevLesson.day.id].forEach((lesson: any) =>
-          setCollisions((state) => ({ ...state, [lesson.id]: [...(state as any)[lesson.id], lesson] })),
-        );
-      }
-    }
-
-    if (movedLesson && movedLesson.lessonTime && movedLesson.day) {
-      // console.log(movedLesson);
-      // move to new collisions
-      const teachersLessonsAtThisPoint = checkingTables.teacher[movedLesson.teacher.id][movedLesson.lessonTime.id][movedLesson.day.id];
-      const subgroupsLessonsAtThisPoint = checkingTables.subgroup[movedLesson.subgroup.id][movedLesson.lessonTime.id][movedLesson.day.id];
-      // add new lesson
-      teachersLessonsAtThisPoint.push(movedLesson);
-      subgroupsLessonsAtThisPoint.push(movedLesson);
-      // add collisions
-      if (teachersLessonsAtThisPoint.length > 1) {
-        const newCollisions = {};
-        teachersLessonsAtThisPoint.forEach((lesson: any) =>
-          (newCollisions as any)[lesson.id] = teachersLessonsAtThisPoint,
-        );
-        setCollisions((state) => ({ ...state, ...newCollisions }));
-      }
-      if (subgroupsLessonsAtThisPoint.length > 1) {
-        const newCollisions = {};
-        subgroupsLessonsAtThisPoint.forEach((lesson: any) =>
-          (newCollisions as any)[lesson.id] = subgroupsLessonsAtThisPoint,
-        );
-        setCollisions((state) => ({ ...state, ...newCollisions }));
-      }
-    }
   }
 
   function getFilteredLessons() {
@@ -219,7 +99,7 @@ function ScheduleEditGrid(): JSX.Element {
                   return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
                     newLesson] as Lesson[];
                 });
-                changeTable(draggedLesson, newLesson);
+                // changeTable(draggedLesson, newLesson);
               }
             }}
             onClick={() => {
@@ -234,40 +114,64 @@ function ScheduleEditGrid(): JSX.Element {
   }
 
   function addCollisionLine(lesson: any) {
-    return ((collisions[lesson.id as keyof typeof collisions] as any).length > 0 &&
+    return (scheduleTables && hasCollisions(scheduleTables, selectedType, selectedEntity.id, selectedWeekType.id, lesson.day.id, lesson.lessonTime.id) &&
       <div className='bg-rose-700 h-full w-2.5 absolute z-2 rounded-l-md'
-           onMouseOver={() => setConflictedModal(lesson)}
-           onMouseLeave={() => setConflictedModal(undefined)}
+           // onMouseOver={() => setConflictedModal(lesson)}
+           // onMouseLeave={() => setConflictedModal(undefined)}
       ></div>);
   }
 
-  function addCollisionCircle(lesson: any) {
-    return (checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length > 1 &&
-      <div
-        className='bg-rose-700 rounded-full w-6 h-6 absolute z-2 -right-2 -top-2  text-white font-bold text-xs pl-2 pt-1'
-        onMouseOver={() => setConflictedModal(lesson)}
-        onMouseLeave={() => setConflictedModal(undefined)}
-      >
-        {checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length}
-      </div>);
+  // function addCollisionCircle(lesson: any) {
+  //   return (checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length > 1 &&
+  //     <div
+  //       className='bg-rose-700 rounded-full w-6 h-6 absolute z-2 -right-2 -top-2  text-white font-bold text-xs pl-2 pt-1'
+  //       onMouseOver={() => setConflictedModal(lesson)}
+  //       onMouseLeave={() => setConflictedModal(undefined)}
+  //     >
+  //       {checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length}
+  //     </div>);
+  // }
+
+  // function addConflictedModal(lesson: any) {
+  //   return (conflictedModal && conflictedModal.id === lesson.id &&
+  //     <div className='flex gap-2 absolute z-2 -top-32 opacity-75'>
+  //       {
+  //         (collisions as any)[lesson.id].map((l: any, i: number) => (
+  //           <LessonCard
+  //             key={i}
+  //             lesson={l as Lesson}
+  //             filterType={selectedType}
+  //           />
+  //         ))
+  //       }
+  //     </div>);
+  // }
+
+  function collisionDescription (collision: Collision) {
+    const markedAs = collision.markedAs;
+    const tableName = collision.filter.tableName;
+    const weekType = weekTypes.find(w => w.id === collision.filter.weekType).name;
+    const day = days.find(d => d.id === collision.filter.day)?.name;
+    const lessonTime = lessonTimes.find(lt => lt.id === collision.filter.lessonTime)?.displayName;
+
+    const type = tableNameToFilterType(collision.filter.tableName);
+
+    const item = allEntities[type].find(i => i.id === collision.filter.item);
+    const week = weekTypes.find(w => w.id === collision.filter.weekType);
+
+    function handleClick() {
+      setType(type);
+      setEntity(item);
+      setWeekType(week);
+      console.log('!');
+    }
+
+    return (<div>
+      * {markedAs} at <span onClick={handleClick}>{tableName} {weekType} {day} {lessonTime}</span>
+    </div>)
   }
 
-  function addConflictedModal(lesson: any) {
-    return (conflictedModal && conflictedModal.id === lesson.id &&
-      <div className='flex gap-2 absolute z-2 -top-32 opacity-75'>
-        {
-          (collisions as any)[lesson.id].map((l: any, i: number) => (
-            <LessonCard
-              key={i}
-              lesson={l as Lesson}
-              filterType={selectedType}
-            />
-          ))
-        }
-      </div>);
-  }
-
-  if (!(lessonTimes && days && allLessons && Object.keys(collisions).length)) {
+  if (!(lessonTimes && days && allLessons)) {
     return <div>Loading...</div>;
   }
 
@@ -304,7 +208,7 @@ function ScheduleEditGrid(): JSX.Element {
                 {
                   getFilteredLessons().map((lesson, index) => (
                     <div key={index}
-                         style={{ gridRowStart: lesson!.lessonTime!.id + 1, gridColumnStart: lesson!.day!.id + 1 }}
+                         style={{ gridRowStart: Number(lesson!.lessonTime!.id) + 1, gridColumnStart: Number(lesson!.day!.id) + 1 }}
                          draggable
                          onDragStart={() => {
                            setDraggedLesson(lesson);
@@ -320,13 +224,12 @@ function ScheduleEditGrid(): JSX.Element {
                          }
                     >
                       {addCollisionLine(lesson)}
-                      {addCollisionCircle(lesson)}
+                      {/* {addCollisionCircle(lesson)} */}
                       <LessonCard
                         lesson={lesson as Lesson}
                         filterType={selectedType}
                         isSelected={selectedLesson?.id === lesson.id}
                       />
-                      {addConflictedModal(lesson)}
                     </div>
                   ))
                 }
@@ -348,7 +251,7 @@ function ScheduleEditGrid(): JSX.Element {
                    return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
                      newLesson] as Lesson[];
                  });
-                 changeTable(draggedLesson, newLesson);
+                 // changeTable(draggedLesson, newLesson);
                }
              }}
         >
@@ -358,7 +261,7 @@ function ScheduleEditGrid(): JSX.Element {
               if (selectedLesson) {
                 dispatch(deleteEntity({ entityName: 'lesson', id: selectedLesson.id }));
                 const filtered = allLessons.filter((item) => item.id !== selectedLesson.id);
-                changeTable(selectedLesson);
+                // changeTable(selectedLesson);
                 setAllLessons(filtered);
                 setSelectedLesson(undefined);
               }
@@ -412,6 +315,21 @@ function ScheduleEditGrid(): JSX.Element {
             })()
           }
         </div>
+      </div>
+      <div>
+        <p>Collisions: </p>
+        {collisions && collisions.map((collision, index) => (
+          <div key={index}>
+            {collisionDescription(collision)}
+            {/* /!* {weekTypes.find((w) => w.id === collision.filter.weekType).name } *!/ */}
+            {/* * {collision.markedAs} at {collision.filter.tableName} {collision.filter.weekType} {collision.filter.day} {collision.filter.lessonTime} : */}
+
+            {/* [lessons in format] */}
+
+            {/* /!* {JSON.stringify(collision.collidedObjects)} *!/ */}
+
+          </div>
+        ))}
       </div>
     </>
   );
