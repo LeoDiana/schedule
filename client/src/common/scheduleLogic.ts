@@ -128,23 +128,20 @@ export function tableNameToFilterType(tableName: TableNames): FilterType {
   }
 }
 
-export function hasCollisions(
+export function getCollisions(
   schedule: ScheduleTables,
   filter: FilterType,
   objId: ID,
   weekTypeId: ID,
   dayId: ID,
   lessonTimeId: ID,
-): boolean {
+): LessonDTO[] {
   try {
     const tableName = filterTypeToTablesFormat(filter);
     const lessons = schedule?.get(tableName)?.get(objId)?.get(weekTypeId)?.get(dayId)?.get(lessonTimeId);
-    if (lessons) {
-      return lessons.length > 1;
-    }
-    return false;
+    return lessons || [];
   } catch (err) {
     console.log(err);
-    return false;
+    return [];
   }
 }

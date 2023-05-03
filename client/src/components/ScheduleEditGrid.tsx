@@ -19,10 +19,11 @@ import {
   buildCollisions,
   buildScheduleTables, Collision,
   Collisions,
-  hasCollisions,
+  getCollisions,
   ScheduleTables, tableNameToFilterType,
 } from '../common/scheduleLogic';
 import { ID, LessonDTO } from '../entities/entitiesDTO';
+import Modal from './Modal';
 
 function hasPositionInSchedule(lesson: EditableLesson): boolean {
   return !!(lesson.lessonTime && lesson.day);
@@ -52,8 +53,10 @@ function ScheduleEditGrid(): JSX.Element {
   const [selectedLesson, setSelectedLesson] = useState<EditableLesson>();
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
+  const [isConflictedModalOpen, openConflictedModal, closeConflictedModal] = useModal();
   const [positionInSchedule, setPosition] = useState({});
 
+  const [conflictedModalData, setConflictedModalData] = useState<any>();
 
   useEffect(() => {
     const allLessons = allEntities.lesson as LessonDTO[];
@@ -114,10 +117,22 @@ function ScheduleEditGrid(): JSX.Element {
   }
 
   function addCollisionLine(lesson: any) {
-    return (scheduleTables && hasCollisions(scheduleTables, selectedType, selectedEntity.id, selectedWeekType.id, lesson.day.id, lesson.lessonTime.id) &&
+    if (!scheduleTables) {
+      return null;
+    }
+
+    const conflictedLessons = getCollisions(scheduleTables, selectedType, selectedEntity.id, selectedWeekType.id, lesson.day.id, lesson.lessonTime.id);
+    // setConflictedModal(conflictedLessons);
+    return (conflictedLessons.length > 1 &&
       <div className='bg-rose-700 h-full w-2.5 absolute z-2 rounded-l-md'
-           // onMouseOver={() => setConflictedModal(lesson)}
-           // onMouseLeave={() => setConflictedModal(undefined)}
+           onClick={(e) => {
+             e.stopPropagation();
+             console.log('66');
+             openConflictedModal();
+             setConflictedModalData(conflictedLessons);
+           }}
+        // onMouseOver={() => setConflictedModal(lesson)}
+        // onMouseLeave={() => setConflictedModal(undefined)}
       ></div>);
   }
 
@@ -147,7 +162,7 @@ function ScheduleEditGrid(): JSX.Element {
   //     </div>);
   // }
 
-  function collisionDescription (collision: Collision) {
+  function collisionDescription(collision: Collision) {
     const markedAs = collision.markedAs;
     const tableName = collision.filter.tableName;
     const weekType = weekTypes.find(w => w.id === collision.filter.weekType).name;
@@ -163,12 +178,12 @@ function ScheduleEditGrid(): JSX.Element {
       setType(type);
       setEntity(item);
       setWeekType(week);
-      console.log('!');
+      window.scrollTo({top: 0});
     }
 
     return (<div>
-      * {markedAs} at <span onClick={handleClick}>{tableName} {weekType} {day} {lessonTime}</span>
-    </div>)
+      * {markedAs} at <span className='text-blue-600 hover:text-pink-600 cursor-pointer' onClick={handleClick}>{tableName} {weekType} {day} {lessonTime}</span>
+    </div>);
   }
 
   if (!(lessonTimes && days && allLessons)) {
@@ -193,6 +208,19 @@ function ScheduleEditGrid(): JSX.Element {
           entity={selectedLesson}
         />
       }
+      {isConflictedModalOpen &&
+        <Modal close={closeConflictedModal}>
+          <div className='flex gap-2 flex-col'>
+          {conflictedModalData.map((l: any, i: number) => (
+            <LessonCard
+              key={i}
+              lesson={l as Lesson}
+              filterType={selectedType}
+            />
+          ))}
+          </div>
+        </Modal>
+      }
       <div className='flex'>
         <div className='flex-grow'>
           <Filters
@@ -208,7 +236,10 @@ function ScheduleEditGrid(): JSX.Element {
                 {
                   getFilteredLessons().map((lesson, index) => (
                     <div key={index}
-                         style={{ gridRowStart: Number(lesson!.lessonTime!.id) + 1, gridColumnStart: Number(lesson!.day!.id) + 1 }}
+                         style={{
+                           gridRowStart: Number(lesson!.lessonTime!.id) + 1,
+                           gridColumnStart: Number(lesson!.day!.id) + 1,
+                         }}
                          draggable
                          onDragStart={() => {
                            setDraggedLesson(lesson);
@@ -224,6 +255,7 @@ function ScheduleEditGrid(): JSX.Element {
                          }
                     >
                       {addCollisionLine(lesson)}
+                      {/* {addConflictedModal(lesson)} */}
                       {/* {addCollisionCircle(lesson)} */}
                       <LessonCard
                         lesson={lesson as Lesson}
@@ -316,18 +348,11 @@ function ScheduleEditGrid(): JSX.Element {
           }
         </div>
       </div>
-      <div>
-        <p>Collisions: </p>
+      <div className='m-8 p-2 border-4 border-blue-300 rounded-xl'>
+        <p className='text-md'>Collisions: </p>
         {collisions && collisions.map((collision, index) => (
           <div key={index}>
             {collisionDescription(collision)}
-            {/* /!* {weekTypes.find((w) => w.id === collision.filter.weekType).name } *!/ */}
-            {/* * {collision.markedAs} at {collision.filter.tableName} {collision.filter.weekType} {collision.filter.day} {collision.filter.lessonTime} : */}
-
-            {/* [lessons in format] */}
-
-            {/* /!* {JSON.stringify(collision.collidedObjects)} *!/ */}
-
           </div>
         ))}
       </div>

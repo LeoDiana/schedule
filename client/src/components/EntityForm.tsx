@@ -98,7 +98,7 @@ function EntityForm<T extends FormType, E extends AllEntities>({
     <>
       {showNotification ?? <SuccessfulNotification />}
       <form
-        className='fixed bg-white z-20 p-7 w-96 flex flex-col items-center gap-3 rounded-3xl drop-shadow-2xl left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2'>
+        className='bg-white p-7 w-96 flex flex-col items-center gap-3 rounded-3xl drop-shadow-2xl'>
         <h6 className='text-2xl font-semibold mb-3'>{ENTITY_TITLES[name]}</h6>
         {Object.keys(fields).map((fieldName) => renderInput(fieldName))}
         <button type='button'
