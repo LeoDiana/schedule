@@ -127,26 +127,11 @@ function ScheduleEditGrid(): JSX.Element {
              openConflictedModal();
              setConflictedModalData(conflictedLessons);
            }}
-        // onMouseOver={() => setConflictedModal(lesson)}
-        // onMouseLeave={() => setConflictedModal(undefined)}
       ></div>);
   }
 
-  // function addCollisionCircle(lesson: any) {
-  //   return (checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length > 1 &&
-  //     <div
-  //       className='bg-rose-700 rounded-full w-6 h-6 absolute z-2 -right-2 -top-2  text-white font-bold text-xs pl-2 pt-1'
-  //       onMouseOver={() => setConflictedModal(lesson)}
-  //       onMouseLeave={() => setConflictedModal(undefined)}
-  //     >
-  //       {checkingTables[selectedType][selectedEntity.id][lesson!.lessonTime!.id][lesson!.day!.id].length}
-  //     </div>);
-  // }
-
-
   function collisionDescription(collision: Collision) {
     const markedAs = collision.markedAs;
-    const tableName = collision.filter.tableName;
     const weekType = weekTypes.find(w => w.id === collision.filter.weekType).name;
     const day = days.find(d => d.id === collision.filter.day)?.name;
     const lessonTime = lessonTimes.find(lt => lt.id === collision.filter.lessonTime)?.displayName;
@@ -164,7 +149,8 @@ function ScheduleEditGrid(): JSX.Element {
     }
 
     return (<div>
-      • <span className={markedAs === 'conflict' ? 'text-red-600' : 'text-green-600'}>{MARKED_AS[collision.markedAs]}</span> в <span className='text-blue-600 hover:text-pink-600 cursor-pointer' onClick={handleClick}>{item.name} {weekType} {day} {lessonTime}</span>
+      • <span className={markedAs === 'conflict' ? 'text-red-600' : 'text-green-600'}>{MARKED_AS[collision.markedAs]}</span>
+      {" "}в <span className='text-blue-600 hover:text-pink-600 cursor-pointer' onClick={handleClick}>{getDisplayName(type, item)} {weekType} {day} {lessonTime}</span>
     </div>);
   }
 
@@ -330,7 +316,7 @@ function ScheduleEditGrid(): JSX.Element {
         </div>
       </div>
       <div className='m-8 p-2 border-4 border-blue-300 rounded-xl'>
-        <p className='text-md'>Суперечності: </p>
+        <p className='text-md font-semibold'>Суперечності: </p>
         {collisions && collisions.map((collision, index) => (
           <div key={index}>
             {collisionDescription(collision)}

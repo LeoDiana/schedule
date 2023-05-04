@@ -56,7 +56,7 @@ export function buildScheduleTables(
 ): ScheduleTables {
   const scheduleTables: ScheduleTables = new Map();
   collisionsFor.forEach(item => {
-    scheduleTables.set(item.name, new Map);
+    scheduleTables.set(item.name, new Map());
   });
 
   allLessons.forEach((lesson) => {
@@ -70,6 +70,7 @@ export function buildScheduleTables(
         table?.get(weekType.id)?.get(day.id)?.get(lessonTime.id)?.push(lesson);
       } else {
         scheduleTables?.get(item.name)?.set(id, makeEmptySchedule(weekTypes, days, lessonTimes));
+        scheduleTables.get(item.name)?.get(id)?.get(weekType.id)?.get(day.id)?.get(lessonTime.id)?.push(lesson);
       }
     });
   });
