@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
-import { Day, Lesson, LessonTime, Subgroup, Teacher } from '../entities/entitiesClasses';
+import { Lesson} from '../entities/entitiesClasses';
 import { LessonCard, ScheduleGrid } from '../pages/Schedule';
 import { ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { EditableLesson, FilterType } from '../common/types';
@@ -104,7 +104,7 @@ function ScheduleEditGrid(): JSX.Element {
               }
             }}
             onClick={() => {
-              setPosition({ lessonTime: lessonTime, day: day });
+              setPosition({ lessonTime: lessonTime, day: day, weekType: selectedWeekType });
               openCreateForm();
             }}
           />,
@@ -280,7 +280,7 @@ function ScheduleEditGrid(): JSX.Element {
               }
             }}
           >
-            <TrashIcon className='w-5 inline stroke-2' /> Delete selected
+            <TrashIcon className='w-5 inline stroke-2' /> Видалити обране
           </button>
           <button
             className='p-2 rounded-lg border-2 border-green-500 text-green-500 font-semibold mb-2'
@@ -289,7 +289,7 @@ function ScheduleEditGrid(): JSX.Element {
               openCreateForm();
             }}
           >
-            <PlusIcon className='w-5 inline stroke-2' /> Create new
+            <PlusIcon className='w-5 inline stroke-2' /> Створити
           </button>
           <button
             className='p-2 rounded-lg border-2 border-blue-500 text-blue-500 font-semibold mb-2'
@@ -297,7 +297,7 @@ function ScheduleEditGrid(): JSX.Element {
               allLessons.forEach(lesson => dispatch(updateEntity({ entityName: 'lesson', entity: lesson })));
             }}
           >
-            <ArrowDownTrayIcon className='w-5 inline stroke-2' /> Save all changes
+            <ArrowDownTrayIcon className='w-5 inline stroke-2' /> Зберегти зміни
           </button>
           {
             (() => {
@@ -324,13 +324,13 @@ function ScheduleEditGrid(): JSX.Element {
                     isSelected={selectedLesson?.id === lesson.id}
                   />
                 </div>,
-              ) : <div className='pt-5 text-center text-gray-400'>DROP LESSONS HERE</div>);
+              ) : <div className='pt-5 text-center text-gray-400'>Перетягніть заняття сюди</div>);
             })()
           }
         </div>
       </div>
       <div className='m-8 p-2 border-4 border-blue-300 rounded-xl'>
-        <p className='text-md'>Колізії: </p>
+        <p className='text-md'>Суперечності: </p>
         {collisions && collisions.map((collision, index) => (
           <div key={index}>
             {collisionDescription(collision)}
