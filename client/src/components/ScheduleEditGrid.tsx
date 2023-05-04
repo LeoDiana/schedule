@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
-import { Lesson} from '../entities/entitiesClasses';
+import { Lesson } from '../entities/entitiesClasses';
 import { LessonCard, ScheduleGrid } from '../pages/Schedule';
 import { ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { EditableLesson, FilterType } from '../common/types';
@@ -54,7 +54,10 @@ function ScheduleEditGrid(): JSX.Element {
   const [isConflictedModalOpen, openConflictedModal, closeConflictedModal] = useModal();
   const [positionInSchedule, setPosition] = useState({});
 
-  const [conflictedModalData, setConflictedModalData] = useState<any>();
+  const [conflictedModalData, setConflictedModalData] = useState<Required<LessonDTO>[]>();
+
+  const lessonsNotOnSchedule = filterLessonsBy(selectedType, selectedEntity).filter((lesson) => !hasPositionInSchedule(lesson));
+  const filteredLessons = getFilteredLessons();
 
   useEffect(() => {
     const allLessons = allEntities.lesson as LessonDTO[];
@@ -80,8 +83,10 @@ function ScheduleEditGrid(): JSX.Element {
     return allLessons.filter((lesson) => lesson[filter]?.id === filteredEntity.id);
   }
 
-  function getFilteredLessons() {
-    return filterLessonsBy(selectedType, selectedEntity).filter((l: any) => l.weekType.id === selectedWeekType.id).filter(hasPositionInSchedule);
+  function getFilteredLessons(): Required<LessonDTO>[] {
+    return filterLessonsBy(selectedType, selectedEntity)
+      .filter((l) => l.weekType?.id === selectedWeekType.id)
+      .filter(hasPositionInSchedule) as Required<LessonDTO>[];
   }
 
   function addEmptyCells() {
@@ -100,7 +105,6 @@ function ScheduleEditGrid(): JSX.Element {
                   return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
                     newLesson] as Lesson[];
                 });
-                // changeTable(draggedLesson, newLesson);
               }
             }}
             onClick={() => {
@@ -114,7 +118,7 @@ function ScheduleEditGrid(): JSX.Element {
     return cells;
   }
 
-  function addCollisionLine(lesson: any) {
+  function addCollisionLine(lesson: Required<LessonDTO>) {
     if (!scheduleTables) {
       return null;
     }
@@ -138,20 +142,24 @@ function ScheduleEditGrid(): JSX.Element {
 
     const type = tableNameToFilterType(collision.filter.tableName);
 
-    const item = allEntities[type].find(i => i.id === collision.filter.item) as {name: string};
+    const item = allEntities[type].find(i => i.id === collision.filter.item) as { name: string };
     const week = weekTypes.find(w => w.id === collision.filter.weekType);
 
     function handleClick() {
       setType(type);
       setEntity(item);
       setWeekType(week);
-      window.scrollTo({top: 0});
+      window.scrollTo({ top: 0 });
     }
 
-    return (<div>
-      • <span className={markedAs === 'conflict' ? 'text-red-600' : 'text-green-600'}>{MARKED_AS[collision.markedAs]}</span>
-      {" "}в <span className='text-blue-600 hover:text-pink-600 cursor-pointer' onClick={handleClick}>{getDisplayName(type, item)} {weekType} {day} {lessonTime}</span>
-    </div>);
+    return (
+      <div>
+        • <span
+        className={markedAs === 'conflict' ? 'text-red-600' : 'text-green-600'}>{MARKED_AS[collision.markedAs]}</span>
+        {' '}в <span className='text-blue-600 hover:text-pink-600 cursor-pointer'
+                     onClick={handleClick}>{getDisplayName(type, item)} {weekType} {day} {lessonTime}</span>
+      </div>
+    );
   }
 
   if (!(lessonTimes && days && allLessons)) {
@@ -176,16 +184,16 @@ function ScheduleEditGrid(): JSX.Element {
           entity={selectedLesson}
         />
       }
-      {isConflictedModalOpen &&
+      {isConflictedModalOpen && conflictedModalData &&
         <Modal close={closeConflictedModal}>
           <div className='flex gap-2 flex-col'>
-          {conflictedModalData.map((l: any, i: number) => (
-            <LessonCard
-              key={i}
-              lesson={l as Lesson}
-              filterType={selectedType}
-            />
-          ))}
+            {conflictedModalData.map((l: LessonDTO, i: number) => (
+              <LessonCard
+                key={i}
+                lesson={l as Lesson}
+                filterType={selectedType}
+              />
+            ))}
           </div>
         </Modal>
       }
@@ -202,11 +210,11 @@ function ScheduleEditGrid(): JSX.Element {
               <>
                 {addEmptyCells()}
                 {
-                  getFilteredLessons().map((lesson, index) => (
+                  filteredLessons.map((lesson, index) => (
                     <div key={index}
                          style={{
-                           gridRowStart: Number(lesson!.lessonTime!.id) + 1,
-                           gridColumnStart: Number(lesson!.day!.id) + 1,
+                           gridRowStart: Number(lesson.lessonTime.id) + 1,
+                           gridColumnStart: Number(lesson.day.id) + 1,
                          }}
                          draggable
                          onDragStart={() => {
@@ -222,8 +230,7 @@ function ScheduleEditGrid(): JSX.Element {
                            }
                          }
                     >
-                      {addCollisionLine(lesson)}
-                      {/* {addCollisionCircle(lesson)} */}
+                      {addCollisionLine(lesson as Required<LessonDTO>)}
                       <LessonCard
                         lesson={lesson as Lesson}
                         filterType={selectedType}
@@ -250,7 +257,6 @@ function ScheduleEditGrid(): JSX.Element {
                    return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
                      newLesson] as Lesson[];
                  });
-                 // changeTable(draggedLesson, newLesson);
                }
              }}
         >
@@ -260,7 +266,6 @@ function ScheduleEditGrid(): JSX.Element {
               if (selectedLesson) {
                 dispatch(deleteEntity({ entityName: 'lesson', id: selectedLesson.id }));
                 const filtered = allLessons.filter((item) => item.id !== selectedLesson.id);
-                // changeTable(selectedLesson);
                 setAllLessons(filtered);
                 setSelectedLesson(undefined);
               }
@@ -286,32 +291,29 @@ function ScheduleEditGrid(): JSX.Element {
             <ArrowDownTrayIcon className='w-5 inline stroke-2' /> Зберегти зміни
           </button>
           {
-            (() => {
-              const lessonsNotOnSchedule = filterLessonsBy(selectedType, selectedEntity).filter((lesson) => !hasPositionInSchedule(lesson));
-              return (lessonsNotOnSchedule.length ? lessonsNotOnSchedule.map((lesson, index) =>
-                <div
-                  draggable
-                  key={index}
-                  onDragStart={() => {
-                    setDraggedLesson(lesson);
-                  }}
-                  onClick={
-                    () => {
-                      if (lesson.id === selectedLesson?.id) {
-                        openEditForm();
-                      }
-                      setSelectedLesson(lesson);
+            (lessonsNotOnSchedule.length ? lessonsNotOnSchedule.map((lesson, index) =>
+              <div
+                draggable
+                key={index}
+                onDragStart={() => {
+                  setDraggedLesson(lesson);
+                }}
+                onClick={
+                  () => {
+                    if (lesson.id === selectedLesson?.id) {
+                      openEditForm();
                     }
+                    setSelectedLesson(lesson);
                   }
-                >
-                  <LessonCard
-                    lesson={lesson as Lesson}
-                    filterType={selectedType}
-                    isSelected={selectedLesson?.id === lesson.id}
-                  />
-                </div>,
-              ) : <div className='pt-5 text-center text-gray-400'>Перетягніть заняття сюди</div>);
-            })()
+                }
+              >
+                <LessonCard
+                  lesson={lesson as Lesson}
+                  filterType={selectedType}
+                  isSelected={selectedLesson?.id === lesson.id}
+                />
+              </div>,
+            ) : <div className='pt-5 text-center text-gray-400'>Перетягніть заняття сюди</div>)
           }
         </div>
       </div>

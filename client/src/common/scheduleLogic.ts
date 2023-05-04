@@ -138,7 +138,7 @@ export function getCollisions(
   weekTypeId: ID,
   dayId: ID,
   lessonTimeId: ID,
-): LessonDTO[] {
+): Required<LessonDTO>[] {
   try {
     const tableName = filterTypeToTablesFormat(filter);
     const lessons = schedule?.get(tableName)?.get(objId)?.get(weekTypeId)?.get(dayId)?.get(lessonTimeId);
