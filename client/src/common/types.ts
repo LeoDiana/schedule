@@ -1,6 +1,7 @@
 import {
   AcademicStatus, Building, Classroom,
-  Day, Lesson,
+  Day,
+  // Lesson,
   LessonTime,
   LessonType,
   Subgroup,
@@ -19,6 +20,10 @@ import {
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
+interface Lesson {
+  [K: string]: any;
+}
+
 export type EntitiesNamesToTypes = {
   academicStatus: AcademicStatus;
   teacher: Teacher;
@@ -33,6 +38,8 @@ export type EntitiesNamesToTypes = {
   lesson: Lesson;
 };
 
+export type Dtos = AcademicStatusDTO | TeacherDTO | LessonTimeDTO | DayDTO | SubjectDTO | LessonTypeDTO | WeekTypeDTO | SubgroupDTO | BuildingDTO| ClassroomDTO | LessonDTO;
+
 export type AllEntities = EntitiesNamesToTypes[keyof EntitiesNamesToTypes];
 export type AllEntitiesNames = keyof EntitiesNamesToTypes;
 
@@ -45,7 +52,7 @@ export type DtoOfEntity<T extends AllEntities> =
             : T extends Subgroup ? SubgroupDTO
               : T extends Building ? BuildingDTO
                 : T extends Classroom ? ClassroomDTO
-                  : T extends Lesson ? LessonDTO
+                  // : T extends Lesson ? LessonDTO
                     : T extends Day ? DayDTO
                       : T extends WeekType ? WeekTypeDTO
                         : never;

@@ -265,44 +265,44 @@ export class Classroom implements ConstructorFor<ClassroomDTO>, Entity {
 }
 
 
-export class Lesson implements ConstructorFor<LessonDTO>, Entity {
-  id: ID;
-  teacher: Teacher;
-  subject: Subject;
-  lessonType: LessonType;
-  lessonTime?: LessonTime;
-  classroom?: any;
-  day?: Day;
-  weekType?: WeekType;
-  subgroup: Subgroup;
-
-  public get displayName(): string {
-    return `${this.day?.displayName} ${this.lessonTime?.displayName} ${this.weekType?.displayName} ${this.subject.displayName} ${this.teacher.displayName} ${this.subgroup.displayName}`;
-  }
-
-  constructor(obj: ConstructorFor<LessonDTO>) {
-    const { teacher, subject, lessonTime, lessonType, weekType, day, subgroup, classroom, id } = obj;
-    this.teacher = teacher;
-    this.subject = subject;
-    this.lessonTime = lessonTime;
-    this.lessonType = lessonType;
-    this.weekType = weekType;
-    this.day = day;
-    this.subgroup = subgroup;
-    this.classroom = classroom;
-    this.id = id;
-  }
-
-  static createEmpty(): EmptyEntityOf<Lesson> {
-    return {
-      teacher: undefined,
-      subject: undefined,
-      lessonType: undefined,
-      lessonTime: undefined,
-      classroom: undefined,
-      day: undefined,
-      weekType: undefined,
-      subgroup: undefined,
-    };
-  }
-}
+// export class Lesson implements ConstructorFor<LessonDTO>, Entity {
+//   id: ID;
+//   teacher: Teacher;
+//   subject: Subject;
+//   lessonType: LessonType;
+//   lessonTime?: LessonTime;
+//   classroom?: any;
+//   day?: Day;
+//   weekType?: WeekType;
+//   subgroup: Subgroup;
+//
+//   public get displayName(): string {
+//     return `${this.day?.displayName} ${this.lessonTime?.displayName} ${this.weekType?.displayName} ${this.subject.displayName} ${this.teacher.displayName} ${this.subgroup.displayName}`;
+//   }
+//
+//   constructor(obj: ConstructorFor<LessonDTO>) {
+//     const { teacher, subject, lessonTime, lessonType, weekType, day, subgroup, classroom, id } = obj;
+//     this.teacher = teacher;
+//     this.subject = subject;
+//     this.lessonTime = lessonTime;
+//     this.lessonType = lessonType;
+//     this.weekType = weekType;
+//     this.day = day;
+//     this.subgroup = subgroup;
+//     this.classroom = classroom;
+//     this.id = id;
+//   }
+//
+//   // static createEmpty(): EmptyEntityOf<Lesson> {
+//   //   return {
+//   //     teacher: undefined,
+//   //     subject: undefined,
+//   //     lessonType: undefined,
+//   //     lessonTime: undefined,
+//   //     classroom: undefined,
+//   //     day: undefined,
+//   //     weekType: undefined,
+//   //     subgroup: undefined,
+//   //   };
+//   // }
+// }

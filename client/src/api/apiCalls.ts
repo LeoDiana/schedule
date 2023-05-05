@@ -1,5 +1,5 @@
 import { instance as axios } from './axiosConfig';
-import { AllEntities, AllEntitiesNames, DtoOfEntity } from '../common/types';
+import { AllEntities, AllEntitiesNames, DtoOfEntity, Dtos } from '../common/types';
 import { ID, LessonDTO } from '../entities/entitiesDTO';
 
 const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
@@ -16,14 +16,14 @@ const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
   lesson: 'lessons',
 };
 
-export type ApiMethods<T extends AllEntities> = {
-  create: (obj: Omit<DtoOfEntity<T>, 'id'>) => Promise<any>;
-  update: (obj: DtoOfEntity<T>) => Promise<any>;
+export type ApiMethods<T extends Dtos> = {
+  create: (obj: Omit<T, 'id'>) => Promise<any>;
+  update: (obj: T) => Promise<any>;
   delete: (id: ID) => void;
-  readAll: () => Promise<DtoOfEntity<T>[]>;
+  readAll: () => Promise<T[]>;
 };
 
-export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
+export class EntityApi<T extends Dtos> implements ApiMethods<T> {
   private convertEntityNameToEndpoint(name: AllEntitiesNames) {
     return ENDPOINTS[name];
   }
@@ -34,7 +34,7 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
     this.endpoint = this.convertEntityNameToEndpoint(name);
   }
 
-  async create(entity: Omit<DtoOfEntity<T>, 'id'>): Promise<any> {
+  async create(entity: Omit<T, 'id'>): Promise<any> {
     try {
       return await axios.post(this.endpoint, entity);
     } catch (error) {
@@ -42,7 +42,7 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
     }
   }
 
-  async update(entity: DtoOfEntity<T>): Promise<any> {
+  async update(entity: T): Promise<any> {
     try {
       return await axios.put(`${this.endpoint}/${entity.id}`, entity);
     } catch (error) {
@@ -58,7 +58,7 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
     }
   }
 
-  async readAll(): Promise<DtoOfEntity<T>[]> {
+  async readAll(): Promise<T[]> {
     try {
       const response = await axios.get(this.endpoint);
       return response.data;

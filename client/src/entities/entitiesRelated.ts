@@ -3,7 +3,7 @@ import {
   Building,
   Classroom,
   Day,
-  Lesson,
+  // Lesson,
   LessonTime,
   LessonType,
   Subgroup,
@@ -28,10 +28,10 @@ import {
 import {
   AllEntities,
   AllEntitiesNames,
-  ConstructorFor,
+  ConstructorFor, DtoOfEntity, Dtos,
   EmptyEntityOf,
-  EntitiesNamesToTypes,
-  FieldsOf, FieldType,
+  // EntitiesNamesToTypes,
+  FieldsOf, FieldType, Optional,
 } from '../common/types';
 
 
@@ -273,47 +273,77 @@ export class ClassroomRelated extends EntityRelated<Classroom> {
   }
 }
 
-
-export class LessonRelated extends EntityRelated<Lesson> {
-  api: ApiMethods<Lesson>;
-  fields: { [K in keyof Omit<LessonDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : LessonDTO[K] extends string ? 'string' : LessonDTO[K] extends number ? 'number' : never };
-
-  constructor() {
-    super();
-    this.api = new EntityApi<Lesson>('lesson');
-    this.fields = {
-      teacher: 'entity',
-      subject: 'entity',
-      lessonType: 'entity',
-      lessonTime: 'entity',
-      classroom: 'entity',
-      day: 'entity',
-      weekType: 'entity',
-      subgroup: 'entity',
-    };
-  }
-
-  create(obj: LessonDTO): Lesson {
-    return new Lesson({
-      ...obj,
-      teacher: new Teacher({ ...obj.teacher, academicStatus: new AcademicStatus(obj.teacher.academicStatus) }),
-      subject: new Subject(obj.subject),
-      lessonType: new LessonType(obj.lessonType),
-      lessonTime: obj.lessonTime ? new LessonTime(obj.lessonTime) : undefined,
-      classroom: obj.classroom ? new Classroom({
-        ...obj.classroom,
-        building: new Building(obj.classroom.building),
-      }) : undefined,
-      day: obj.day ? new Day(obj.day) : undefined,
-      weekType: obj.weekType ? new WeekType(obj.weekType) : undefined,
-      subgroup: new Subgroup(obj.subgroup),
-    });
-  }
-
-  createEmpty() {
-    return Lesson.createEmpty();
-  }
+interface Related<T extends Dtos> {
+  api: ApiMethods<T>;
+  fields: {[K in keyof Omit<T, 'id'> ]: FieldType}
+  createEmpty: () => Optional<T, keyof T>
 }
+
+const LessonRelated: Related<LessonDTO> = {
+  api: new EntityApi('lesson'),
+  fields: {
+    teacher: 'entity',
+    subject: 'entity',
+    lessonType: 'entity',
+    lessonTime: 'entity',
+    classroom: 'entity',
+    day: 'entity',
+    weekType: 'entity',
+    subgroup: 'entity',
+  },
+  createEmpty: () => ({
+      teacher: undefined,
+      subject: undefined,
+      lessonType: undefined,
+      lessonTime: undefined,
+      classroom: undefined,
+      day: undefined,
+      weekType: undefined,
+      subgroup: undefined,
+  })
+}
+
+// export class LessonRelated extends EntityRelatedNew<LessonDTO> {
+//   api: ApiMethods<Lesson>;
+//   fields: {[K in keyof LessonDTO] : string}
+//     //{ [K in keyof Omit<LessonDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : LessonDTO[K] extends string ? 'string' : LessonDTO[K] extends number ? 'number' : never };
+//
+//   // constructor() {
+//   //   // super();
+//   //   this.api = new EntityApi<Lesson>('lesson');
+//   //   this.fields = {
+//   //     teacher: 'entity',
+//   //     subject: 'entity',
+//   //     lessonType: 'entity',
+//   //     lessonTime: 'entity',
+//   //     classroom: 'entity',
+//   //     day: 'entity',
+//   //     weekType: 'entity',
+//   //     subgroup: 'entity',
+//   //   };
+//   // }
+//
+//   // create(obj: LessonDTO): Lesson {
+//   //   return new Lesson({
+//   //     ...obj,
+//   //     teacher: new Teacher({ ...obj.teacher, academicStatus: new AcademicStatus(obj.teacher.academicStatus) }),
+//   //     subject: new Subject(obj.subject),
+//   //     lessonType: new LessonType(obj.lessonType),
+//   //     lessonTime: obj.lessonTime ? new LessonTime(obj.lessonTime) : undefined,
+//   //     classroom: obj.classroom ? new Classroom({
+//   //       ...obj.classroom,
+//   //       building: new Building(obj.classroom.building),
+//   //     }) : undefined,
+//   //     day: obj.day ? new Day(obj.day) : undefined,
+//   //     weekType: obj.weekType ? new WeekType(obj.weekType) : undefined,
+//   //     subgroup: new Subgroup(obj.subgroup),
+//   //   });
+//   // }
+//
+//   createEmpty() {
+//     return Lesson.createEmpty();
+//   }
+// }
 
 export const getDisplayName = (entityName: AllEntitiesNames, obj: any): string => {
   try {
@@ -350,7 +380,7 @@ export const getDisplayName = (entityName: AllEntitiesNames, obj: any): string =
 };
 
 
-export const allEntitiesRelated: { [K in AllEntitiesNames]: EntityRelated<EntitiesNamesToTypes[K]> } = {
+export const allEntitiesRelated: { [K in AllEntitiesNames]: any } = {
   academicStatus: new AcademicStatusRelated(),
   teacher: new TeacherRelated(),
   lessonTime: new LessonTimeRelated(),
@@ -361,5 +391,5 @@ export const allEntitiesRelated: { [K in AllEntitiesNames]: EntityRelated<Entiti
   subgroup: new SubgroupRelated(),
   building: new BuildingRelated(),
   classroom: new ClassroomRelated(),
-  lesson: new LessonRelated(),
+  lesson: LessonRelated,
 };

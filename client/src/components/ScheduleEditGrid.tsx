@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
-import { Lesson } from '../entities/entitiesClasses';
 import { LessonCard, ScheduleGrid } from '../pages/Schedule';
 import { ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { FilterType } from '../common/types';
@@ -104,7 +103,7 @@ function ScheduleEditGrid(): JSX.Element {
                 const newLesson = { ...draggedLesson, lessonTime: lessonTime, day: day };
                 setAllLessons((lessons) => {
                   return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
-                    newLesson] as Lesson[];
+                    newLesson];
                 });
               }
             }}
@@ -191,7 +190,7 @@ function ScheduleEditGrid(): JSX.Element {
             {conflictedModalData.map((l: LessonDTO, i: number) => (
               <LessonCard
                 key={i}
-                lesson={l as Lesson}
+                lesson={l}
                 filterType={selectedType}
               />
             ))}
@@ -233,7 +232,7 @@ function ScheduleEditGrid(): JSX.Element {
                     >
                       {addCollisionLine(lesson as Required<LessonDTO>)}
                       <LessonCard
-                        lesson={lesson as Lesson}
+                        lesson={lesson}
                         filterType={selectedType}
                         isSelected={selectedLesson?.id === lesson.id}
                       />
@@ -256,7 +255,7 @@ function ScheduleEditGrid(): JSX.Element {
                  const newLesson = { ...draggedLesson, lessonTime: undefined, day: undefined };
                  setAllLessons((lessons) => {
                    return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
-                     newLesson] as Lesson[];
+                     newLesson];
                  });
                }
              }}
