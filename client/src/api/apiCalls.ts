@@ -1,7 +1,6 @@
 import { instance as axios } from './axiosConfig';
 import { AllEntities, AllEntitiesNames, DtoOfEntity } from '../common/types';
-import { allEntitiesRelated } from '../entities/entitiesRelated';
-import { ID } from '../entities/entitiesDTO';
+import { ID, LessonDTO } from '../entities/entitiesDTO';
 
 const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
   academicStatus: 'academic-statuses',
@@ -30,11 +29,9 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
   }
 
   endpoint: string;
-  generateObject: (obj: DtoOfEntity<T>) => T;
 
-  constructor(name: AllEntitiesNames, generateObject: (obj: DtoOfEntity<T>) => T) {
+  constructor(name: AllEntitiesNames) {
     this.endpoint = this.convertEntityNameToEndpoint(name);
-    this.generateObject = generateObject;
   }
 
   async create(entity: Omit<DtoOfEntity<T>, 'id'>): Promise<any> {
@@ -72,10 +69,10 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
   }
 }
 
-export const readLessonsWithFilter = async (id: number, filter: string): Promise<any[]> => {
+export const readLessonsWithFilter = async (id: number, filter: string): Promise<LessonDTO[]> => {
   try {
     const response = await axios.get(`${ENDPOINTS.lesson}/${filter}/${id}`);
-    return (response.data).map(allEntitiesRelated.lesson.create);
+    return (response.data);
   } catch (error) {
     console.log(error);
     return [];

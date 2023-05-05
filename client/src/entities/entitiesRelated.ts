@@ -54,7 +54,7 @@ export class AcademicStatusRelated extends EntityRelated<AcademicStatus> {
 
   constructor() {
     super();
-    this.api = new EntityApi<AcademicStatus>('academicStatus', this.create);
+    this.api = new EntityApi<AcademicStatus>('academicStatus');
     this.fields = {
       name: 'string',
       shortName: 'string',
@@ -76,7 +76,7 @@ export class TeacherRelated extends EntityRelated<Teacher> {
 
   constructor() {
     super();
-    this.api = new EntityApi<Teacher>('teacher', this.create);
+    this.api = new EntityApi<Teacher>('teacher');
     this.fields = {
       firstName: 'string',
       surname: 'string',
@@ -100,7 +100,7 @@ export class LessonTimeRelated extends EntityRelated<LessonTime> {
 
   constructor() {
     super();
-    this.api = new EntityApi<LessonTime>('lessonTime', this.create);
+    this.api = new EntityApi<LessonTime>('lessonTime');
     this.fields = {
       number: 'string',
       timeStart: 'string',
@@ -123,7 +123,7 @@ export class DayRelated extends EntityRelated<Day> {
 
   constructor() {
     super();
-    this.api = new EntityApi<Day>('day', this.create);
+    this.api = new EntityApi<Day>('day');
     this.fields = {
       name: 'string',
     };
@@ -145,7 +145,7 @@ export class SubjectRelated extends EntityRelated<Subject> {
 
   constructor() {
     super();
-    this.api = new EntityApi<Subject>('subject', this.create);
+    this.api = new EntityApi<Subject>('subject');
     this.fields = {
       name: 'string',
       shortName: 'string',
@@ -167,7 +167,7 @@ export class LessonTypeRelated extends EntityRelated<LessonType> {
 
   constructor() {
     super();
-    this.api = new EntityApi<LessonType>('lessonType', this.create);
+    this.api = new EntityApi<LessonType>('lessonType');
     this.fields = {
       name: 'string',
       shortName: 'string',
@@ -189,7 +189,7 @@ export class WeekTypeRelated extends EntityRelated<WeekType> {
 
   constructor() {
     super();
-    this.api = new EntityApi<WeekType>('weekType', this.create);
+    this.api = new EntityApi<WeekType>('weekType');
     this.fields = {
       name: 'string',
     };
@@ -210,7 +210,7 @@ export class SubgroupRelated extends EntityRelated<Subgroup> {
 
   constructor() {
     super();
-    this.api = new EntityApi<Subgroup>('subgroup', this.create);
+    this.api = new EntityApi<Subgroup>('subgroup');
     this.fields = {
       name: 'string',
       studentsNumber: 'number',
@@ -233,7 +233,7 @@ export class BuildingRelated extends EntityRelated<Building> {
 
   constructor() {
     super();
-    this.api = new EntityApi<Building>('building', this.create);
+    this.api = new EntityApi<Building>('building');
     this.fields = {
       name: 'string',
       address: 'string',
@@ -256,7 +256,7 @@ export class ClassroomRelated extends EntityRelated<Classroom> {
 
   constructor() {
     super();
-    this.api = new EntityApi<Classroom>('classroom', this.create);
+    this.api = new EntityApi<Classroom>('classroom');
     this.fields = {
       number: 'string',
       capacity: 'number',
@@ -280,7 +280,7 @@ export class LessonRelated extends EntityRelated<Lesson> {
 
   constructor() {
     super();
-    this.api = new EntityApi<Lesson>('lesson', this.create);
+    this.api = new EntityApi<Lesson>('lesson');
     this.fields = {
       teacher: 'entity',
       subject: 'entity',

@@ -63,7 +63,7 @@ function Schedule({filter, filteredEntity, weekType}: Props): JSX.Element {
   useEffect(() => {
     (async () => {
       const ls = await readLessonsWithFilter(filteredEntity.id, filter);
-      setLessons(ls.filter((l) => l.weekType.id === weekType.id));
+      setLessons(ls.filter((l) => l.weekType?.id === weekType.id));
     })();
 
   }, [filter, filteredEntity, weekType]);

@@ -1,14 +1,12 @@
 import { EntityApi } from './apiCalls';
 import { AcademicStatus } from '../entities/entitiesClasses';
 import mockAxios from 'jest-mock-axios';
-import { AcademicStatusRelated } from '../entities/entitiesRelated';
 
 describe('Entity CRUD operations', () => {
-  const academicStatusRelated = new AcademicStatusRelated();
   let entityApi: EntityApi<AcademicStatus>;
 
   beforeEach(() => {
-    entityApi = new EntityApi('academicStatus', academicStatusRelated.create);
+    entityApi = new EntityApi('academicStatus');
   });
 
   afterEach(() => {
