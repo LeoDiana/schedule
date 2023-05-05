@@ -3,7 +3,7 @@ import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
 import { ENTITY_TITLES, FIELD_TITLES } from '../common/constants';
 import {
-  AllEntitiesNames,
+  AllEntitiesNames, EntitiesNamesToTypes,
 } from '../common/types';
 import { useModal } from '../common/hooks';
 import { CreateModal, EditModal } from '../components/EntityForm';
@@ -37,6 +37,8 @@ function AdminPanel(): JSX.Element {
     return Object.keys(allEntitiesRelated[ent].fields).length + 2;
   }
 
+  const entitiesOfSelectedType: Array<EntitiesNamesToTypes[typeof selectedEntityType]> = entities[selectedEntityType];
+
   return (
     <>
       {isCreateFormOpen &&
@@ -52,7 +54,7 @@ function AdminPanel(): JSX.Element {
             closeEditForm();
           }}
           entityType={selectedEntityType}
-          entity={entities[selectedEntityType].find((item) => item.id === selectedEntityId) as any} />
+          entity={entitiesOfSelectedType.find((item) => item.id === selectedEntityId)} />
       }
 
       <div className='m-5 flex gap-4'>
@@ -87,7 +89,7 @@ function AdminPanel(): JSX.Element {
             <tbody className='space-y-4 divide-y divide-gray-200'>
             {
               entities[selectedEntityType].length ?
-                entities[selectedEntityType].map((item) =>
+                entitiesOfSelectedType.map((item) =>
                   (<tr key={item.id} className='h-10'>
                     {
                       Object.keys(allEntitiesRelated[selectedEntityType].fields).map((fieldName) => {

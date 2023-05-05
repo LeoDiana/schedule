@@ -1,17 +1,19 @@
 import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allEntitiesRelated } from '../../entities/entitiesRelated';
 import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes } from '../../common/types';
-import { DayDTO, ID, LessonTimeDTO } from '../../entities/entitiesDTO';
+import { ID } from '../../entities/entitiesDTO';
 
-interface CreateProps {
-  entityName: AllEntitiesNames,
-  entity: object
+interface CreatePropsGeneral <T extends AllEntitiesNames> {
+  entityName: T,
+  entity: EntitiesNamesToTypes[T]
 }
+type CreateProps = CreatePropsGeneral <AllEntitiesNames>;
 
-interface UpdateProps {
-  entityName: AllEntitiesNames,
-  entity: { id: ID }
+interface UpdatePropsGeneral<T extends AllEntitiesNames> {
+  entityName: T,
+  entity: EntitiesNamesToTypes[T]
 }
+type UpdateProps = UpdatePropsGeneral<AllEntitiesNames>;
 
 interface DeleteProps {
   entityName: AllEntitiesNames,
@@ -54,13 +56,16 @@ export const entitiesSlice = createSlice({
       state.status = 'loading';
     }).addCase(deleteEntity.fulfilled, (state, action: PayloadAction<DeleteProps>) => {
       const { entityName, id } = action.payload;
-      state.entities[entityName] = state.entities[entityName].filter((item) => item.id !== id);
+      const entityStore: Array<EntitiesNamesToTypes[typeof entityName]> = state.entities[entityName];
+      entityStore.filter((item) => item.id !== id);
     }).addCase(createEntity.fulfilled, (state, action: PayloadAction<CreateProps>) => {
       const { entityName, entity } = action.payload;
-      state.entities[entityName].push(entity as EntitiesNamesToTypes[typeof entityName]);
+      const entityStore: Array<EntitiesNamesToTypes[typeof entityName]> = state.entities[entityName];
+      entityStore.push(entity);
     }).addCase(updateEntity.fulfilled, (state, action: PayloadAction<UpdateProps>) => {
       const { entityName, entity } = action.payload;
-      state.entities[entityName] = state.entities[entityName].map((ent) => ent.id !== entity.id ? ent : entity as EntitiesNamesToTypes[typeof entityName]);
+      const entityStore: Array<EntitiesNamesToTypes[typeof entityName]> = state.entities[entityName];
+      (state.entities[entityName] as Array<EntitiesNamesToTypes[typeof entityName]>) = entityStore.map((ent) => ent.id !== entity.id ? ent : entity);
     });
   },
 });
@@ -84,7 +89,7 @@ export type CreateEntityApi = AsyncThunk<CreateProps, CreateProps, any>;
 export const createEntity = createAsyncThunk<CreateProps, CreateProps>(
   'entities/createEntity',
   async ({ entityName, entity }) => {
-    const result = await allEntitiesRelated[entityName].api.create(entity as any);
+    const result = await allEntitiesRelated[entityName].api.create(entity);
     return { entityName, entity: result.data };
   });
 
@@ -92,14 +97,14 @@ export type UpdateEntityApi = AsyncThunk<UpdateProps, UpdateProps, any>;
 export const updateEntity = createAsyncThunk<UpdateProps, UpdateProps>(
   'entities/editEntity',
   async ({ entityName, entity }) => {
-    const result = await allEntitiesRelated[entityName].api.update(entity as any);
+    const result = await allEntitiesRelated[entityName].api.update(entity);
     return { entityName, entity: result.data };
   });
 
 
 export const selectAllEntities = (state: { entities: InitialState }) => state.entities.entities;
-export const selectDays = (state: { entities: InitialState }) => state.entities.entities.day as DayDTO[];
-export const selectLessonTimes = (state: { entities: InitialState }) => state.entities.entities.lessonTime as LessonTimeDTO[];
+export const selectDays = (state: { entities: InitialState }) => state.entities.entities.day;
+export const selectLessonTimes = (state: { entities: InitialState }) => state.entities.entities.lessonTime;
 export const selectSubgroup = (state: { entities: InitialState }) => state.entities.entities.subgroup;
 export const selectTeacher = (state: { entities: InitialState }) => state.entities.entities.teacher;
 export const selectWeekType = (state: { entities: InitialState }) => state.entities.entities.weekType;

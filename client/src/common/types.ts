@@ -32,6 +32,6 @@ export type AllFields = UnionToIntersection<AllEntities>;
 
 export type FieldType = 'string' | 'number' | 'entity';
 
-export type AllEntitiesItems = { [K in AllEntitiesNames]: Array<AllEntities> };
+export type AllEntitiesItems = { [K in AllEntitiesNames]: Array<EntitiesNamesToTypes[K]> };
 
 export type FilterType = 'subgroup' | 'teacher';

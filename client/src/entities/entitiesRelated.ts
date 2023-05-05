@@ -18,9 +18,13 @@ import {
   FieldType,
 } from '../common/types';
 
-export interface EntityRelated<T extends AllEntities> {
+export type Fields<T extends AllEntities> = {
+  [K in keyof Omit<T, 'id'>]: FieldType
+}
+
+interface EntityRelated<T extends AllEntities> {
   api: ApiMethods<T>;
-  fields: {[K in keyof Omit<T, 'id'> ]: FieldType}
+  fields: Fields<T>
   createEmpty: () => Partial<T>
 }
 

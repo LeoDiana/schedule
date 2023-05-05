@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
 import { LessonCard, ScheduleGrid } from '../pages/Schedule';
 import { ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { FilterType } from '../common/types';
+import { EntitiesNamesToTypes, FilterType } from '../common/types';
 import { Filters, useFilters } from './Filters';
 import { CreateModal, EditModal } from './EntityForm';
 import { useModal } from '../common/hooks';
@@ -60,7 +60,7 @@ function ScheduleEditGrid(): JSX.Element {
   const filteredLessons = getFilteredLessons();
 
   useEffect(() => {
-    const allLessons = allEntities.lesson as LessonDTO[];
+    const allLessons = allEntities.lesson;
     const lessonsInSchedule = allLessons.filter(hasPositionInSchedule) as Required<LessonDTO>[];
 
     const tables = buildScheduleTables(lessonsInSchedule, weekTypes, days, lessonTimes);
@@ -142,7 +142,8 @@ function ScheduleEditGrid(): JSX.Element {
 
     const type = tableNameToFilterType(collision.filter.tableName);
 
-    const item = allEntities[type].find(i => i.id === collision.filter.item) as { name: string };
+    const entitiesOfType: Array<EntitiesNamesToTypes[typeof type]> = allEntities[type];
+    const item = entitiesOfType.find((i: { id: ID; }) => i.id === collision.filter.item);
     const week = weekTypes.find(w => w.id === collision.filter.weekType);
 
     function handleClick() {
