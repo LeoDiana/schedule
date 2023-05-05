@@ -327,7 +327,7 @@ export class LessonRelated extends EntityRelated<Lesson> {
         building: new Building(obj.classroom.building),
       }) : undefined,
       day: obj.day ? new Day(obj.day) : undefined,
-      weekType: new WeekType(obj.weekType),
+      weekType: obj.weekType ? new WeekType(obj.weekType) : undefined,
       subgroup: new Subgroup(obj.subgroup),
     });
   }

@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { getDisplayName } from '../entities/entitiesRelated';
-import { Lesson } from '../entities/entitiesClasses';
 import { readLessonsWithFilter } from '../api/apiCalls';
 import { FilterType } from '../common/types';
 import { useSelector } from 'react-redux';
 import { selectDays, selectLessonTimes } from '../features/entities/entitiesSlice';
-import { DayDTO, LessonTimeDTO } from '../entities/entitiesDTO';
+import { DayDTO, LessonDTO, LessonTimeDTO } from '../entities/entitiesDTO';
 
 interface LessonCardProps {
-  lesson: Lesson,
+  lesson: LessonDTO,
   filterType: FilterType,
   isSelected?: boolean
 }
@@ -59,7 +58,7 @@ interface Props {
 function Schedule({filter, filteredEntity, weekType}: Props): JSX.Element {
   const lessonTimes = useSelector(selectLessonTimes);
   const days = useSelector(selectDays);
-  const [lessons, setLessons] = useState<Lesson[]>();
+  const [lessons, setLessons] = useState<LessonDTO[]>();
 
   useEffect(() => {
     (async () => {

@@ -3,7 +3,7 @@ import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated'
 import { Lesson } from '../entities/entitiesClasses';
 import { LessonCard, ScheduleGrid } from '../pages/Schedule';
 import { ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { EditableLesson, FilterType } from '../common/types';
+import { FilterType } from '../common/types';
 import { Filters, useFilters } from './Filters';
 import { CreateModal, EditModal } from './EntityForm';
 import { useModal } from '../common/hooks';
@@ -27,7 +27,7 @@ import Modal from './Modal';
 import { MARKED_AS } from '../common/constants';
 import toast from 'react-hot-toast';
 
-function hasPositionInSchedule(lesson: EditableLesson): boolean {
+function hasPositionInSchedule(lesson: LessonDTO): boolean {
   return !!(lesson.lessonTime && lesson.day);
 }
 
@@ -37,9 +37,9 @@ function ScheduleEditGrid(): JSX.Element {
   const lessonTimes = useSelector(selectLessonTimes);
   const days = useSelector(selectDays);
 
-  const [draggedLesson, setDraggedLesson] = useState<EditableLesson>();
+  const [draggedLesson, setDraggedLesson] = useState<LessonDTO>();
 
-  const [allLessons, setAllLessons] = useState<EditableLesson[]>([]);
+  const [allLessons, setAllLessons] = useState<LessonDTO[]>([]);
 
   const [scheduleTables, setScheduleTables] = useState<ScheduleTables>();
   const [collisions, setCollisions] = useState<Collisions>();
@@ -49,7 +49,7 @@ function ScheduleEditGrid(): JSX.Element {
     weekTypes, selectedWeekType, setWeekType,
   ] = useFilters();
 
-  const [selectedLesson, setSelectedLesson] = useState<EditableLesson>();
+  const [selectedLesson, setSelectedLesson] = useState<LessonDTO>();
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
   const [isConflictedModalOpen, openConflictedModal, closeConflictedModal] = useModal();
@@ -310,7 +310,7 @@ function ScheduleEditGrid(): JSX.Element {
                 }
               >
                 <LessonCard
-                  lesson={lesson as Lesson}
+                  lesson={lesson}
                   filterType={selectedType}
                   isSelected={selectedLesson?.id === lesson.id}
                 />
