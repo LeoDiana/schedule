@@ -1,5 +1,8 @@
 import { instance as axios } from './axiosConfig';
-import { AllEntities, AllEntitiesNames, DtoOfEntity, Dtos } from '../common/types';
+import {
+  AllEntities,
+  AllEntitiesNames,
+} from '../common/types';
 import { ID, LessonDTO } from '../entities/entitiesDTO';
 
 const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
@@ -16,14 +19,14 @@ const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
   lesson: 'lessons',
 };
 
-export type ApiMethods<T extends Dtos> = {
+export type ApiMethods<T extends AllEntities> = {
   create: (obj: Omit<T, 'id'>) => Promise<any>;
   update: (obj: T) => Promise<any>;
   delete: (id: ID) => void;
   readAll: () => Promise<T[]>;
 };
 
-export class EntityApi<T extends Dtos> implements ApiMethods<T> {
+export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
   private convertEntityNameToEndpoint(name: AllEntitiesNames) {
     return ENDPOINTS[name];
   }
