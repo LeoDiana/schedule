@@ -45,7 +45,13 @@ export class LessonsController {
     @Param('id') id: string,
     @Body() lesson: Lesson,
   ): Promise<Lesson> {
-    return await this.lessonsService.update(lesson);
+    const newLesson = {
+      weekType: null,
+      lessonTime: null,
+      day: null,
+      ...lesson,
+    };
+    return await this.lessonsService.update(newLesson);
   }
 
   @Delete(':id')

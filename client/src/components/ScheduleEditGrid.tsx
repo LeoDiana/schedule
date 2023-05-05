@@ -57,7 +57,7 @@ function ScheduleEditGrid(): JSX.Element {
 
   const [conflictedModalData, setConflictedModalData] = useState<Required<LessonDTO>[]>();
 
-  const lessonsNotOnSchedule = filterLessonsBy(selectedType, selectedEntity).filter((lesson) => !hasPositionInSchedule(lesson));
+  const lessonsNotOnSchedule = allLessons.filter((lesson) => !hasPositionInSchedule(lesson));
   const filteredLessons = getFilteredLessons();
 
   useEffect(() => {
@@ -139,7 +139,7 @@ function ScheduleEditGrid(): JSX.Element {
     const markedAs = collision.markedAs;
     const weekType = weekTypes.find(w => w.id === collision.filter.weekType).name;
     const day = days.find(d => d.id === collision.filter.day)?.name;
-    const lessonTime = lessonTimes.find(lt => lt.id === collision.filter.lessonTime)?.displayName;
+    const lessonTime = getDisplayName('lessonTime', lessonTimes.find(lt => lt.id === collision.filter.lessonTime));
 
     const type = tableNameToFilterType(collision.filter.tableName);
 

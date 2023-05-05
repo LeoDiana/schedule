@@ -1,9 +1,4 @@
-import {
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Teacher } from '../teachers/teachers.entity';
 import { LessonType } from '../lesson-types/lesson-types.entity';
 import { Classroom } from '../classrooms/classrooms.entity';
@@ -30,7 +25,7 @@ export class Lesson {
   @JoinColumn()
   lessonType: LessonType;
 
-  @ManyToOne(() => LessonTime, { eager: true })
+  @ManyToOne(() => LessonTime, { eager: true, nullable: true })
   @JoinColumn()
   lessonTime: LessonTime;
 
@@ -38,11 +33,11 @@ export class Lesson {
   @JoinColumn()
   classroom: Classroom;
 
-  @ManyToOne(() => Day, { eager: true })
+  @ManyToOne(() => Day, { eager: true, nullable: true })
   @JoinColumn()
   day: Day;
 
-  @ManyToOne(() => WeekType, { eager: true })
+  @ManyToOne(() => WeekType, { eager: true, nullable: true })
   @JoinColumn()
   weekType: WeekType;
 
