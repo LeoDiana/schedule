@@ -204,28 +204,6 @@ export class WeekTypeRelated extends EntityRelated<WeekType> {
   }
 }
 
-// export class GroupRelated extends EntityRelated<Group> {
-//   api: ApiMethods<Group>;
-//   fields: { [K in keyof Omit<GroupDTO, 'id'>]: K extends AllEntitiesNames ? 'entity' : GroupDTO[K] extends string ? 'string' : GroupDTO[K] extends number ? 'number' : never };
-//
-//   constructor() {
-//     super();
-//     this.api = new EntityApi<Group>('group', this.create);
-//     this.fields = {
-//       name: 'string',
-//       startYear: 'number',
-//     };
-//   }
-//
-//   create(obj: GroupDTO): Group {
-//     return new Group(obj);
-//   }
-//
-//   createEmpty() {
-//     return Group.createEmpty();
-//   }
-// }
-
 export class SubgroupRelated extends EntityRelated<Subgroup> {
   api: ApiMethods<Subgroup>;
   fields: { [K in keyof Required<Omit<SubgroupDTO, 'id'>>]: FieldType };
@@ -354,7 +332,6 @@ export const getDisplayName = (entityName: AllEntitiesNames, obj: any): string =
         return obj.shortName;
       case 'weekType':
         return obj.name;
-      // case 'group': return obj.name;
       case 'subgroup':
         return obj.name;
       case 'building':

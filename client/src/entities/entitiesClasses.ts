@@ -306,28 +306,3 @@ export class Lesson implements ConstructorFor<LessonDTO>, Entity {
     };
   }
 }
-
-
-// export class OoO implements ConstructorFor<OoODTO>, Entity {
-//   // fields
-//
-//   public get displayName(): string {
-//     return `${this.surname} ${this.firstName[0]}.${this.patronymic[0]}.`;
-//   }
-//
-//   constructor(obj: ConstructorFor<OoODTO>) {
-//     const { firstName, surname, patronymic, academicStatus, id } = obj;
-//     this.surname = surname;
-//     this.firstName = firstName;
-//     this.patronymic = patronymic;
-//     this.academicStatus = academicStatus;
-//     this.id = id;
-//   }
-//
-//   static createEmpty(): EmptyEntityOf<OoO> {
-//     return {
-//     };
-//   }
-// }
-
-
