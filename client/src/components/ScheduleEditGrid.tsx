@@ -25,6 +25,7 @@ import {
 import { ID, LessonDTO } from '../entities/entitiesDTO';
 import Modal from './Modal';
 import { MARKED_AS } from '../common/constants';
+import toast from 'react-hot-toast';
 
 function hasPositionInSchedule(lesson: EditableLesson): boolean {
   return !!(lesson.lessonTime && lesson.day);
@@ -286,6 +287,7 @@ function ScheduleEditGrid(): JSX.Element {
             className='p-2 rounded-lg border-2 border-blue-500 text-blue-500 font-semibold mb-2'
             onClick={() => {
               allLessons.forEach(lesson => dispatch(updateEntity({ entityName: 'lesson', entity: lesson })));
+              toast.success('Збережено')
             }}
           >
             <ArrowDownTrayIcon className='w-5 inline stroke-2' /> Зберегти зміни
