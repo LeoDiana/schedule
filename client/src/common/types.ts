@@ -1,6 +1,6 @@
 import {
   AcademicStatus, Building, Classroom,
-  Day, Group, Lesson,
+  Day, Lesson,
   LessonTime,
   LessonType,
   Subgroup,
@@ -10,7 +10,7 @@ import {
 } from '../entities/entitiesClasses';
 import {
   AcademicStatusDTO, BuildingDTO, ClassroomDTO,
-  DayDTO, GroupDTO, LessonDTO,
+  DayDTO, ID, LessonDTO,
   LessonTimeDTO,
   LessonTypeDTO, SubgroupDTO,
   SubjectDTO,
@@ -27,7 +27,6 @@ export type EntitiesNamesToTypes = {
   subject: Subject;
   lessonType: LessonType;
   weekType: WeekType;
-  group: Group;
   subgroup: Subgroup;
   building: Building;
   classroom: Classroom;
@@ -38,19 +37,18 @@ export type AllEntities = EntitiesNamesToTypes[keyof EntitiesNamesToTypes];
 export type AllEntitiesNames = keyof EntitiesNamesToTypes;
 
 export type DtoOfEntity<T extends AllEntities> =
-    T extends AcademicStatus ? AcademicStatusDTO
-  : T extends Teacher ? TeacherDTO
-  : T extends LessonTime ? LessonTimeDTO
-  : T extends Subject ? SubjectDTO
-  : T extends LessonType ? LessonTypeDTO
-  : T extends Group ? GroupDTO
-  : T extends Subgroup ? SubgroupDTO
-  : T extends Building ? BuildingDTO
-  : T extends Classroom ? ClassroomDTO
-  : T extends Lesson ? LessonDTO
-  : T extends Day ? DayDTO
-  : T extends WeekType ? WeekTypeDTO
-  : never;
+  T extends AcademicStatus ? AcademicStatusDTO
+    : T extends Teacher ? TeacherDTO
+      : T extends LessonTime ? LessonTimeDTO
+        : T extends Subject ? SubjectDTO
+          : T extends LessonType ? LessonTypeDTO
+            : T extends Subgroup ? SubgroupDTO
+              : T extends Building ? BuildingDTO
+                : T extends Classroom ? ClassroomDTO
+                  : T extends Lesson ? LessonDTO
+                    : T extends Day ? DayDTO
+                      : T extends WeekType ? WeekTypeDTO
+                        : never;
 
 type DtoFieldsToCorrespondingClasses<T extends DtoOfEntity<AllEntities>> = {
   [K in keyof T]: K extends AllEntitiesNames ? EntitiesNamesToTypes[K] : T[K];
@@ -85,7 +83,7 @@ export type AllEntitiesItems = { [K in AllEntitiesNames]: Array<AllEntities> };
 
 
 // export type FieldsOf<T extends AllEntities> = { [K in keyof Omit<DtoOfEntity<T>, 'id'>]: K extends AllEntitiesNames ? 'entity' : DtoOfEntity<T>[K] extends string ? 'string' : DtoOfEntity<T>[K] extends number ? 'number' : never };
-export type FieldsOf<T extends AllEntities> = { [K in keyof Omit<DtoOfEntity<T>, 'id'>]: FieldType};
+export type FieldsOf<T extends AllEntities> = { [K in keyof Omit<DtoOfEntity<T>, 'id'>]: FieldType };
 
 export type EmptyEntityOf<T extends AllEntities> = { [K in keyof Omit<DtoOfEntity<T>, 'id'>]: undefined };
 type ThisTypeAndUndefined<T> = { [K in keyof T]: undefined | T[K] };
@@ -93,7 +91,7 @@ export type CreationTypeOf<T extends AllEntities> = ThisTypeAndUndefined<Omit<Dt
 
 export type FilterType = 'subgroup' | 'teacher';
 
-export type EditableLesson = Partial<LessonDTO> & {id: number};
+export type EditableLesson = Partial<LessonDTO> & { id: ID };
 
 // export type DtoOfEntityName<T extends AllEntitiesNames> = T extends 'academicStatus'
 //   ? AcademicStatusDTO

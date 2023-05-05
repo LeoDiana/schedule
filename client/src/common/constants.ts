@@ -1,4 +1,5 @@
 import { AllEntitiesNames, AllFields, FilterType } from './types';
+import { CollisionMark } from './scheduleLogic';
 
 export const ENTITY_TITLES: { [K in AllEntitiesNames]: string } = {
   academicStatus: 'Академічний статус',
@@ -7,9 +8,8 @@ export const ENTITY_TITLES: { [K in AllEntitiesNames]: string } = {
   day: 'День',
   subject: 'Предмет',
   lessonType: 'Тип заняття',
-  group: 'Група',
-  subgroup: 'Підгрупа',
-  weekType: 'Тип тижня',
+  subgroup: 'Група',
+  weekType: 'Тиждень',
   building: 'Корпус',
   classroom: 'Аудиторія',
   lesson: 'Заняття',
@@ -32,5 +32,10 @@ export const FIELD_TITLES: { [K in keyof AllFields]: string } = {
   address: 'Адреса',
   ...ENTITY_TITLES,
 };
+
+export const MARKED_AS: { [K in CollisionMark]: string } = {
+  conflict: 'конфлікт',
+  ok: 'ок',
+}
 
 export const FILTERS: FilterType[] = ['subgroup', 'teacher'];

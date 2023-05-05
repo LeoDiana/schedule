@@ -1,11 +1,13 @@
+export type ID = number;
+
 export interface AcademicStatusDTO {
-  id: number;
+  id: ID;
   name: string;
   shortName: string;
 }
 
 export interface TeacherDTO {
-  id: number;
+  id: ID;
   firstName: string;
   surname: string;
   patronymic: string;
@@ -13,63 +15,57 @@ export interface TeacherDTO {
 }
 
 export interface LessonTimeDTO {
-  id: number;
+  id: ID;
   number: string;
   timeStart: string;
   timeEnd: string;
 }
 
 export interface DayDTO {
-  id: number;
+  id: ID;
   name: string;
 }
 
 export interface SubjectDTO {
-  id: number;
+  id: ID;
   name: string;
   shortName: string;
 }
 
 export interface LessonTypeDTO {
-  id: number;
+  id: ID;
   name: string;
   shortName: string;
 }
 
 export interface WeekTypeDTO {
-  id: number;
+  id: ID;
   name: string;
-}
-
-export interface GroupDTO {
-  id: number;
-  name: string;
-  startYear: number;
 }
 
 export interface SubgroupDTO {
-  id: number;
-  name?: string;
-  group: GroupDTO;
+  id: ID;
+  name: string;
+  startYear: number;
   studentsNumber: number;
 }
 
 export interface BuildingDTO {
-  id: number;
+  id: ID;
   name: string;
   address: string;
 }
 
 
 export interface ClassroomDTO {
-  id: number;
+  id: ID;
   number: string;
   capacity: number;
   building: BuildingDTO;
 }
 
 export interface LessonDTO {
-  id: number;
+  id: ID;
   teacher: TeacherDTO;
   subject: SubjectDTO;
   lessonType: LessonTypeDTO;

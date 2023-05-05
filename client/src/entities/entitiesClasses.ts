@@ -1,7 +1,7 @@
 import { ConstructorFor, EmptyEntityOf } from '../common/types';
 import {
   AcademicStatusDTO, BuildingDTO, ClassroomDTO,
-  DayDTO, GroupDTO, LessonDTO,
+  DayDTO, ID, LessonDTO,
   LessonTimeDTO,
   LessonTypeDTO,
   SubgroupDTO,
@@ -10,12 +10,12 @@ import {
 } from './entitiesDTO';
 
 interface Entity {
-  id: number,
+  id: ID,
   displayName: string,
 }
 
 export class AcademicStatus implements AcademicStatusDTO, Entity {
-  id: number;
+  id: ID;
   name: string;
   shortName: string;
 
@@ -39,7 +39,7 @@ export class AcademicStatus implements AcademicStatusDTO, Entity {
 }
 
 export class Teacher implements ConstructorFor<TeacherDTO>, Entity {
-  id: number;
+  id: ID;
   firstName: string;
   surname: string;
   patronymic: string;
@@ -69,7 +69,7 @@ export class Teacher implements ConstructorFor<TeacherDTO>, Entity {
 }
 
 export class LessonTime implements LessonTimeDTO, Entity {
-  id: number;
+  id: ID;
   number: string;
   timeStart: string;
   timeEnd: string;
@@ -96,7 +96,7 @@ export class LessonTime implements LessonTimeDTO, Entity {
 }
 
 export class Day implements DayDTO, Entity {
-  id: number;
+  id: ID;
   name: string;
 
   public get displayName(): string {
@@ -117,7 +117,7 @@ export class Day implements DayDTO, Entity {
 }
 
 export class Subject implements SubjectDTO, Entity {
-  id: number;
+  id: ID;
   name: string;
   shortName: string;
 
@@ -141,7 +141,7 @@ export class Subject implements SubjectDTO, Entity {
 }
 
 export class LessonType implements LessonTypeDTO, Entity {
-  id: number;
+  id: ID;
   name: string;
   shortName: string;
 
@@ -165,7 +165,7 @@ export class LessonType implements LessonTypeDTO, Entity {
 }
 
 export class WeekType implements ConstructorFor<WeekTypeDTO>, Entity {
-  id: number;
+  id: ID;
   name: string;
 
   public get displayName(): string {
@@ -185,46 +185,21 @@ export class WeekType implements ConstructorFor<WeekTypeDTO>, Entity {
   }
 }
 
-export class Group implements ConstructorFor<GroupDTO>, Entity {
-  id: number;
+export class Subgroup implements ConstructorFor<SubgroupDTO>, Entity {
+  id: ID;
   name: string;
   startYear: number;
+  studentsNumber: number;
 
   public get displayName(): string {
     return this.name;
   }
 
-  constructor(obj: ConstructorFor<GroupDTO>) {
-    const { name, startYear, id } = obj;
-    this.name = name;
-    this.startYear = startYear;
-    this.id = id;
-  }
-
-  static createEmpty(): EmptyEntityOf<Group> {
-    return {
-      name: undefined,
-      startYear: undefined,
-    };
-  }
-}
-
-
-export class Subgroup implements ConstructorFor<SubgroupDTO>, Entity {
-  id: number;
-  name?: string;
-  group: Group;
-  studentsNumber: number;
-
-  public get displayName(): string {
-    return `${this.group.displayName} ${this.name ? this.name : ''}`;
-  }
-
   constructor(obj: ConstructorFor<SubgroupDTO>) {
-    const { name, group, studentsNumber, id } = obj;
-    this.name = name || undefined;
+    const { name, startYear, studentsNumber, id } = obj;
+    this.name = name;
     this.studentsNumber = studentsNumber;
-    this.group = group;
+    this.startYear = startYear;
     this.id = id;
   }
 
@@ -232,13 +207,13 @@ export class Subgroup implements ConstructorFor<SubgroupDTO>, Entity {
     return {
       name: undefined,
       studentsNumber: undefined,
-      group: undefined,
+      startYear: undefined,
     };
   }
 }
 
 export class Building implements ConstructorFor<BuildingDTO>, Entity {
-  id: number;
+  id: ID;
   name: string;
   address: string;
 
@@ -263,7 +238,7 @@ export class Building implements ConstructorFor<BuildingDTO>, Entity {
 
 
 export class Classroom implements ConstructorFor<ClassroomDTO>, Entity {
-  id: number;
+  id: ID;
   number: string;
   capacity: number;
   building: Building;
@@ -291,7 +266,7 @@ export class Classroom implements ConstructorFor<ClassroomDTO>, Entity {
 
 
 export class Lesson implements ConstructorFor<LessonDTO>, Entity {
-  id: number;
+  id: ID;
   teacher: Teacher;
   subject: Subject;
   lessonType: LessonType;

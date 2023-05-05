@@ -18,6 +18,7 @@ import {
   UpdateEntityApi,
 } from '../features/entities/entitiesSlice';
 import Modal from './Modal';
+import toast from 'react-hot-toast';
 
 interface BaseFormProps<T extends AllEntities> {
   name: AllEntitiesNames
@@ -51,12 +52,10 @@ function EntityForm<T extends FormType, E extends AllEntities>({
   const allEntities = useSelector(selectAllEntities);
 
   const [values, setValues] = useState<CreationTypeOf<E> | DtoOfEntity<E>>(entity);
-  const [showNotification, setShowNotification] = useState(false);
 
   async function handleSubmit(): Promise<void> {
     dispatch(apiFunc({ entityName: name, entity: values as any }));
-    setShowNotification(true);
-    setTimeout(() => setShowNotification(false), 3 * 1000);
+    toast.success('Збережено');
   }
 
   const renderInput = (fieldName: string) => {
@@ -96,9 +95,8 @@ function EntityForm<T extends FormType, E extends AllEntities>({
 
   return (
     <>
-      {showNotification ?? <SuccessfulNotification />}
       <form
-        className='fixed bg-white z-20 p-7 w-96 flex flex-col items-center gap-3 rounded-3xl drop-shadow-2xl left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2'>
+        className='bg-white p-7 w-96 flex flex-col items-center gap-3 rounded-3xl drop-shadow-2xl'>
         <h6 className='text-2xl font-semibold mb-3'>{ENTITY_TITLES[name]}</h6>
         {Object.keys(fields).map((fieldName) => renderInput(fieldName))}
         <button type='button'
@@ -109,15 +107,6 @@ function EntityForm<T extends FormType, E extends AllEntities>({
         </button>
       </form>
     </>
-  );
-}
-
-function SuccessfulNotification(): JSX.Element {
-  return (
-    <div
-      className='bg-green-500 font-bold fixed z-50 left-1/2 -translate-x-1/2 bottom-10 rounded-lg py-2 px-6 drop-shadow-md'>
-      Entity created/edited
-    </div>
   );
 }
 

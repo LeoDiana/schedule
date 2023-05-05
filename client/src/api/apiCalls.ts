@@ -1,6 +1,7 @@
 import { instance as axios } from './axiosConfig';
 import { AllEntities, AllEntitiesNames, DtoOfEntity } from '../common/types';
 import { allEntitiesRelated } from '../entities/entitiesRelated';
+import { ID } from '../entities/entitiesDTO';
 
 const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
   academicStatus: 'academic-statuses',
@@ -11,7 +12,6 @@ const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
   subject: 'subjects',
   weekType: 'week-types',
   subgroup: 'subgroups',
-  group: 'groups',
   building: 'buildings',
   classroom: 'classrooms',
   lesson: 'lessons',
@@ -20,7 +20,7 @@ const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
 export type ApiMethods<T extends AllEntities> = {
   create: (obj: Omit<DtoOfEntity<T>, 'id'>) => Promise<any>;
   update: (obj: DtoOfEntity<T>) => Promise<any>;
-  delete: (id: number) => void;
+  delete: (id: ID) => void;
   readAll: () => Promise<DtoOfEntity<T>[]>;
 };
 
@@ -53,7 +53,7 @@ export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
     }
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: ID): Promise<void> {
     try {
       await axios.delete(`${this.endpoint}/${id}`);
     } catch (error) {

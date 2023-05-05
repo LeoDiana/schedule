@@ -12,7 +12,7 @@ interface EmptyCellProps {
 function EmptyCell({ lessonTime, day, onDrop, onClick }: EmptyCellProps) {
   return (
     <div className='group'
-         style={{ gridRowStart: lessonTime.id + 1, gridColumnStart: day.id + 1 }}
+         style={{ gridRowStart: Number(lessonTime.id) + 1, gridColumnStart: Number(day.id) + 1 }}
          onDragEnter={(e) => {
            e.preventDefault();
          }}
