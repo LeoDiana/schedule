@@ -16,15 +16,15 @@ function App() {
   return (
     <>
       {status === 'succeeded' ?
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}/>
-          <Route path={ROUTES.view} element={<ScheduleFilter />}/>
-          <Route path={ROUTES.panel} element={<AdminPanel/>}/>
-          <Route path={ROUTES.edit} element={<ScheduleEditGrid/>}/>
-        </Routes>
-      </BrowserRouter>
-       : <p>Loading...</p>
+        <BrowserRouter>
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path={ROUTES.view} element={<ScheduleFilter />} />
+            <Route path={ROUTES.panel} element={<AdminPanel />} />
+            <Route path={ROUTES.edit} element={<ScheduleEditGrid />} />
+          </Routes>
+        </BrowserRouter>
+        : <p>Loading...</p>
       }
     </>
 

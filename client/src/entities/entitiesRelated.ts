@@ -24,8 +24,8 @@ export type Fields<T extends AllEntities> = {
 
 interface EntityRelated<T extends AllEntities> {
   api: ApiMethods<T>;
-  fields: Fields<T>
-  createEmpty: () => Partial<T>
+  fields: Fields<T>;
+  createEmpty: () => Partial<T>;
 }
 
 const AcademicStatusRelated: EntityRelated<AcademicStatusDTO> = {
@@ -37,8 +37,8 @@ const AcademicStatusRelated: EntityRelated<AcademicStatusDTO> = {
   createEmpty: () => ({
     name: undefined,
     shortName: undefined,
-  })
-}
+  }),
+};
 
 const TeacherRelated: EntityRelated<TeacherDTO> = {
   api: createEntityApi<TeacherDTO>('teacher'),
@@ -53,8 +53,8 @@ const TeacherRelated: EntityRelated<TeacherDTO> = {
     firstName: undefined,
     patronymic: undefined,
     academicStatus: undefined,
-  })
-}
+  }),
+};
 
 const LessonTimeRelated: EntityRelated<LessonTimeDTO> = {
   api: createEntityApi('lessonTime'),
@@ -67,8 +67,8 @@ const LessonTimeRelated: EntityRelated<LessonTimeDTO> = {
     number: undefined,
     timeStart: undefined,
     timeEnd: undefined,
-  })
-}
+  }),
+};
 
 const DayRelated: EntityRelated<DayDTO> = {
   api: createEntityApi('day'),
@@ -77,8 +77,8 @@ const DayRelated: EntityRelated<DayDTO> = {
   },
   createEmpty: () => ({
     name: undefined,
-  })
-}
+  }),
+};
 
 const SubjectRelated: EntityRelated<SubjectDTO> = {
   api: createEntityApi('subject'),
@@ -88,9 +88,9 @@ const SubjectRelated: EntityRelated<SubjectDTO> = {
   },
   createEmpty: () => ({
     name: undefined,
-    shortName: undefined
-  })
-}
+    shortName: undefined,
+  }),
+};
 
 const LessonTypeRelated: EntityRelated<LessonTypeDTO> = {
   api: createEntityApi('lessonType'),
@@ -100,9 +100,9 @@ const LessonTypeRelated: EntityRelated<LessonTypeDTO> = {
   },
   createEmpty: () => ({
     name: undefined,
-    shortName: undefined
-  })
-}
+    shortName: undefined,
+  }),
+};
 
 const WeekTypeRelated: EntityRelated<WeekTypeDTO> = {
   api: createEntityApi('weekType'),
@@ -110,23 +110,23 @@ const WeekTypeRelated: EntityRelated<WeekTypeDTO> = {
     name: 'string',
   },
   createEmpty: () => ({
-    name: undefined
-  })
-}
+    name: undefined,
+  }),
+};
 
 const SubgroupRelated: EntityRelated<SubgroupDTO> = {
   api: createEntityApi('subgroup'),
   fields: {
     name: 'string',
     studentsNumber: 'number',
-    startYear: 'number'
+    startYear: 'number',
   },
   createEmpty: () => ({
     name: undefined,
     studentsNumber: undefined,
     startYear: undefined,
-  })
-}
+  }),
+};
 
 const BuildingRelated: EntityRelated<BuildingDTO> = {
   api: createEntityApi('building'),
@@ -137,8 +137,8 @@ const BuildingRelated: EntityRelated<BuildingDTO> = {
   createEmpty: () => ({
     name: undefined,
     address: undefined,
-  })
-}
+  }),
+};
 
 const ClassroomRelated: EntityRelated<ClassroomDTO> = {
   api: createEntityApi('classroom'),
@@ -151,8 +151,8 @@ const ClassroomRelated: EntityRelated<ClassroomDTO> = {
     number: undefined,
     capacity: undefined,
     building: undefined,
-  })
-}
+  }),
+};
 
 const LessonRelated: EntityRelated<LessonDTO> = {
   api: createEntityApi('lesson'),
@@ -167,16 +167,16 @@ const LessonRelated: EntityRelated<LessonDTO> = {
     subgroup: 'entity',
   },
   createEmpty: () => ({
-      teacher: undefined,
-      subject: undefined,
-      lessonType: undefined,
-      lessonTime: undefined,
-      classroom: undefined,
-      day: undefined,
-      weekType: undefined,
-      subgroup: undefined,
-  })
-}
+    teacher: undefined,
+    subject: undefined,
+    lessonType: undefined,
+    lessonTime: undefined,
+    classroom: undefined,
+    day: undefined,
+    weekType: undefined,
+    subgroup: undefined,
+  }),
+};
 
 export const getDisplayName = (entityName: AllEntitiesNames, obj: any): string => {
   try {

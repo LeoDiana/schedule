@@ -4,9 +4,9 @@ import { Filters, useFilters } from './Filters';
 
 export function ScheduleFilter() {
   const [types, selectedType, setType,
-         entities, selectedEntity, setEntity,
-         weekTypes, selectedWeekType, setWeekType
-        ] = useFilters();
+    entities, selectedEntity, setEntity,
+    weekTypes, selectedWeekType, setWeekType,
+  ] = useFilters();
 
   return (
     <>
@@ -14,7 +14,7 @@ export function ScheduleFilter() {
         types={types} selectedType={selectedType}
         setType={setType} entities={entities}
         selectedEntity={selectedEntity} setEntity={setEntity}
-        selectedWeekType={selectedWeekType} setWeekType={setWeekType} weekTypes={weekTypes}/>
+        selectedWeekType={selectedWeekType} setWeekType={setWeekType} weekTypes={weekTypes} />
       {selectedType && selectedEntity ? (
         <Schedule
           {...{

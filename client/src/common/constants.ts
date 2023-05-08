@@ -36,6 +36,6 @@ export const FIELD_TITLES: { [K in keyof AllFields]: string } = {
 export const MARKED_AS: { [K in CollisionMark]: string } = {
   conflict: 'конфлікт',
   ok: 'ок',
-}
+};
 
 export const FILTERS: FilterType[] = ['subgroup', 'teacher'];

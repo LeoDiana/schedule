@@ -4,16 +4,18 @@ import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes, FilterType } 
 import { ID, LessonDTO, WeekTypeDTO } from '../../entities/entitiesDTO';
 import { RootState } from '../../app/store';
 
-interface CreatePropsGeneral <T extends AllEntitiesNames> {
+interface CreatePropsGeneral<T extends AllEntitiesNames> {
   entityName: T,
   entity: EntitiesNamesToTypes[T]
 }
-type CreateProps = CreatePropsGeneral <AllEntitiesNames>;
+
+type CreateProps = CreatePropsGeneral<AllEntitiesNames>;
 
 interface UpdatePropsGeneral<T extends AllEntitiesNames> {
   entityName: T,
   entity: EntitiesNamesToTypes[T]
 }
+
 type UpdateProps = UpdatePropsGeneral<AllEntitiesNames>;
 
 interface DeleteProps {
@@ -113,7 +115,7 @@ export const selectFilteredLessons = (
   state: RootState,
   weekType: WeekTypeDTO,
   filter: FilterType,
-  filteredEntity: { id: ID }
+  filteredEntity: { id: ID },
 ) => state.entities.entities.lesson
   .filter((l) => l.weekType?.id === weekType.id
     && l[filter]?.id === filteredEntity.id) as LessonDTO[];

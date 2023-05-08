@@ -10,7 +10,7 @@ type UseFilterReturn = [FilterType[], FilterType, (type: FilterType) => void,
 
 export function useFilters(): UseFilterReturn {
   const teachers = useSelector(selectTeacher);
-  const subroups = useSelector(selectSubgroup);
+  const subgroups = useSelector(selectSubgroup);
   const weekTypes = useSelector(selectWeekType);
 
   const [typeFilter, setTypeFilter] = useState<FilterType>(FILTERS[0]);
@@ -22,13 +22,13 @@ export function useFilters(): UseFilterReturn {
   useEffect(() => {
     (() => {
       const fetchedEntities = {} as { [k in FilterType]: any };
-      fetchedEntities['subgroup'] = subroups;
+      fetchedEntities['subgroup'] = subgroups;
       fetchedEntities['teacher'] = teachers;
       setEntities(fetchedEntities);
       setSelectedEntity(fetchedEntities[typeFilter][0]);
       setSelectedWeekType(weekTypes[0]);
-    })()
-  }, [teachers, subroups, weekTypes]);
+    })();
+  }, [teachers, subgroups, weekTypes]);
 
   const handleTypeChange = (filter: FilterType) => {
     setTypeFilter(filter);
@@ -63,7 +63,7 @@ export interface FiltersProps {
 export function Filters({
                           types, selectedType, setType,
                           entities, selectedEntity, setEntity,
-                          weekTypes, selectedWeekType, setWeekType
+                          weekTypes, selectedWeekType, setWeekType,
                         }: FiltersProps) {
   return (
     <div className='flex gap-2 p-4'>
@@ -75,7 +75,8 @@ export function Filters({
           onChange={setEntity}
           items={entities} />
       )}
-      <DropdownInput name='weekType' value={selectedWeekType} onChange={(item) => setWeekType(item)} items={weekTypes} />
+      <DropdownInput name='weekType' value={selectedWeekType} onChange={(item) => setWeekType(item)}
+                     items={weekTypes} />
     </div>
   );
 }

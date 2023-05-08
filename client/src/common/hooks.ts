@@ -1,13 +1,13 @@
-import {useState} from "react";
+import { useState } from 'react';
 
-export function useModal(isOpen = false): [boolean, ()=>void, ()=>void] {
+export function useModal(isOpen = false): [boolean, () => void, () => void] {
   const [isModalOpen, setIsModalOpen] = useState(isOpen);
 
-  function openModal():void {
+  function openModal(): void {
     setIsModalOpen(true);
   }
 
-  function closeModal():void {
+  function closeModal(): void {
     setIsModalOpen(false);
   }
 
