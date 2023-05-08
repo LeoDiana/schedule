@@ -90,7 +90,7 @@ export type CreateEntityApi = AsyncThunk<CreateProps, CreateProps, any>;
 export const createEntity = createAsyncThunk<CreateProps, CreateProps>(
   'entities/createEntity',
   async ({ entityName, entity }) => {
-    const result = await allEntitiesRelated[entityName].api.create(entity);
+    const result = await allEntitiesRelated[entityName].api.create(entity as any);
     return { entityName, entity: result.data };
   });
 
@@ -98,7 +98,7 @@ export type UpdateEntityApi = AsyncThunk<UpdateProps, UpdateProps, any>;
 export const updateEntity = createAsyncThunk<UpdateProps, UpdateProps>(
   'entities/editEntity',
   async ({ entityName, entity }) => {
-    const result = await allEntitiesRelated[entityName].api.update(entity);
+    const result = await allEntitiesRelated[entityName].api.update(entity as any);
     return { entityName, entity: result.data };
   });
 
