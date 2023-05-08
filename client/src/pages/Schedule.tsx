@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { getDisplayName } from '../entities/entitiesRelated';
-import { readLessonsWithFilter } from '../api/apiCalls';
 import { FilterType } from '../common/types';
 import { useSelector } from 'react-redux';
-import { selectDays, selectLessonTimes } from '../features/entities/entitiesSlice';
-import { DayDTO, LessonDTO, LessonTimeDTO } from '../entities/entitiesDTO';
+import { selectDays, selectFilteredLessons, selectLessonTimes } from '../features/entities/entitiesSlice';
+import { DayDTO, ID, LessonDTO, LessonTimeDTO, WeekTypeDTO } from '../entities/entitiesDTO';
+import { hasPositionInSchedule } from '../components/ScheduleEditGrid';
+import { RootState } from '../app/store';
 
 interface LessonCardProps {
   lesson: LessonDTO,
@@ -50,30 +51,25 @@ export function TimeCell({number, time}: TimeCellsProps): JSX.Element {
 }
 
 interface Props {
-  filter: any,
-  filteredEntity: any,
-  weekType: any,
+  filter: FilterType,
+  filteredEntity: { id: ID },
+  weekType: WeekTypeDTO,
 }
 
 function Schedule({filter, filteredEntity, weekType}: Props): JSX.Element {
   const lessonTimes = useSelector(selectLessonTimes);
   const days = useSelector(selectDays);
-  const [lessons, setLessons] = useState<LessonDTO[]>();
+  const lessons = useSelector((state: RootState) =>
+    selectFilteredLessons(state, weekType, filter, filteredEntity)
+  )
 
-  useEffect(() => {
-    (async () => {
-      const ls = await readLessonsWithFilter(filteredEntity.id, filter);
-      setLessons(ls.filter((l) => l.weekType?.id === weekType.id));
-    })();
-
-  }, [filter, filteredEntity, weekType]);
-
+  const title = `${getDisplayName(filter, filteredEntity)} ${getDisplayName('weekType', weekType)}`
 
   return lessonTimes && days && lessons ? (
     <div className='m-5'>
-      <h3 className='text-3xl text-center pb-6 font-bold'>{getDisplayName(filter, filteredEntity)} {getDisplayName('weekType', weekType)}</h3>
+      <h3 className='text-3xl text-center pb-6 font-bold'>{title}</h3>
       <ScheduleGrid lessonTimes={lessonTimes} days={days}>
-        {lessons.filter(lesson => lesson.lessonTime && lesson.day).map((lesson) => (
+        {lessons.filter(hasPositionInSchedule).map((lesson) => (
           <div key={lesson.id}
                style={{gridRowStart: lesson.lessonTime!.id+1, gridColumnStart: lesson.day!.id+1}}
           >

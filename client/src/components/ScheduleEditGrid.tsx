@@ -26,7 +26,7 @@ import Modal from './Modal';
 import { MARKED_AS } from '../common/constants';
 import toast from 'react-hot-toast';
 
-function hasPositionInSchedule(lesson: LessonDTO): boolean {
+export function hasPositionInSchedule(lesson: LessonDTO): boolean {
   return !!(lesson.lessonTime && lesson.day);
 }
 

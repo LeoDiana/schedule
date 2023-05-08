@@ -1,4 +1,4 @@
-import { ApiMethods, EntityApi } from '../api/apiCalls';
+import { ApiMethods, createEntityApi } from '../api/apiCalls';
 import {
   AcademicStatusDTO,
   BuildingDTO,
@@ -15,7 +15,7 @@ import {
 import {
   AllEntitiesNames,
   AllEntities,
-  FieldType,
+  FieldType, EntitiesNamesToTypes,
 } from '../common/types';
 
 export type Fields<T extends AllEntities> = {
@@ -29,7 +29,7 @@ interface EntityRelated<T extends AllEntities> {
 }
 
 const AcademicStatusRelated: EntityRelated<AcademicStatusDTO> = {
-  api: new EntityApi('academicStatus'),
+  api: createEntityApi('academicStatus'),
   fields: {
     name: 'string',
     shortName: 'string',
@@ -41,7 +41,7 @@ const AcademicStatusRelated: EntityRelated<AcademicStatusDTO> = {
 }
 
 const TeacherRelated: EntityRelated<TeacherDTO> = {
-  api: new EntityApi('teacher'),
+  api: createEntityApi<TeacherDTO>('teacher'),
   fields: {
     firstName: 'string',
     surname: 'string',
@@ -57,7 +57,7 @@ const TeacherRelated: EntityRelated<TeacherDTO> = {
 }
 
 const LessonTimeRelated: EntityRelated<LessonTimeDTO> = {
-  api: new EntityApi('lessonTime'),
+  api: createEntityApi('lessonTime'),
   fields: {
     number: 'string',
     timeStart: 'string',
@@ -71,7 +71,7 @@ const LessonTimeRelated: EntityRelated<LessonTimeDTO> = {
 }
 
 const DayRelated: EntityRelated<DayDTO> = {
-  api: new EntityApi('day'),
+  api: createEntityApi('day'),
   fields: {
     name: 'string',
   },
@@ -81,7 +81,7 @@ const DayRelated: EntityRelated<DayDTO> = {
 }
 
 const SubjectRelated: EntityRelated<SubjectDTO> = {
-  api: new EntityApi('subject'),
+  api: createEntityApi('subject'),
   fields: {
     name: 'string',
     shortName: 'string',
@@ -93,7 +93,7 @@ const SubjectRelated: EntityRelated<SubjectDTO> = {
 }
 
 const LessonTypeRelated: EntityRelated<LessonTypeDTO> = {
-  api: new EntityApi('lessonType'),
+  api: createEntityApi('lessonType'),
   fields: {
     name: 'string',
     shortName: 'string',
@@ -105,7 +105,7 @@ const LessonTypeRelated: EntityRelated<LessonTypeDTO> = {
 }
 
 const WeekTypeRelated: EntityRelated<WeekTypeDTO> = {
-  api: new EntityApi('weekType'),
+  api: createEntityApi('weekType'),
   fields: {
     name: 'string',
   },
@@ -115,7 +115,7 @@ const WeekTypeRelated: EntityRelated<WeekTypeDTO> = {
 }
 
 const SubgroupRelated: EntityRelated<SubgroupDTO> = {
-  api: new EntityApi('subgroup'),
+  api: createEntityApi('subgroup'),
   fields: {
     name: 'string',
     studentsNumber: 'number',
@@ -129,7 +129,7 @@ const SubgroupRelated: EntityRelated<SubgroupDTO> = {
 }
 
 const BuildingRelated: EntityRelated<BuildingDTO> = {
-  api: new EntityApi('building'),
+  api: createEntityApi('building'),
   fields: {
     name: 'string',
     address: 'string',
@@ -141,7 +141,7 @@ const BuildingRelated: EntityRelated<BuildingDTO> = {
 }
 
 const ClassroomRelated: EntityRelated<ClassroomDTO> = {
-  api: new EntityApi('classroom'),
+  api: createEntityApi('classroom'),
   fields: {
     number: 'string',
     capacity: 'number',
@@ -155,7 +155,7 @@ const ClassroomRelated: EntityRelated<ClassroomDTO> = {
 }
 
 const LessonRelated: EntityRelated<LessonDTO> = {
-  api: new EntityApi('lesson'),
+  api: createEntityApi('lesson'),
   fields: {
     teacher: 'entity',
     subject: 'entity',
@@ -213,7 +213,7 @@ export const getDisplayName = (entityName: AllEntitiesNames, obj: any): string =
 };
 
 
-export const allEntitiesRelated: { [K in AllEntitiesNames]: any } = {
+export const allEntitiesRelated: { [K in AllEntitiesNames]: EntityRelated<EntitiesNamesToTypes[K]> } = {
   academicStatus: AcademicStatusRelated,
   teacher: TeacherRelated,
   lessonTime: LessonTimeRelated,

@@ -3,7 +3,7 @@ import {
   AllEntities,
   AllEntitiesNames,
 } from '../common/types';
-import { ID, LessonDTO } from '../entities/entitiesDTO';
+import { ID } from '../entities/entitiesDTO';
 
 const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
   academicStatus: 'academic-statuses',
@@ -26,58 +26,48 @@ export type ApiMethods<T extends AllEntities> = {
   readAll: () => Promise<T[]>;
 };
 
-export class EntityApi<T extends AllEntities> implements ApiMethods<T> {
-  private convertEntityNameToEndpoint(name: AllEntitiesNames) {
-    return ENDPOINTS[name];
-  }
 
-  endpoint: string;
+export function createEntityApi<T extends AllEntities>(entityName: AllEntitiesNames): ApiMethods<T> {
+  const endpoint = ENDPOINTS[entityName];
 
-  constructor(name: AllEntitiesNames) {
-    this.endpoint = this.convertEntityNameToEndpoint(name);
-  }
-
-  async create(entity: Omit<T, 'id'>): Promise<any> {
+  async function create(entity: Omit<T, 'id'>): Promise<any> {
     try {
-      return await axios.post(this.endpoint, entity);
+      return await axios.post(endpoint, entity);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async update(entity: T): Promise<any> {
+  async function update(entity: T): Promise<any> {
     try {
-      return await axios.put(`${this.endpoint}/${entity.id}`, entity);
+      return await axios.put(`${endpoint}/${entity.id}`, entity);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async delete(id: ID): Promise<void> {
+  async function remove(id: ID): Promise<void> {
     try {
-      await axios.delete(`${this.endpoint}/${id}`);
+      await axios.delete(`${endpoint}/${id}`);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async readAll(): Promise<T[]> {
+  async function readAll(): Promise<T[]> {
     try {
-      const response = await axios.get(this.endpoint);
+      const response = await axios.get(endpoint);
       return response.data;
     } catch (error) {
       console.log(error);
       return [];
     }
   }
-}
 
-export const readLessonsWithFilter = async (id: number, filter: string): Promise<LessonDTO[]> => {
-  try {
-    const response = await axios.get(`${ENDPOINTS.lesson}/${filter}/${id}`);
-    return (response.data);
-  } catch (error) {
-    console.log(error);
-    return [];
+  return {
+    create,
+    update,
+    delete: remove,
+    readAll
   }
-};
+}

@@ -1,5 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import entitiesReducer from '../features/entities/entitiesSlice';
+import entitiesReducer, { EntitiesInitialState } from '../features/entities/entitiesSlice';
+
+export interface RootState {
+  entities: EntitiesInitialState
+}
 
 export default configureStore({
   reducer: {

@@ -1,7 +1,8 @@
 import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allEntitiesRelated } from '../../entities/entitiesRelated';
-import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes } from '../../common/types';
-import { ID } from '../../entities/entitiesDTO';
+import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes, FilterType } from '../../common/types';
+import { ID, LessonDTO, WeekTypeDTO } from '../../entities/entitiesDTO';
+import { RootState } from '../../app/store';
 
 interface CreatePropsGeneral <T extends AllEntitiesNames> {
   entityName: T,
@@ -20,13 +21,13 @@ interface DeleteProps {
   id: ID
 }
 
-interface InitialState {
+export interface EntitiesInitialState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed',
   error: string | null,
   entities: AllEntitiesItems,
 }
 
-const initialState: InitialState = {
+const initialState: EntitiesInitialState = {
   status: 'idle',
   error: null,
   entities: {
@@ -102,14 +103,22 @@ export const updateEntity = createAsyncThunk<UpdateProps, UpdateProps>(
   });
 
 
-export const selectAllEntities = (state: { entities: InitialState }) => state.entities.entities;
-export const selectDays = (state: { entities: InitialState }) => state.entities.entities.day;
-export const selectLessonTimes = (state: { entities: InitialState }) => state.entities.entities.lessonTime;
-export const selectSubgroup = (state: { entities: InitialState }) => state.entities.entities.subgroup;
-export const selectTeacher = (state: { entities: InitialState }) => state.entities.entities.teacher;
-export const selectWeekType = (state: { entities: InitialState }) => state.entities.entities.weekType;
-// export const selectLessons = (state: { entities: InitialState }) => state.entities.entities.lesson.map(lesson => allEntitiesRelated.lesson.create(lesson as any)) as Lesson[];
+export const selectAllEntities = (state: RootState) => state.entities.entities;
+export const selectDays = (state: RootState) => state.entities.entities.day;
+export const selectLessonTimes = (state: RootState) => state.entities.entities.lessonTime;
+export const selectSubgroup = (state: RootState) => state.entities.entities.subgroup;
+export const selectTeacher = (state: RootState) => state.entities.entities.teacher;
+export const selectWeekType = (state: RootState) => state.entities.entities.weekType;
+export const selectFilteredLessons = (
+  state: RootState,
+  weekType: WeekTypeDTO,
+  filter: FilterType,
+  filteredEntity: { id: ID }
+) => state.entities.entities.lesson
+  .filter((l) => l.weekType?.id === weekType.id
+    && l[filter]?.id === filteredEntity.id) as LessonDTO[];
+export const selectLessons = (state: RootState) => state.entities.entities.lesson;
 
-export const selectStatus = (state: { entities: InitialState }) => state.entities.status;
+export const selectStatus = (state: RootState) => state.entities.status;
 
 export default entitiesSlice.reducer;
