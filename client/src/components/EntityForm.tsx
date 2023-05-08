@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { ENTITY_TITLES } from '../common/constants';
 import {
+  AllEntitiesNames,
   AllEntities,
-  AllEntitiesNames, CreationTypeOf,
-  DtoOfEntity, EmptyEntityOf, EntitiesNamesToTypes,
+  EntitiesNamesToTypes,
 } from '../common/types';
-import { allEntitiesRelated, EntityRelated } from '../entities/entitiesRelated';
+import { allEntitiesRelated, Fields } from '../entities/entitiesRelated';
 import NumberInput from './inputs/NumberInput';
 import TextInput from './inputs/TextInput';
 import DropdownInput from './inputs/DropdownInput';
@@ -22,18 +22,18 @@ import toast from 'react-hot-toast';
 
 interface BaseFormProps<T extends AllEntities> {
   name: AllEntitiesNames
-  fields: EntityRelated<T>['fields'],
+  fields: Fields<T>,
   formType: FormType,
 }
 
 interface UpdateFormProps<T extends AllEntities> extends BaseFormProps<T> {
   apiFunc: UpdateEntityApi,
-  entity: DtoOfEntity<T>,
+  entity: T,
 }
 
 interface CreateFormProps<T extends AllEntities> extends BaseFormProps<T> {
   apiFunc: CreateEntityApi,
-  entity: EmptyEntityOf<T>,
+  entity: Partial<T>,
 }
 
 type FormType = 'update' | 'create';
@@ -51,7 +51,7 @@ function EntityForm<T extends FormType, E extends AllEntities>({
   const dispatch = useDispatch();
   const allEntities = useSelector(selectAllEntities);
 
-  const [values, setValues] = useState<CreationTypeOf<E> | DtoOfEntity<E>>(entity);
+  const [values, setValues] = useState<Partial<E>>(entity);
 
   async function handleSubmit(): Promise<void> {
     dispatch(apiFunc({ entityName: name, entity: values as any }));
@@ -94,19 +94,17 @@ function EntityForm<T extends FormType, E extends AllEntities>({
   };
 
   return (
-    <>
-      <form
-        className='bg-white p-7 w-96 flex flex-col items-center gap-3 rounded-3xl drop-shadow-2xl'>
-        <h6 className='text-2xl font-semibold mb-3'>{ENTITY_TITLES[name]}</h6>
-        {Object.keys(fields).map((fieldName) => renderInput(fieldName))}
-        <button type='button'
-                className='bg-blue-500 rounded-md py-1 mt-2 w-full drop-shadow-sm text-white font-bold text-lg'
-                onClick={handleSubmit}
-        >
-          {formType === 'create' ? 'Створити' : 'Зберегти зміни'}
-        </button>
-      </form>
-    </>
+    <form
+      className='bg-white p-7 w-96 flex flex-col items-center gap-3 rounded-3xl drop-shadow-2xl'>
+      <h6 className='text-2xl font-semibold mb-3'>{ENTITY_TITLES[name]}</h6>
+      {Object.keys(fields).map((fieldName) => renderInput(fieldName))}
+      <button type='button'
+              className='bg-blue-500 rounded-md py-1 mt-2 w-full drop-shadow-sm text-white font-bold text-lg'
+              onClick={handleSubmit}
+      >
+        {formType === 'create' ? 'Створити' : 'Зберегти зміни'}
+      </button>
+    </form>
   );
 }
 
@@ -130,7 +128,7 @@ export function CreateModal({ onClose, entityType, entity }: FormModalProps) {
   );
 }
 
-export function EditModal({onClose, entityType, entity}: FormModalProps) {
+export function EditModal({ onClose, entityType, entity }: FormModalProps) {
   return (
     <Modal close={onClose}>
       <EntityForm<'update', EntitiesNamesToTypes[typeof entityType]>

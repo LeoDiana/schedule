@@ -1,31 +1,33 @@
 import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allEntitiesRelated } from '../../entities/entitiesRelated';
-import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes } from '../../common/types';
-import { Day, Lesson, LessonTime, Subgroup, Teacher, WeekType } from '../../entities/entitiesClasses';
-import { ID } from '../../entities/entitiesDTO';
+import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes, FilterType } from '../../common/types';
+import { ID, LessonDTO, WeekTypeDTO } from '../../entities/entitiesDTO';
+import { RootState } from '../../app/store';
 
-interface CreateProps {
-  entityName: AllEntitiesNames,
-  entity: object
+interface CreatePropsGeneral <T extends AllEntitiesNames> {
+  entityName: T,
+  entity: EntitiesNamesToTypes[T]
 }
+type CreateProps = CreatePropsGeneral <AllEntitiesNames>;
 
-interface UpdateProps {
-  entityName: AllEntitiesNames,
-  entity: { id: ID }
+interface UpdatePropsGeneral<T extends AllEntitiesNames> {
+  entityName: T,
+  entity: EntitiesNamesToTypes[T]
 }
+type UpdateProps = UpdatePropsGeneral<AllEntitiesNames>;
 
 interface DeleteProps {
   entityName: AllEntitiesNames,
   id: ID
 }
 
-interface InitialState {
+export interface EntitiesInitialState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed',
   error: string | null,
   entities: AllEntitiesItems,
 }
 
-const initialState: InitialState = {
+const initialState: EntitiesInitialState = {
   status: 'idle',
   error: null,
   entities: {
@@ -55,13 +57,16 @@ export const entitiesSlice = createSlice({
       state.status = 'loading';
     }).addCase(deleteEntity.fulfilled, (state, action: PayloadAction<DeleteProps>) => {
       const { entityName, id } = action.payload;
-      state.entities[entityName] = state.entities[entityName].filter((item) => item.id !== id);
+      const entityStore: Array<EntitiesNamesToTypes[typeof entityName]> = state.entities[entityName];
+      entityStore.filter((item) => item.id !== id);
     }).addCase(createEntity.fulfilled, (state, action: PayloadAction<CreateProps>) => {
       const { entityName, entity } = action.payload;
-      state.entities[entityName].push(entity as EntitiesNamesToTypes[typeof entityName]);
+      const entityStore: Array<EntitiesNamesToTypes[typeof entityName]> = state.entities[entityName];
+      entityStore.push(entity);
     }).addCase(updateEntity.fulfilled, (state, action: PayloadAction<UpdateProps>) => {
       const { entityName, entity } = action.payload;
-      state.entities[entityName] = state.entities[entityName].map((ent) => ent.id !== entity.id ? ent : entity as EntitiesNamesToTypes[typeof entityName]);
+      const entityStore: Array<EntitiesNamesToTypes[typeof entityName]> = state.entities[entityName];
+      (state.entities[entityName] as Array<EntitiesNamesToTypes[typeof entityName]>) = entityStore.map((ent) => ent.id !== entity.id ? ent : entity);
     });
   },
 });
@@ -98,14 +103,22 @@ export const updateEntity = createAsyncThunk<UpdateProps, UpdateProps>(
   });
 
 
-export const selectAllEntities = (state: { entities: InitialState }) => state.entities.entities;
-export const selectDays = (state: { entities: InitialState }) => state.entities.entities.day.map((day => allEntitiesRelated.day.create(day as any))) as Day[];
-export const selectLessonTimes = (state: { entities: InitialState }) => state.entities.entities.lessonTime.map(lt => allEntitiesRelated.lessonTime.create(lt as any)) as LessonTime[];
-export const selectSubgroup = (state: { entities: InitialState }) => state.entities.entities.subgroup.map(subgroup => allEntitiesRelated.subgroup.create(subgroup as any)) as Subgroup[];
-export const selectTeacher = (state: { entities: InitialState }) => state.entities.entities.teacher.map(teacher => allEntitiesRelated.teacher.create(teacher as any)) as Teacher[];
-export const selectWeekType = (state: { entities: InitialState }) => state.entities.entities.weekType.map(weekType => allEntitiesRelated.weekType.create(weekType as any)) as WeekType[];
-export const selectLessons = (state: { entities: InitialState }) => state.entities.entities.lesson.map(lesson => allEntitiesRelated.lesson.create(lesson as any)) as Lesson[];
+export const selectAllEntities = (state: RootState) => state.entities.entities;
+export const selectDays = (state: RootState) => state.entities.entities.day;
+export const selectLessonTimes = (state: RootState) => state.entities.entities.lessonTime;
+export const selectSubgroup = (state: RootState) => state.entities.entities.subgroup;
+export const selectTeacher = (state: RootState) => state.entities.entities.teacher;
+export const selectWeekType = (state: RootState) => state.entities.entities.weekType;
+export const selectFilteredLessons = (
+  state: RootState,
+  weekType: WeekTypeDTO,
+  filter: FilterType,
+  filteredEntity: { id: ID }
+) => state.entities.entities.lesson
+  .filter((l) => l.weekType?.id === weekType.id
+    && l[filter]?.id === filteredEntity.id) as LessonDTO[];
+export const selectLessons = (state: RootState) => state.entities.entities.lesson;
 
-export const selectStatus = (state: { entities: InitialState } ) => state.entities.status;
+export const selectStatus = (state: RootState) => state.entities.status;
 
 export default entitiesSlice.reducer;

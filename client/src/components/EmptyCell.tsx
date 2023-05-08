@@ -1,10 +1,10 @@
-import { Day, LessonTime } from '../entities/entitiesClasses';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import React from 'react';
+import { DayDTO, LessonTimeDTO } from '../entities/entitiesDTO';
 
 interface EmptyCellProps {
-  lessonTime: LessonTime,
-  day: Day,
+  lessonTime: LessonTimeDTO,
+  day: DayDTO,
   onDrop: () => void,
   onClick: () => void,
 }

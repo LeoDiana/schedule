@@ -17,7 +17,7 @@ export const ENTITY_TITLES: { [K in AllEntitiesNames]: string } = {
 
 export const FIELD_TITLES: { [K in keyof AllFields]: string } = {
   id: '',
-  displayName: 'Відображуване імʼя',
+  // displayName: 'Відображуване імʼя',
   name: 'Назва',
   shortName: 'Скорочена назва',
   firstName: 'Імʼя',
