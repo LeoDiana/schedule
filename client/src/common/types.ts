@@ -39,3 +39,5 @@ export type FilterType = 'subgroup' | 'teacher';
 export interface ObjWithId {
   id: ID;
 }
+
+export type setState<T> = React.Dispatch<React.SetStateAction<T>>

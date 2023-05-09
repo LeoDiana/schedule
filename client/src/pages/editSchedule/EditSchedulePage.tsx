@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { allEntitiesRelated, getDisplayName } from '../../utils/entitiesRelated';
-import { ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { EntitiesNamesToTypes, FilterType } from '../../common/types';
+import { EntitiesNamesToTypes, FilterType, ObjWithId } from '../../common/types';
 import { Filters } from '../../components/filters/Filters';
 import { CreateModal, EditModal } from '../../components/EntityForm';
 import { useModal } from '../../components/modal/useModal';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
-  deleteEntity,
-  selectAllEntities,
   selectDays,
   selectLessonTimes,
-  updateEntity,
 } from '../../store/features/entities/entitiesSlice';
 import EmptyCell from '../../components/EmptyCell';
 import {
@@ -26,22 +22,31 @@ import {
 import { DayDTO, ID, LessonDTO, LessonTimeDTO } from '../../common/entitiesDTO';
 import Modal from '../../components/modal/Modal';
 import { MARKED_AS } from '../../common/constants';
-import toast from 'react-hot-toast';
 import { useFilters } from '../../components/filters/useFilters';
 import { LessonCard } from '../../components/LessonCard';
 import { ScheduleGrid } from '../../components/ScheduleGrid';
 import { Spinner } from '../../components/Spinner';
 import { hasPositionInSchedule } from '../../utils/hasPositionInSchedule';
+import { useEditSchedule } from './useEditSchedule';
+import { DraggableCard } from './components/DraggableCard';
+import { SidePanel } from './components/SidePanel';
 
 function EditSchedulePage(): JSX.Element {
-  const dispatch = useDispatch();
-  const allEntities = useSelector(selectAllEntities);
+  const {
+    allLessons,
+    setAllLessons,
+    selectedLesson,
+    setSelectedLesson,
+    handleDelete,
+    // handleCreate,
+    handleSave,
+    allEntities,
+  } = useEditSchedule();
+
   const lessonTimes = useSelector(selectLessonTimes);
   const days = useSelector(selectDays);
 
   const [draggedLesson, setDraggedLesson] = useState<LessonDTO>();
-
-  const [allLessons, setAllLessons] = useState<LessonDTO[]>([]);
 
   const [scheduleTables, setScheduleTables] = useState<ScheduleTables>();
   const [collisions, setCollisions] = useState<Collisions>();
@@ -52,7 +57,7 @@ function EditSchedulePage(): JSX.Element {
     weekTypes, selectedWeekType, setWeekType,
   } = useFilters();
 
-  const [selectedLesson, setSelectedLesson] = useState<LessonDTO>();
+
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
   const [isConflictedModalOpen, openConflictedModal, closeConflictedModal] = useModal();
@@ -64,10 +69,6 @@ function EditSchedulePage(): JSX.Element {
   const filteredLessons = getFilteredLessons();
 
   useEffect(() => {
-    setAllLessons(allEntities.lesson);
-  }, [allEntities.lesson]);
-
-  useEffect(() => {
     const lessonsInSchedule = allLessons.filter(hasPositionInSchedule) as Required<LessonDTO>[];
     const tables = buildScheduleTables(lessonsInSchedule, weekTypes, days, lessonTimes);
 
@@ -76,7 +77,7 @@ function EditSchedulePage(): JSX.Element {
   }, [allLessons, days, lessonTimes, weekTypes]);
 
 
-  function filterLessonsBy(filter: FilterType, filteredEntity: { id: ID }) {
+  function filterLessonsBy(filter: FilterType, filteredEntity: ObjWithId) {
     return allLessons.filter((lesson) => lesson[filter]?.id === filteredEntity.id);
   }
 
@@ -89,19 +90,10 @@ function EditSchedulePage(): JSX.Element {
   function handleDrop(lessonTime?: LessonTimeDTO | undefined, day?: DayDTO | undefined) {
     if (draggedLesson) {
       const newLesson = { ...draggedLesson, lessonTime, day };
-      setAllLessons((lessons) => {
+      setAllLessons((lessons: LessonDTO[]) => {
         return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
           newLesson];
       });
-    }
-  }
-
-  function handleDelete() {
-    if (selectedLesson) {
-      dispatch(deleteEntity({ entityName: 'lesson', id: selectedLesson.id }));
-      const filtered = allLessons.filter((item) => item.id !== selectedLesson.id);
-      setAllLessons(filtered);
-      setSelectedLesson(undefined);
     }
   }
 
@@ -110,12 +102,16 @@ function EditSchedulePage(): JSX.Element {
     openCreateForm();
   }
 
-  function handleSave() {
-    allLessons.forEach(lesson => dispatch(updateEntity({ entityName: 'lesson', entity: lesson })));
-    toast.success('Збережено');
+  function handleDrag(lesson: LessonDTO) {
+    setDraggedLesson(lesson);
   }
 
-
+  function handleEdit(lesson: LessonDTO) {
+    if (lesson.id === selectedLesson?.id) {
+      openEditForm();
+    }
+    setSelectedLesson(lesson);
+  }
 
   function addEmptyCells() {
     const cells = [];
@@ -138,20 +134,24 @@ function EditSchedulePage(): JSX.Element {
     return cells;
   }
 
-  function addCollisionLine(lesson: Required<LessonDTO>) {
+  function addCollisionLine(lesson: Required<LessonDTO>): JSX.Element {
     if (!scheduleTables) {
-      return null;
+      return <></>;
     }
 
     const conflictedLessons = getCollisions(scheduleTables, selectedType, selectedEntity.id, selectedWeekType.id, lesson.day.id, lesson.lessonTime.id);
-    return (conflictedLessons.length > 1 &&
-      <div className='bg-rose-700 h-full w-2.5 absolute z-2 rounded-l-md'
-           onClick={(e) => {
-             e.stopPropagation();
-             openConflictedModal();
-             setConflictedModalData(conflictedLessons);
-           }}
-      ></div>);
+    if (conflictedLessons.length < 2) {
+      return <></>;
+    }
+    return (
+      <div
+        className='bg-rose-700 h-full w-2.5 absolute z-2 rounded-l-md'
+        onClick={(e) => {
+          e.stopPropagation();
+          openConflictedModal();
+          setConflictedModalData(conflictedLessons);
+        }}
+      />);
   }
 
   function collisionDescription(collision: Collision) {
@@ -238,92 +238,33 @@ function EditSchedulePage(): JSX.Element {
               <>
                 {addEmptyCells()}
                 {
-                  filteredLessons.map((lesson, index) => (
-                    <div key={index}
-                         style={{
-                           gridRowStart: Number(lesson.lessonTime.id) + 1,
-                           gridColumnStart: Number(lesson.day.id) + 1,
-                         }}
-                         draggable
-                         onDragStart={() => {
-                           setDraggedLesson(lesson);
-                         }}
-                         className='relative'
-                         onClick={
-                           () => {
-                             if (lesson.id === selectedLesson?.id) {
-                               openEditForm();
-                             }
-                             setSelectedLesson(lesson);
-                           }
-                         }
-                    >
-                      {addCollisionLine(lesson as Required<LessonDTO>)}
-                      <LessonCard
-                        lesson={lesson}
-                        filterType={selectedType}
-                        isSelected={selectedLesson?.id === lesson.id}
-                      />
-                    </div>
+                  filteredLessons.map((lesson) => (
+                    <DraggableCard
+                      key={lesson.id}
+                      lesson={lesson}
+                      addLine={() => addCollisionLine(lesson as Required<LessonDTO>)}
+                      selectedType={selectedType}
+                      isSelected={selectedLesson?.id === lesson.id}
+                      onDrag={() => handleDrag(lesson)}
+                      onClick={() => handleEdit(lesson)}
+                    />
                   ))
                 }
               </>
             </ScheduleGrid>
           </div>
         </div>
-        <div className='border-blue-300 border-l-4 p-3 flex flex-col gap-2'
-             onDragEnter={(e) => {
-               e.preventDefault();
-             }}
-             onDragOver={(e) => {
-               e.preventDefault();
-             }}
-             onDrop={() => handleDrop()}
-        >
-          <button
-            className='p-2 rounded-lg border-2 border-rose-500 text-rose-500 font-semibold mb-2'
-            onClick={handleDelete}
-          >
-            <TrashIcon className='w-5 inline stroke-2' /> Видалити обране
-          </button>
-          <button
-            className='p-2 rounded-lg border-2 border-green-500 text-green-500 font-semibold mb-2'
-            onClick={handleCreate}
-          >
-            <PlusIcon className='w-5 inline stroke-2' /> Створити
-          </button>
-          <button
-            className='p-2 rounded-lg border-2 border-blue-500 text-blue-500 font-semibold mb-2'
-            onClick={handleSave}
-          >
-            <ArrowDownTrayIcon className='w-5 inline stroke-2' /> Зберегти зміни
-          </button>
-          {
-            (lessonsNotOnSchedule.length ? lessonsNotOnSchedule.map((lesson, index) =>
-              <div
-                draggable
-                key={index}
-                onDragStart={() => {
-                  setDraggedLesson(lesson);
-                }}
-                onClick={
-                  () => {
-                    if (lesson.id === selectedLesson?.id) {
-                      openEditForm();
-                    }
-                    setSelectedLesson(lesson);
-                  }
-                }
-              >
-                <LessonCard
-                  lesson={lesson}
-                  filterType={selectedType}
-                  isSelected={selectedLesson?.id === lesson.id}
-                />
-              </div>,
-            ) : <div className='pt-5 text-center text-gray-400'>Перетягніть заняття сюди</div>)
-          }
-        </div>
+        <SidePanel onDrop={handleDrop} onCreate={handleCreate} onDelete={handleDelete} onSave={handleSave} cards={
+          lessonsNotOnSchedule.map((lesson) => (
+            <DraggableCard
+              key={lesson.id}
+              lesson={lesson}
+              selectedType={selectedType}
+              isSelected={selectedLesson?.id === lesson.id}
+              onDrag={() => handleDrag(lesson)}
+              onClick={() => handleEdit(lesson)}
+            />))
+        } />
       </div>
       <div className='m-8 p-2 border-4 border-blue-300 rounded-xl'>
         <p className='text-md font-semibold'>Суперечності: </p>

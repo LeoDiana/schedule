@@ -18,6 +18,10 @@ interface UpdatePropsGeneral<T extends AllEntitiesNames> {
 
 type UpdateProps = UpdatePropsGeneral<AllEntitiesNames>;
 
+interface SaveAllLessonsProps {
+  lessons: LessonDTO[]
+}
+
 interface DeleteProps {
   entityName: AllEntitiesNames,
   id: ID
@@ -103,6 +107,16 @@ export const updateEntity = createAsyncThunk<UpdateProps, UpdateProps>(
     const result = await allEntitiesRelated[entityName].api.update(entity as any);
     return { entityName, entity: result.data };
   });
+
+export const saveAllLessons = createAsyncThunk<void, SaveAllLessonsProps, any>(
+  'entities/saveAllEntity',
+  async ({ lessons }) => {
+    lessons.forEach(lesson => updateEntity({ entityName: 'lesson', entity: lesson }));
+    // const result = await allEntitiesRelated.lesson.api.update(entity as any);
+    // return { entities: result.data };
+  }
+
+)
 
 
 export const selectAllEntities = (state: RootState) => state.entities.entities;
