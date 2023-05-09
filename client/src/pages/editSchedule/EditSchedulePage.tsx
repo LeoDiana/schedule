@@ -18,7 +18,7 @@ import {
   ScheduleTables,
   tableNameToFilterType,
 } from '../../utils/scheduleLogic';
-import { DayDTO, ID, LessonDTO, LessonTimeDTO, WeekTypeDTO } from '../../common/entitiesDTO';
+import { ID, LessonDTO } from '../../common/entitiesDTO';
 import Modal from '../../components/modal/Modal';
 import { MARKED_AS } from '../../common/constants';
 import { useFilters } from '../../components/filters/useFilters';
@@ -32,20 +32,28 @@ import { SidePanel } from './components/SidePanel';
 import { EmptyCells } from './components/EmptyCells';
 
 function EditSchedulePage(): JSX.Element {
+  const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
+  const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
+
   const {
     allLessons,
-    setAllLessons,
     selectedLesson,
-    setSelectedLesson,
     handleDelete,
     handleSave,
+    handleDrag,
+    handleDrop,
+    handleCreate,
+    handleEdit,
     allEntities,
-  } = useEditSchedule();
+    positionInSchedule,
+  } = useEditSchedule({
+    openEditForm,
+    openCreateForm,
+  });
 
   const lessonTimes = useSelector(selectLessonTimes);
   const days = useSelector(selectDays);
 
-  const [draggedLesson, setDraggedLesson] = useState<LessonDTO>();
 
   const [scheduleTables, setScheduleTables] = useState<ScheduleTables>();
   const [collisions, setCollisions] = useState<Collisions>();
@@ -56,10 +64,6 @@ function EditSchedulePage(): JSX.Element {
     weekTypes, selectedWeekType, setWeekType,
   } = useFilters();
 
-
-  const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
-  const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
-  const [positionInSchedule, setPosition] = useState({});
 
   const [isConflictedModalOpen, openConflictedModal, closeConflictedModal] = useModal();
   const [conflictedModalData, setConflictedModalData] = useState<Required<LessonDTO>[]>();
@@ -84,32 +88,6 @@ function EditSchedulePage(): JSX.Element {
     return filterLessonsBy(selectedType, selectedEntity)
       .filter((l) => l.weekType?.id === selectedWeekType.id)
       .filter(hasPositionInSchedule) as Required<LessonDTO>[];
-  }
-
-  function handleDrop(lessonTime?: LessonTimeDTO, day?: DayDTO) {
-    if (draggedLesson) {
-      const newLesson = { ...draggedLesson, lessonTime, day };
-      setAllLessons((lessons: LessonDTO[]) => {
-        return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
-          newLesson];
-      });
-    }
-  }
-
-  function handleCreate(weekType?: WeekTypeDTO, lessonTime?: LessonTimeDTO, day?: DayDTO) {
-    setPosition({ lessonTime, day, weekType });
-    openCreateForm();
-  }
-
-  function handleDrag(lesson: LessonDTO) {
-    setDraggedLesson(lesson);
-  }
-
-  function handleEdit(lesson: LessonDTO) {
-    if (lesson.id === selectedLesson?.id) {
-      openEditForm();
-    }
-    setSelectedLesson(lesson);
   }
 
 
@@ -195,10 +173,10 @@ function EditSchedulePage(): JSX.Element {
       {isConflictedModalOpen && conflictedModalData &&
         <Modal close={closeConflictedModal}>
           <div className='flex gap-2 flex-col'>
-            {conflictedModalData.map((l: LessonDTO, i: number) => (
+            {conflictedModalData.map((lesson: LessonDTO) => (
               <LessonCard
-                key={i}
-                lesson={l}
+                key={lesson.id}
+                lesson={lesson}
                 filterType={selectedType}
               />
             ))}
@@ -216,20 +194,21 @@ function EditSchedulePage(): JSX.Element {
             <h3 className='text-3xl text-center pb-6 font-bold'>{getDisplayName(selectedType, selectedEntity)}</h3>
             <ScheduleGrid lessonTimes={lessonTimes} days={days}>
               <>
-                <EmptyCells onDrop={handleDrop} onClick={handleCreate.bind(null, selectedWeekType)} />
-                {
-                  filteredLessons.map((lesson) => (
-                    <DraggableCard
-                      key={lesson.id}
-                      lesson={lesson}
-                      addLine={() => addCollisionLine(lesson as Required<LessonDTO>)}
-                      selectedType={selectedType}
-                      isSelected={selectedLesson?.id === lesson.id}
-                      onDrag={() => handleDrag(lesson)}
-                      onClick={() => handleEdit(lesson)}
-                    />
-                  ))
-                }
+                <EmptyCells
+                  onDrop={handleDrop.bind(null, selectedWeekType)}
+                  onClick={handleCreate.bind(null, selectedWeekType)}
+                />
+                {filteredLessons.map((lesson) => (
+                  <DraggableCard
+                    key={lesson.id}
+                    lesson={lesson}
+                    addLine={() => addCollisionLine(lesson as Required<LessonDTO>)}
+                    selectedType={selectedType}
+                    isSelected={selectedLesson?.id === lesson.id}
+                    onDrag={() => handleDrag(lesson)}
+                    onClick={() => handleEdit(lesson)}
+                  />
+                ))}
               </>
             </ScheduleGrid>
           </div>
