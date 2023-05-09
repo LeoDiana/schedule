@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { allEntitiesRelated, getDisplayName } from '../../utils/entitiesRelated';
-import { EntitiesNamesToTypes, FilterType, ObjWithId } from '../../common/types';
+import { EntitiesNamesToTypes } from '../../common/types';
 import { Filters } from '../../components/filters/Filters';
 import { CreateModal, EditModal } from '../../components/EntityForm';
 import { useModal } from '../../components/modal/useModal';
@@ -30,6 +30,7 @@ import { useEditSchedule } from './useEditSchedule';
 import { DraggableCard } from './components/DraggableCard';
 import { SidePanel } from './components/SidePanel';
 import { EmptyCells } from './components/EmptyCells';
+import { isFitFilters } from '../../utils/isFitFilters';
 
 function EditSchedulePage(): JSX.Element {
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
@@ -69,7 +70,9 @@ function EditSchedulePage(): JSX.Element {
   const [conflictedModalData, setConflictedModalData] = useState<Required<LessonDTO>[]>();
 
   const lessonsNotOnSchedule = allLessons.filter((lesson) => !hasPositionInSchedule(lesson));
-  const filteredLessons = getFilteredLessons();
+  const lessonsOnGrid = allLessons
+    .filter(isFitFilters.bind(null, selectedWeekType, selectedType, selectedEntity))
+    .filter(hasPositionInSchedule) as Required<LessonDTO>[];
 
   useEffect(() => {
     const lessonsInSchedule = allLessons.filter(hasPositionInSchedule) as Required<LessonDTO>[];
@@ -78,17 +81,6 @@ function EditSchedulePage(): JSX.Element {
     setScheduleTables(tables);
     setCollisions(buildCollisions(tables));
   }, [allLessons, days, lessonTimes, weekTypes]);
-
-
-  function filterLessonsBy(filter: FilterType, filteredEntity: ObjWithId) {
-    return allLessons.filter((lesson) => lesson[filter]?.id === filteredEntity.id);
-  }
-
-  function getFilteredLessons(): Required<LessonDTO>[] {
-    return filterLessonsBy(selectedType, selectedEntity)
-      .filter((l) => l.weekType?.id === selectedWeekType.id)
-      .filter(hasPositionInSchedule) as Required<LessonDTO>[];
-  }
 
 
   function addCollisionLine(lesson: Required<LessonDTO>): JSX.Element {
@@ -198,7 +190,7 @@ function EditSchedulePage(): JSX.Element {
                   onDrop={handleDrop.bind(null, selectedWeekType)}
                   onClick={handleCreate.bind(null, selectedWeekType)}
                 />
-                {filteredLessons.map((lesson) => (
+                {lessonsOnGrid.map((lesson) => (
                   <DraggableCard
                     key={lesson.id}
                     lesson={lesson}

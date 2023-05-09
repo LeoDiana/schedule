@@ -1,8 +1,9 @@
 import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allEntitiesRelated } from '../../../utils/entitiesRelated';
-import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes, FilterType } from '../../../common/types';
+import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes, FilterType, ObjWithId } from '../../../common/types';
 import { ID, LessonDTO, WeekTypeDTO } from '../../../common/entitiesDTO';
 import { RootState } from '../../app/store';
+import { isFitFilters } from '../../../utils/isFitFilters';
 
 interface CreatePropsGeneral<T extends AllEntitiesNames> {
   entityName: T,
@@ -112,10 +113,7 @@ export const saveAllLessons = createAsyncThunk<void, SaveAllLessonsProps, any>(
   'entities/saveAllEntity',
   async ({ lessons }) => {
     lessons.forEach(lesson => updateEntity({ entityName: 'lesson', entity: lesson }));
-    // const result = await allEntitiesRelated.lesson.api.update(entity as any);
-    // return { entities: result.data };
   }
-
 )
 
 
@@ -129,10 +127,9 @@ export const selectFilteredLessons = (
   state: RootState,
   weekType: WeekTypeDTO,
   filter: FilterType,
-  filteredEntity: { id: ID },
+  filteredEntity: ObjWithId,
 ) => state.entities.entities.lesson
-  .filter((l) => l.weekType?.id === weekType.id
-    && l[filter]?.id === filteredEntity.id) as LessonDTO[];
+  .filter(isFitFilters.bind(null, weekType, filter, filteredEntity)) as LessonDTO[];
 export const selectLessons = (state: RootState) => state.entities.entities.lesson;
 
 export const selectStatus = (state: RootState) => state.entities.status;
