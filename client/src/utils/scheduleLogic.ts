@@ -1,5 +1,5 @@
-import { DayDTO, ID, LessonDTO, LessonTimeDTO, WeekTypeDTO } from '../entities/entitiesDTO';
-import { FilterType } from './types';
+import { DayDTO, ID, LessonDTO, LessonTimeDTO, WeekTypeDTO } from '../common/entitiesDTO';
+import { FilterType } from '../common/types';
 
 type LessonTimeTable = Map<ID, Required<LessonDTO>[]>;
 type DayTable = Map<ID, LessonTimeTable>;

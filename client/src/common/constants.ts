@@ -1,5 +1,5 @@
 import { AllEntitiesNames, AllFields, FilterType } from './types';
-import { CollisionMark } from './scheduleLogic';
+import { CollisionMark } from '../utils/scheduleLogic';
 
 export const ENTITY_TITLES: { [K in AllEntitiesNames]: string } = {
   academicStatus: 'Академічний статус',
@@ -17,7 +17,6 @@ export const ENTITY_TITLES: { [K in AllEntitiesNames]: string } = {
 
 export const FIELD_TITLES: { [K in keyof AllFields]: string } = {
   id: '',
-  // displayName: 'Відображуване імʼя',
   name: 'Назва',
   shortName: 'Скорочена назва',
   firstName: 'Імʼя',

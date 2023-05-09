@@ -11,7 +11,7 @@ import {
   SubjectDTO,
   TeacherDTO,
   WeekTypeDTO,
-} from './entitiesDTO';
+} from '../common/entitiesDTO';
 import {
   AllEntitiesNames,
   AllEntities,

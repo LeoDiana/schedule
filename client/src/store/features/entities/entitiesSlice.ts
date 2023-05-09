@@ -1,7 +1,7 @@
 import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { allEntitiesRelated } from '../../entities/entitiesRelated';
-import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes, FilterType } from '../../common/types';
-import { ID, LessonDTO, WeekTypeDTO } from '../../entities/entitiesDTO';
+import { allEntitiesRelated } from '../../../utils/entitiesRelated';
+import { AllEntitiesItems, AllEntitiesNames, EntitiesNamesToTypes, FilterType } from '../../../common/types';
+import { ID, LessonDTO, WeekTypeDTO } from '../../../common/entitiesDTO';
 import { RootState } from '../../app/store';
 
 interface CreatePropsGeneral<T extends AllEntitiesNames> {

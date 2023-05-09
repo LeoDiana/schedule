@@ -5,7 +5,7 @@ import {
   AllEntities,
   EntitiesNamesToTypes,
 } from '../common/types';
-import { allEntitiesRelated, Fields } from '../entities/entitiesRelated';
+import { allEntitiesRelated, Fields } from '../utils/entitiesRelated';
 import NumberInput from './inputs/NumberInput';
 import TextInput from './inputs/TextInput';
 import DropdownInput from './inputs/DropdownInput';
@@ -16,8 +16,8 @@ import {
   selectAllEntities,
   updateEntity,
   UpdateEntityApi,
-} from '../features/entities/entitiesSlice';
-import Modal from './Modal';
+} from '../store/features/entities/entitiesSlice';
+import Modal from './modal/Modal';
 import toast from 'react-hot-toast';
 
 interface BaseFormProps<T extends AllEntities> {

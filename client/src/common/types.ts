@@ -1,11 +1,11 @@
 import {
   AcademicStatusDTO, BuildingDTO, ClassroomDTO,
-  DayDTO, LessonDTO,
+  DayDTO, ID, LessonDTO,
   LessonTimeDTO,
   LessonTypeDTO, SubgroupDTO,
   SubjectDTO,
   TeacherDTO, WeekTypeDTO,
-} from '../entities/entitiesDTO';
+} from './entitiesDTO';
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
@@ -35,3 +35,7 @@ export type FieldType = 'string' | 'number' | 'entity';
 export type AllEntitiesItems = { [K in AllEntitiesNames]: Array<EntitiesNamesToTypes[K]> };
 
 export type FilterType = 'subgroup' | 'teacher';
+
+export interface ObjWithId {
+  id: ID;
+}

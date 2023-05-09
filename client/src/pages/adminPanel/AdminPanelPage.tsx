@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
-import { ENTITY_TITLES, FIELD_TITLES } from '../common/constants';
+import { allEntitiesRelated, getDisplayName } from '../../utils/entitiesRelated';
+import { ENTITY_TITLES, FIELD_TITLES } from '../../common/constants';
 import {
   AllEntitiesNames, EntitiesNamesToTypes,
-} from '../common/types';
-import { useModal } from '../common/hooks';
-import { CreateModal, EditModal } from '../components/EntityForm';
+} from '../../common/types';
+import { useModal } from '../../components/modal/useModal';
+import { CreateModal, EditModal } from '../../components/EntityForm';
 import {
   deleteEntity,
   selectAllEntities,
-} from '../features/entities/entitiesSlice';
+} from '../../store/features/entities/entitiesSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { ID } from '../entities/entitiesDTO';
+import { ID } from '../../common/entitiesDTO';
 
-function AdminPanel(): JSX.Element {
+function AdminPanelPage(): JSX.Element {
   const dispatch = useDispatch();
   const entities = useSelector(selectAllEntities);
 
@@ -128,4 +128,4 @@ function AdminPanel(): JSX.Element {
   );
 }
 
-export default AdminPanel;
+export default AdminPanelPage;

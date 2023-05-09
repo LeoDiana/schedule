@@ -4,8 +4,8 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
-import store from './app/store';
-import { fetchEntities } from './features/entities/entitiesSlice';
+import store from './store/app/store';
+import { fetchEntities } from './store/features/entities/entitiesSlice';
 import { Toaster } from 'react-hot-toast';
 
 store.dispatch(fetchEntities());

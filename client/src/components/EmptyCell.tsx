@@ -1,18 +1,19 @@
-import { PlusIcon } from '@heroicons/react/24/outline';
 import React from 'react';
-import { DayDTO, LessonTimeDTO } from '../entities/entitiesDTO';
+import { PlusIcon } from '@heroicons/react/24/outline';
+import { DayDTO, LessonTimeDTO } from '../common/entitiesDTO';
+import { inGridPosition } from '../utils/inGridPosition';
 
-interface EmptyCellProps {
+interface Props {
   lessonTime: LessonTimeDTO,
   day: DayDTO,
   onDrop: () => void,
   onClick: () => void,
 }
 
-function EmptyCell({ lessonTime, day, onDrop, onClick }: EmptyCellProps) {
+function EmptyCell({ lessonTime, day, onDrop, onClick }: Props) {
   return (
     <div className='group'
-         style={{ gridRowStart: Number(lessonTime.id) + 1, gridColumnStart: Number(day.id) + 1 }}
+         style={inGridPosition({ lessonTime, day })}
          onDragEnter={(e) => {
            e.preventDefault();
          }}

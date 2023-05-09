@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
-export function useModal(isOpen = false): [boolean, () => void, () => void] {
+type ReturnType = [boolean, () => void, () => void]
+
+export function useModal(isOpen = false): ReturnType {
   const [isModalOpen, setIsModalOpen] = useState(isOpen);
 
   function openModal(): void {

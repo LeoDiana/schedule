@@ -3,7 +3,7 @@ import {
   AllEntities,
   AllEntitiesNames,
 } from '../common/types';
-import { ID } from '../entities/entitiesDTO';
+import { ID } from '../common/entitiesDTO';
 
 const ENDPOINTS: { [K in AllEntitiesNames]: string } = {
   academicStatus: 'academic-statuses',

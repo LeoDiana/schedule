@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FIELD_TITLES } from '../../common/constants';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import { getDisplayName } from '../../entities/entitiesRelated';
+import { getDisplayName } from '../../utils/entitiesRelated';
 import { AllEntitiesNames } from '../../common/types';
 
 interface Props {

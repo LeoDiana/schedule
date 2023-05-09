@@ -1,36 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { allEntitiesRelated, getDisplayName } from '../entities/entitiesRelated';
-import { LessonCard, ScheduleGrid } from '../pages/Schedule';
+import { allEntitiesRelated, getDisplayName } from '../../utils/entitiesRelated';
 import { ArrowDownTrayIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { EntitiesNamesToTypes, FilterType } from '../common/types';
-import { Filters, useFilters } from './Filters';
-import { CreateModal, EditModal } from './EntityForm';
-import { useModal } from '../common/hooks';
+import { EntitiesNamesToTypes, FilterType } from '../../common/types';
+import { Filters } from '../../components/filters/Filters';
+import { CreateModal, EditModal } from '../../components/EntityForm';
+import { useModal } from '../../components/modal/useModal';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   deleteEntity,
   selectAllEntities,
   selectDays,
-  selectLessonTimes, updateEntity,
-} from '../features/entities/entitiesSlice';
-import EmptyCell from './EmptyCell';
+  selectLessonTimes,
+  updateEntity,
+} from '../../store/features/entities/entitiesSlice';
+import EmptyCell from '../../components/EmptyCell';
 import {
   buildCollisions,
-  buildScheduleTables, Collision,
+  buildScheduleTables,
+  Collision,
   Collisions,
   getCollisions,
-  ScheduleTables, tableNameToFilterType,
-} from '../common/scheduleLogic';
-import { ID, LessonDTO } from '../entities/entitiesDTO';
-import Modal from './Modal';
-import { MARKED_AS } from '../common/constants';
+  ScheduleTables,
+  tableNameToFilterType,
+} from '../../utils/scheduleLogic';
+import { DayDTO, ID, LessonDTO, LessonTimeDTO } from '../../common/entitiesDTO';
+import Modal from '../../components/modal/Modal';
+import { MARKED_AS } from '../../common/constants';
 import toast from 'react-hot-toast';
+import { useFilters } from '../../components/filters/useFilters';
+import { LessonCard } from '../../components/LessonCard';
+import { ScheduleGrid } from '../../components/ScheduleGrid';
+import { Spinner } from '../../components/Spinner';
+import { hasPositionInSchedule } from '../../utils/hasPositionInSchedule';
 
-export function hasPositionInSchedule(lesson: LessonDTO): boolean {
-  return !!(lesson.lessonTime && lesson.day);
-}
-
-function ScheduleEditGrid(): JSX.Element {
+function EditSchedulePage(): JSX.Element {
   const dispatch = useDispatch();
   const allEntities = useSelector(selectAllEntities);
   const lessonTimes = useSelector(selectLessonTimes);
@@ -43,10 +46,11 @@ function ScheduleEditGrid(): JSX.Element {
   const [scheduleTables, setScheduleTables] = useState<ScheduleTables>();
   const [collisions, setCollisions] = useState<Collisions>();
 
-  const [types, selectedType, setType,
+  const {
+    types, selectedType, setType,
     entities, selectedEntity, setEntity,
     weekTypes, selectedWeekType, setWeekType,
-  ] = useFilters();
+  } = useFilters();
 
   const [selectedLesson, setSelectedLesson] = useState<LessonDTO>();
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
@@ -60,15 +64,8 @@ function ScheduleEditGrid(): JSX.Element {
   const filteredLessons = getFilteredLessons();
 
   useEffect(() => {
-    const allLessons = allEntities.lesson;
-    const lessonsInSchedule = allLessons.filter(hasPositionInSchedule) as Required<LessonDTO>[];
-
-    const tables = buildScheduleTables(lessonsInSchedule, weekTypes, days, lessonTimes);
-
-    setAllLessons(allLessons);
-    setScheduleTables(tables);
-    setCollisions(buildCollisions(tables));
-  }, []);
+    setAllLessons(allEntities.lesson);
+  }, [allEntities.lesson]);
 
   useEffect(() => {
     const lessonsInSchedule = allLessons.filter(hasPositionInSchedule) as Required<LessonDTO>[];
@@ -76,7 +73,7 @@ function ScheduleEditGrid(): JSX.Element {
 
     setScheduleTables(tables);
     setCollisions(buildCollisions(tables));
-  }, [allLessons]);
+  }, [allLessons, days, lessonTimes, weekTypes]);
 
 
   function filterLessonsBy(filter: FilterType, filteredEntity: { id: ID }) {
@@ -89,6 +86,37 @@ function ScheduleEditGrid(): JSX.Element {
       .filter(hasPositionInSchedule) as Required<LessonDTO>[];
   }
 
+  function handleDrop(lessonTime?: LessonTimeDTO | undefined, day?: DayDTO | undefined) {
+    if (draggedLesson) {
+      const newLesson = { ...draggedLesson, lessonTime, day };
+      setAllLessons((lessons) => {
+        return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
+          newLesson];
+      });
+    }
+  }
+
+  function handleDelete() {
+    if (selectedLesson) {
+      dispatch(deleteEntity({ entityName: 'lesson', id: selectedLesson.id }));
+      const filtered = allLessons.filter((item) => item.id !== selectedLesson.id);
+      setAllLessons(filtered);
+      setSelectedLesson(undefined);
+    }
+  }
+
+  function handleCreate() {
+    setPosition({});
+    openCreateForm();
+  }
+
+  function handleSave() {
+    allLessons.forEach(lesson => dispatch(updateEntity({ entityName: 'lesson', entity: lesson })));
+    toast.success('Збережено');
+  }
+
+
+
   function addEmptyCells() {
     const cells = [];
     for (const day of days) {
@@ -98,15 +126,7 @@ function ScheduleEditGrid(): JSX.Element {
             key={`${day.id}-${lessonTime.id}`}
             day={day}
             lessonTime={lessonTime}
-            onDrop={() => {
-              if (draggedLesson) {
-                const newLesson = { ...draggedLesson, lessonTime: lessonTime, day: day };
-                setAllLessons((lessons) => {
-                  return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
-                    newLesson];
-                });
-              }
-            }}
+            onDrop={() => handleDrop(lessonTime, day)}
             onClick={() => {
               setPosition({ lessonTime: lessonTime, day: day, weekType: selectedWeekType });
               openCreateForm();
@@ -136,7 +156,7 @@ function ScheduleEditGrid(): JSX.Element {
 
   function collisionDescription(collision: Collision) {
     const markedAs = collision.markedAs;
-    const weekType = weekTypes.find(w => w.id === collision.filter.weekType).name;
+    const weekType = weekTypes.find(w => w.id === collision.filter.weekType)?.name;
     const day = days.find(d => d.id === collision.filter.day)?.name;
     const lessonTime = getDisplayName('lessonTime', lessonTimes.find(lt => lt.id === collision.filter.lessonTime));
 
@@ -148,8 +168,13 @@ function ScheduleEditGrid(): JSX.Element {
 
     function handleClick() {
       setType(type);
-      setEntity(item);
-      setWeekType(week);
+      if (item) {
+        setEntity(item);
+      }
+      if (week) {
+        setWeekType(week);
+      }
+
       window.scrollTo({ top: 0 });
     }
 
@@ -163,8 +188,10 @@ function ScheduleEditGrid(): JSX.Element {
     );
   }
 
-  if (!(lessonTimes && days && allLessons)) {
-    return <div>Loading...</div>;
+  const isLoading = !(lessonTimes && days && allLessons);
+
+  if (isLoading) {
+    return <Spinner />;
   }
 
   return (
@@ -251,44 +278,23 @@ function ScheduleEditGrid(): JSX.Element {
              onDragOver={(e) => {
                e.preventDefault();
              }}
-             onDrop={() => {
-               if (draggedLesson) {
-                 const newLesson = { ...draggedLesson, lessonTime: undefined, day: undefined };
-                 setAllLessons((lessons) => {
-                   return [...lessons.filter(lesson => lesson.id !== draggedLesson.id),
-                     newLesson];
-                 });
-               }
-             }}
+             onDrop={() => handleDrop()}
         >
           <button
             className='p-2 rounded-lg border-2 border-rose-500 text-rose-500 font-semibold mb-2'
-            onClick={async () => {
-              if (selectedLesson) {
-                dispatch(deleteEntity({ entityName: 'lesson', id: selectedLesson.id }));
-                const filtered = allLessons.filter((item) => item.id !== selectedLesson.id);
-                setAllLessons(filtered);
-                setSelectedLesson(undefined);
-              }
-            }}
+            onClick={handleDelete}
           >
             <TrashIcon className='w-5 inline stroke-2' /> Видалити обране
           </button>
           <button
             className='p-2 rounded-lg border-2 border-green-500 text-green-500 font-semibold mb-2'
-            onClick={() => {
-              setPosition({});
-              openCreateForm();
-            }}
+            onClick={handleCreate}
           >
             <PlusIcon className='w-5 inline stroke-2' /> Створити
           </button>
           <button
             className='p-2 rounded-lg border-2 border-blue-500 text-blue-500 font-semibold mb-2'
-            onClick={() => {
-              allLessons.forEach(lesson => dispatch(updateEntity({ entityName: 'lesson', entity: lesson })));
-              toast.success('Збережено');
-            }}
+            onClick={handleSave}
           >
             <ArrowDownTrayIcon className='w-5 inline stroke-2' /> Зберегти зміни
           </button>
@@ -331,4 +337,4 @@ function ScheduleEditGrid(): JSX.Element {
   );
 }
 
-export default ScheduleEditGrid;
+export default EditSchedulePage;
