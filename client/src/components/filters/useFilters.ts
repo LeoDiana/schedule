@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { FILTERS } from '../../common/constants';
 import { WeekTypeDTO } from '../../common/entitiesDTO';
 
-export interface UseFiltersReturn {
+interface Return {
   types: FilterType[],
   selectedType: FilterType,
   setType: (type: FilterType) => void,
@@ -15,9 +15,10 @@ export interface UseFiltersReturn {
   weekTypes: WeekTypeDTO[],
   selectedWeekType: WeekTypeDTO,
   setWeekType: (item: WeekTypeDTO) => void,
+  setFilters: (type: FilterType, item: ObjWithId, week: WeekTypeDTO) => void
 }
 
-export function useFilters(): UseFiltersReturn {
+export function useFilters(): Return {
   const allEntities = useSelector(selectAllEntities);
 
   const [typeFilter, setTypeFilter] = useState<FilterType>(FILTERS[0]);
@@ -29,18 +30,25 @@ export function useFilters(): UseFiltersReturn {
     setSelectedWeekType(allEntities.weekType[0]);
   }, [allEntities, typeFilter]);
 
-  const handleTypeChange = (filter: FilterType) => {
+  function handleTypeChange(filter: FilterType) {
     setTypeFilter(filter);
     setSelectedEntity(allEntities[filter][0]);
-  };
+  }
 
-  const handleEntityChange = (item: ObjWithId) => {
+  function handleEntityChange(item: ObjWithId) {
     setSelectedEntity(item);
-  };
+  }
 
-  const handleWeekTypeChange = (item: WeekTypeDTO) => {
+  function handleWeekTypeChange(item: WeekTypeDTO) {
     setSelectedWeekType(item);
-  };
+  }
+
+  function setFilters(type: FilterType, item: ObjWithId, week: WeekTypeDTO) {
+    handleTypeChange(type);
+    handleEntityChange(item);
+    handleWeekTypeChange(week);
+    window.scrollTo({ top: 0 });
+  }
 
   return {
     types: FILTERS,
@@ -52,5 +60,6 @@ export function useFilters(): UseFiltersReturn {
     weekTypes: allEntities.weekType,
     selectedWeekType,
     setWeekType: handleWeekTypeChange,
+    setFilters,
   };
 }

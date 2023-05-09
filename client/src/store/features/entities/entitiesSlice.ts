@@ -120,9 +120,9 @@ export const saveAllLessons = createAsyncThunk<void, SaveAllLessonsProps, any>(
 export const selectAllEntities = (state: RootState) => state.entities.entities;
 export const selectDays = (state: RootState) => state.entities.entities.day;
 export const selectLessonTimes = (state: RootState) => state.entities.entities.lessonTime;
-export const selectSubgroup = (state: RootState) => state.entities.entities.subgroup;
-export const selectTeacher = (state: RootState) => state.entities.entities.teacher;
-export const selectWeekType = (state: RootState) => state.entities.entities.weekType;
+export const selectSubgroups = (state: RootState) => state.entities.entities.subgroup;
+export const selectTeachers = (state: RootState) => state.entities.entities.teacher;
+export const selectWeekTypes = (state: RootState) => state.entities.entities.weekType;
 export const selectFilteredLessons = (
   state: RootState,
   weekType: WeekTypeDTO,

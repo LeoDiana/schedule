@@ -1,14 +1,16 @@
 import React from 'react';
-import { DayDTO, LessonTimeDTO } from '../common/entitiesDTO';
 import { inGridPosition } from '../utils/inGridPosition';
+import { useSelector } from 'react-redux';
+import { selectDays, selectLessonTimes } from '../store/features/entities/entitiesSlice';
 
 interface Props {
-  lessonTimes: LessonTimeDTO[],
-  days: DayDTO[],
   children: JSX.Element | JSX.Element[],
 }
 
-export function ScheduleGrid({ lessonTimes, days, children }: Props) {
+export function ScheduleGrid({ children }: Props) {
+  const lessonTimes = useSelector(selectLessonTimes);
+  const days = useSelector(selectDays);
+
   return (
     <div className='grid grid-cols-6 grid-rows-8 gap-2'>
       {lessonTimes.map((lessonTime) => (

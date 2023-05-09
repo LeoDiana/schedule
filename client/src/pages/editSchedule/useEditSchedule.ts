@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { DayDTO, LessonDTO, LessonTimeDTO, WeekTypeDTO } from '../../common/entitiesDTO';
-import { AllEntitiesItems } from '../../common/types';
 
 interface Props {
   openCreateForm: () => void,
@@ -14,7 +13,7 @@ interface Props {
 }
 
 interface Return {
-  allLessons: LessonDTO[],
+  lessons: LessonDTO[],
   selectedLesson: LessonDTO | undefined,
   handleDelete: () => void,
   handleSave: () => void,
@@ -22,7 +21,6 @@ interface Return {
   handleDrop: (weekType?: WeekTypeDTO, lessonTime?: LessonTimeDTO, day?: DayDTO) => void,
   handleCreate: (weekType?: WeekTypeDTO, lessonTime?: LessonTimeDTO, day?: DayDTO) => void,
   handleEdit: (lesson: LessonDTO) => void,
-  allEntities: AllEntitiesItems,
   positionInSchedule: {weekType?: WeekTypeDTO, lessonTime?: LessonTimeDTO, day?: DayDTO};
 }
 
@@ -81,7 +79,7 @@ export function useEditSchedule({openCreateForm, openEditForm}: Props): Return {
 
 
   return {
-    allLessons,
+    lessons: allLessons,
     selectedLesson,
     handleDelete,
     handleSave,
@@ -89,7 +87,6 @@ export function useEditSchedule({openCreateForm, openEditForm}: Props): Return {
     handleDrop,
     handleCreate,
     handleEdit,
-    allEntities,
     positionInSchedule
   }
 }
