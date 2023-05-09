@@ -14,7 +14,6 @@ interface Return {
   selectedLesson: LessonDTO | undefined,
   setSelectedLesson: setState<LessonDTO | undefined>
   handleDelete: () => void,
-  // handleCreate: () => void,
   handleSave: () => void,
   allEntities: AllEntitiesItems,
 }
@@ -51,7 +50,6 @@ export function useEditSchedule(): Return {
     selectedLesson,
     setSelectedLesson,
     handleDelete,
-    // handleCreate,
     handleSave,
     allEntities,
   }

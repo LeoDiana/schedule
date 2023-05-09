@@ -9,7 +9,6 @@ import {
   selectDays,
   selectLessonTimes,
 } from '../../store/features/entities/entitiesSlice';
-import EmptyCell from '../../components/EmptyCell';
 import {
   buildCollisions,
   buildScheduleTables,
@@ -19,7 +18,7 @@ import {
   ScheduleTables,
   tableNameToFilterType,
 } from '../../utils/scheduleLogic';
-import { DayDTO, ID, LessonDTO, LessonTimeDTO } from '../../common/entitiesDTO';
+import { DayDTO, ID, LessonDTO, LessonTimeDTO, WeekTypeDTO } from '../../common/entitiesDTO';
 import Modal from '../../components/modal/Modal';
 import { MARKED_AS } from '../../common/constants';
 import { useFilters } from '../../components/filters/useFilters';
@@ -30,6 +29,7 @@ import { hasPositionInSchedule } from '../../utils/hasPositionInSchedule';
 import { useEditSchedule } from './useEditSchedule';
 import { DraggableCard } from './components/DraggableCard';
 import { SidePanel } from './components/SidePanel';
+import { EmptyCells } from './components/EmptyCells';
 
 function EditSchedulePage(): JSX.Element {
   const {
@@ -38,7 +38,6 @@ function EditSchedulePage(): JSX.Element {
     selectedLesson,
     setSelectedLesson,
     handleDelete,
-    // handleCreate,
     handleSave,
     allEntities,
   } = useEditSchedule();
@@ -60,9 +59,9 @@ function EditSchedulePage(): JSX.Element {
 
   const [isEditFormOpen, openEditForm, closeEditForm] = useModal();
   const [isCreateFormOpen, openCreateForm, closeCreateForm] = useModal();
-  const [isConflictedModalOpen, openConflictedModal, closeConflictedModal] = useModal();
   const [positionInSchedule, setPosition] = useState({});
 
+  const [isConflictedModalOpen, openConflictedModal, closeConflictedModal] = useModal();
   const [conflictedModalData, setConflictedModalData] = useState<Required<LessonDTO>[]>();
 
   const lessonsNotOnSchedule = allLessons.filter((lesson) => !hasPositionInSchedule(lesson));
@@ -87,7 +86,7 @@ function EditSchedulePage(): JSX.Element {
       .filter(hasPositionInSchedule) as Required<LessonDTO>[];
   }
 
-  function handleDrop(lessonTime?: LessonTimeDTO | undefined, day?: DayDTO | undefined) {
+  function handleDrop(lessonTime?: LessonTimeDTO, day?: DayDTO) {
     if (draggedLesson) {
       const newLesson = { ...draggedLesson, lessonTime, day };
       setAllLessons((lessons: LessonDTO[]) => {
@@ -97,8 +96,8 @@ function EditSchedulePage(): JSX.Element {
     }
   }
 
-  function handleCreate() {
-    setPosition({});
+  function handleCreate(weekType?: WeekTypeDTO, lessonTime?: LessonTimeDTO, day?: DayDTO) {
+    setPosition({ lessonTime, day, weekType });
     openCreateForm();
   }
 
@@ -113,26 +112,6 @@ function EditSchedulePage(): JSX.Element {
     setSelectedLesson(lesson);
   }
 
-  function addEmptyCells() {
-    const cells = [];
-    for (const day of days) {
-      for (const lessonTime of lessonTimes) {
-        cells.push(
-          <EmptyCell
-            key={`${day.id}-${lessonTime.id}`}
-            day={day}
-            lessonTime={lessonTime}
-            onDrop={() => handleDrop(lessonTime, day)}
-            onClick={() => {
-              setPosition({ lessonTime: lessonTime, day: day, weekType: selectedWeekType });
-              openCreateForm();
-            }}
-          />,
-        );
-      }
-    }
-    return cells;
-  }
 
   function addCollisionLine(lesson: Required<LessonDTO>): JSX.Element {
     if (!scheduleTables) {
@@ -202,7 +181,8 @@ function EditSchedulePage(): JSX.Element {
           entityType='lesson'
           entity={{
             ...allEntitiesRelated.lesson.createEmpty(),
-            [selectedType]: selectedEntity, ...positionInSchedule,
+            [selectedType]: selectedEntity,
+            ...positionInSchedule,
           }} />
       }
       {selectedLesson && isEditFormOpen &&
@@ -236,7 +216,7 @@ function EditSchedulePage(): JSX.Element {
             <h3 className='text-3xl text-center pb-6 font-bold'>{getDisplayName(selectedType, selectedEntity)}</h3>
             <ScheduleGrid lessonTimes={lessonTimes} days={days}>
               <>
-                {addEmptyCells()}
+                <EmptyCells onDrop={handleDrop} onClick={handleCreate.bind(null, selectedWeekType)} />
                 {
                   filteredLessons.map((lesson) => (
                     <DraggableCard
@@ -254,17 +234,22 @@ function EditSchedulePage(): JSX.Element {
             </ScheduleGrid>
           </div>
         </div>
-        <SidePanel onDrop={handleDrop} onCreate={handleCreate} onDelete={handleDelete} onSave={handleSave} cards={
-          lessonsNotOnSchedule.map((lesson) => (
-            <DraggableCard
-              key={lesson.id}
-              lesson={lesson}
-              selectedType={selectedType}
-              isSelected={selectedLesson?.id === lesson.id}
-              onDrag={() => handleDrag(lesson)}
-              onClick={() => handleEdit(lesson)}
-            />))
-        } />
+        <SidePanel
+          onDrop={handleDrop}
+          onCreate={() => handleCreate()}
+          onDelete={handleDelete}
+          onSave={handleSave}
+          cards={
+            lessonsNotOnSchedule.map((lesson) => (
+              <DraggableCard
+                key={lesson.id}
+                lesson={lesson}
+                selectedType={selectedType}
+                isSelected={selectedLesson?.id === lesson.id}
+                onDrag={() => handleDrag(lesson)}
+                onClick={() => handleEdit(lesson)}
+              />))
+          } />
       </div>
       <div className='m-8 p-2 border-4 border-blue-300 rounded-xl'>
         <p className='text-md font-semibold'>Суперечності: </p>
