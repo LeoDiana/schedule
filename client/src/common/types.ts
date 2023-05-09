@@ -34,7 +34,7 @@ export type FieldType = 'string' | 'number' | 'entity';
 
 export type AllEntitiesItems = { [K in AllEntitiesNames]: Array<EntitiesNamesToTypes[K]> };
 
-export type FilterType = 'subgroup' | 'teacher';
+export type FilterType = 'subgroup' | 'teacher' | 'classroom';
 
 export interface ObjWithId {
   id: ID;
